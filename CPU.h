@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-//This file maps all instructions, paarmeters, registers and jump conditions. It also defines the Operation struct that will store the instruction + parameters in a way that is easier to use in order to process.
+//This file maps all instructions, parmeters, registers and jump conditions. It also defines the Operation struct that will store the instruction + parameters in a way that is easier to use in order to process.
 namespace CPU{
     enum class INSTRUCTION{
         NOP, LD, INC, DEC, RLCA, ADD, RRCA, STOP, RLA, JR, RRA, CPL, SCF, DAA, CCF, HALT, SUB, ADC, SBC, AND, XOR, OR, CP, RET, POP, JP, PUSH, RST, CB, CALL, RETI, LDH, DI, EI,
