@@ -2,10 +2,6 @@
 #include <fstream>
 #include <iomanip>
 
-#include "stringify.h"
-#include "tracer.h"
-
-using namespace Disassembly;
 
 int loadFileTo(std::string filename, char** data)
 {
@@ -28,7 +24,7 @@ int loadFileTo(std::string filename, char** data)
 
 //This can be heavily improved, as of now this is a simple code to initialize what is needed and generate the disassembly
 int main(int argc, char** argv){
-    if(argc != 2)
+    /*if(argc != 2)
         return 1;
 
     std::string filename = argv[1];
@@ -59,7 +55,7 @@ int main(int argc, char** argv){
     }
 
     delete[] data;
-    
+    */
     return 0;
 }
 
