@@ -62,6 +62,7 @@ endif()
 
 # define the list of search paths for headers and libraries
 set(FIND_SFML_PATHS
+    ${SFML_WINDOWS_ROOT}
     ${SFML_ROOT}
     $ENV{SFML_ROOT}
     ~/Library/Frameworks

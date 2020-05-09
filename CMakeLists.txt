@@ -7,6 +7,7 @@ endif ()
 
 # Set Modules Dir
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+set(SFML_WINDOWS_ROOT "D:/Developer/SFML-2.1")
 
 # Find source files
 file(GLOB SOURCES *.cpp)
