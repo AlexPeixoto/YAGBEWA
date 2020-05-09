@@ -7,7 +7,7 @@
 #include "CPU.h"
 
 namespace CPU{
-//As of now, this class simulates the decofing step
+//As of now, this class simulates the decoding step
 //This class implements the logic to process the opcode, and retrieve the necessary parameters for the opcode (if any).
 //This is an initial work for a GB Emulator and an experimentation.
 class Decoder
