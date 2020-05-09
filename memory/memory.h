@@ -1,6 +1,7 @@
 #include <array>
 
 namespace Memory{
+	using MemoryArray = std::array<uint8_t, 0xFFF>;
     struct Segment{
         uint16_t position;
         uint16_t size;
@@ -8,7 +9,7 @@ namespace Memory{
     //The whole memory map (As of now) is here
     class Map{
         private:
-            std::array<uint8_t, 0xFFFF> memory;
+			MemoryArray memory;
             
             //MemorySegments
             const Segment romBank0{0x0000, 0x3999};

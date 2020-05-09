@@ -15,7 +15,8 @@ file(GLOB SOURCES *.cpp)
 # Include header files
 include_directories(.)
 include_directories(debug)
-include_directories(memory)
+
+include_directories(Memory)
 
 include_directories(CPU)
 include_directories(PPU)

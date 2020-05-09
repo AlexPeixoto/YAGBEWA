@@ -3,8 +3,10 @@
 #include <iomanip>
 #include <string>
 
+//#include <Memory/Cartridge/RomLoader.h>
 
-int loadFileTo(std::string filename, char** data)
+
+std::size_t loadFileTo(std::string filename, char** data)
 {
     //Assumes that the first parameter is the name of the file
     std::cout << "File opened:" << filename << std::endl;
@@ -25,38 +27,23 @@ int loadFileTo(std::string filename, char** data)
 
 //This can be heavily improved, as of now this is a simple code to initialize what is needed and generate the disassembly
 int main(int argc, char** argv){
-    /*if(argc != 2)
+    if(argc != 2)
         return 1;
 
     std::string filename = argv[1];
     char* data;
     size_t fileSize = loadFileTo(filename, &data);
 
-    if(!fileSize)
+	if(!fileSize)
         return 2;
 
     unsigned char* begin = reinterpret_cast<unsigned char*>(data);
-    //Generate header
-    Memory::Cartridge::Header header(begin);
-    std::cout << Disassembly::Stringify::headerToString(header) << std::endl;
-
-    if(header.getCartridgeType().mbc != Memory::Cartridge::MBC::NONE){
-        std::cerr << "Only roms without memory controller are supported!";
-    }
-
-    Tracer tracer;
-    tracer.decodeTracing(begin, fileSize);
-    auto operationList = tracer.getOperationList();
-
-    for(int addr=0; addr<operationList.size(); ++addr){
-        if(operationList[addr].first){
-            std::cout << "0x" << std::setfill('0') << std::setw(2) << std::hex << (addr) << "  ";
-            std::cout << Disassembly::Stringify::operationToString(operationList[addr].second) << std::endl;
-        }
-    }
-
-    delete[] data;
-    */
+    //Load cartridge header
+    //Memory::Cartridge::RomLoader loader(begin);
+	//loader.load()
+	//TODO: Have to load the first and second bank of the cartridge into memory.
+	
+    
     return 0;
 }
 
