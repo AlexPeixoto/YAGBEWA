@@ -1,5 +1,5 @@
 #include <header.h>
-#include <Memory/memory.h>
+#include <Memory/MemoryMap.h>
 
 namespace Memory {
 	namespace Cartridge {
@@ -11,7 +11,7 @@ namespace Memory {
 			virtual ~ControllerBase();
 
 			virtual void loadCartridge();
-			virtual void executeBankSwitch(uint8_t bank);
+			virtual void executeBankSwitch(uint16_t bank);
 		};
 	}
 }

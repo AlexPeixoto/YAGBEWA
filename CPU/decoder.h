@@ -4,7 +4,7 @@
 #include <functional>
 #include <string>
 
-#include "CPU.h"
+#include <CPU.h>
 
 namespace CPU{
 //As of now, this class simulates the decoding step

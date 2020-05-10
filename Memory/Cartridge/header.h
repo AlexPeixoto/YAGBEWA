@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include <cartridgeType.h>
+#include <CartridgeType.h>
 
 namespace Memory::Cartridge{
     enum class GB_TYPE{
