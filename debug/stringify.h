@@ -2,8 +2,8 @@
 
 #include <string>
 #include <vector>
-#include "CPU.h"
-#include "header.h"
+#include <CPU.h>
+#include <Header.h>
 
 namespace Disassembly{
 class Stringify{

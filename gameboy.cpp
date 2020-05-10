@@ -43,7 +43,8 @@ int main(int argc, char** argv){
 	//loader.load()
 	//TODO: Have to load the first and second bank of the cartridge into memory.
 	
-    
+    //TODO: Memory writes MIGHT work as an interrution.
+	//Example is when writting between 2000 - 3FFFF to switch the cartridge bank
     return 0;
 }
 
