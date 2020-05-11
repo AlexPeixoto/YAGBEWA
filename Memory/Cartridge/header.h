@@ -22,13 +22,14 @@ namespace Memory::Cartridge{
     class Header{
         private:
             //START OF EACH SECTION
-            const uint16_t TITLE_START = 0x134;
-            const uint16_t TYPE_START = 0x143;
-            const uint16_t FUNCTIONS_START = 0x146;
-            const uint16_t CARTRIDGE_TYPE_START = 0x147;
-            const uint16_t ROM_BANK_COUNT_START = 0x148;
-            const uint16_t RAM_BANK_COUNT_START = 0x149;
-            const uint16_t DESTINATION_CODE_START = 0x14A;
+            const static uint16_t TITLE_START = 0x134;
+            const static uint16_t TYPE_START = 0x143;
+            const static uint16_t FUNCTIONS_START = 0x146;
+            const static uint16_t CARTRIDGE_TYPE_START = 0x147;
+            const static uint16_t ROM_BANK_COUNT_START = 0x148;
+            const static uint16_t RAM_BANK_COUNT_START = 0x149;
+            const static uint16_t DESTINATION_CODE_START = 0x14A;
+			const static uint16_t TOTAL_BYTES = DESTINATION_CODE_START - TITLE_START;
             //END
                 
             unsigned char* ptr;
@@ -53,11 +54,14 @@ namespace Memory::Cartridge{
             void setRamBankCount();
             void setDestination();
         public:
-            Header(unsigned char* ptr){
-                this->ptr = ptr;
-                romName[0]='\0';
-                processHeader();
-            }
+			Header() {};
+			Header(unsigned char* ptr) : loadData(ptr) {};
+                
+			void loadData(unsigned char* ptr) {
+				this->ptr = ptr;
+				romName[0] = '\0';
+				processHeader();
+			}
 
             const char* getRomName();
             uint8_t getRomBankCount();
@@ -66,6 +70,10 @@ namespace Memory::Cartridge{
             GB_FUNCTIONS getFunction();
             GB_TYPE getType();
             CartridgeType& getCartridgeType();
+
+			constexpr static uint16_t getHeaderStartAddress() { return TITLE_START; }
+			constexpr static uint16_t getTotalHeaderSize() { return TOTAL_BYTES; }
+
         
     };
 }
