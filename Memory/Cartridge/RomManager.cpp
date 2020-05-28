@@ -1,8 +1,8 @@
-#include <RomManager.h>
+#include <Memory/Cartridge/RomManager.h>
 
 #include <exception>
-using namespace Memory::Cartridge::RomManager;
-using namespace Memory::Cartridge::MBC;
+#include <fstream>
+using namespace Memory::Cartridge;
 
 RomManager::RomManager(std::string fileName) {
 	this->loadCartridge();
@@ -14,7 +14,7 @@ void RomManager::loadCartridge() {
 	//std::cout << "File opened:" << filename << std::endl;
 	std::ifstream file(this->fileName, std::ios::in | std::ios::binary | std::ios::ate);
 	if (!file.good()) {
-		throw std::runtime_error("Failed to open the file: " << filename);
+		throw std::runtime_error("Failed to open the file: " + fileName);
 	}
 
 	//All the cartridge data is stored on a file
@@ -25,7 +25,7 @@ void RomManager::loadCartridge() {
 
 	//Go to the start of the rom file and read its content
 	file.seekg(0, std::ios::beg);
-	file.read(*data, fileSize);//copy file into memory
+	file.read(data, fileSize);//copy file into memory
 
 	//Get an unsigned char* from the char* (required by file.read).
 	//Then uses that to load the header.
@@ -33,6 +33,6 @@ void RomManager::loadCartridge() {
 	header.loadData(cartridgeBeginPtr);
 }
 
-void RomManager::initController(const Cartridge::MBC &controllerType) {
+void RomManager::initController(const MBC &controllerType) {
 	
 }

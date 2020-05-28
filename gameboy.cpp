@@ -2,8 +2,9 @@
 #include <fstream>
 #include <iomanip>
 #include <string>
+
 #include <APU/audiocontroller.h>
-#include <Memory/Cartridge/RomLoader.h>
+#include <Memory/Cartridge/RomManager.h>
 
 
 //This can be heavily improved, as of now this is a simple code to initialize what is needed and generate the disassembly

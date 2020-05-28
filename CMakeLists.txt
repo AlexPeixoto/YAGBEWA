@@ -9,8 +9,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 set(SFML_WINDOWS_ROOT "D:/Developer/SFML-2.1")
 
 # Find source files
-file(GLOB SOURCES *.cpp)
-
+file(GLOB_RECURSE SOURCES GameBoy.cpp Memory/*.cpp CPU/*.cpp PPU/*.cpp APU/*.cpp IO/*.cpp)
 
 # Include header files
 include_directories(.)
@@ -25,21 +24,14 @@ include_directories(APU)
 include_directories(IO)
 
 
-# Create shared library
-#add_library(${PROJECT_NAME} SHARED )
-add_library(APU SHARED APU/audiocontroller.cpp)
-
 
 find_package(SFML 2 REQUIRED network audio graphics window system)
 if(SFML_FOUND)
           include_directories(${SFML_INCLUDE_DIR})
-          message(${SFML_INCLUDE_DIR})
-	  add_executable(${PROJECT_NAME} ${SOURCES})
-          target_link_libraries(${PROJECT_NAME} ${SFML_LIBRARIES} ${SFML_DEPENDENCIES} APU)
+		  add_executable(${PROJECT_NAME} ${SOURCES})
+		  #target_link_libraries(${PROJECT_NAME} ${SFML_AUDIO} ${SFML_GRAPHICS} ${SFML_MAIN} ${SFML_SYSTEM} ${SFML_WINDOW})
+          target_link_libraries(${PROJECT_NAME} ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
 endif()
-
-target_link_libraries(${PROJECT_NAME} ${SFML_AUDIO} ${SFML_GRAPHICS} ${SFML_MAIN} ${SFML_SYSTEM} ${SFML_WINDOW})
-
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
             CXX_STANDARD 17
