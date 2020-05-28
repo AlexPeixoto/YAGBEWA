@@ -2,12 +2,12 @@
 
 #include <array>
 #include <functional>
+#include <string>
 
 namespace Memory{
-	using MemoryArray = std::array<uint8_t, 0xFFF>;
+	using MemoryArray = std::array<uint8_t, 0xFFFF>;
     //The whole memory map (As of now) is here
-	//Also this is now made as a static "class", this might change in the future, but as of now a single memory
-	//Instance might be the easiest one to work with.
+	//Maybe its worth breaking it up into video, work ram and cartridge ram
     class Map{
         private:
 			struct Segment {
@@ -48,10 +48,50 @@ namespace Memory{
 			};
 			Map();
 
+			bool isValidWrite(std::size_t size, MemArea area) const {
+				switch (area) {
+					case MemArea::ROMBANK_0:
+						return size <= romBank0.size;
+					case MemArea::ROMBANK_1:
+						return size <= romBank1.size;
+					case MemArea::VIDEORAM:
+						return size <= videoRam.size;
+					case MemArea::SWITCHABLERAM:
+						return size <= switchableRam.size;
+					case MemArea::INTERNALRAM_1:
+						return size <= internalRam1.size;
+					case MemArea::INTERNALRAM_2:
+						return size <= internalRam2.size;
+					case MemArea::SPRITEATTRIB:
+						return size <= spriteAttrib.size;
+					case MemArea::IOREG:
+						return size <= ioReg.size;
+					case MemArea::HIRAM:
+						return size <= hiRam.size;
+					case MemArea::INTERRUPTED:
+						return size <= interrupted.size;
+					default: //CPU
+						return true;
+				}
+			};
+
 			//Used to fill certain areas of the memory.
 			//Mem area is used to prevent writing to a wrong memory space
+			//Maybe I should change that to a single write
 			template<typename T>
-			void fillWith(const T& memArr, std::size_t size, MemArea area);
+			void fillWith(const T& memArr, std::size_t size, MemArea area) {
+				if (!isValidWrite(size, area))
+					std::runtime_error("Invalid write for: " + std::to_string(static_cast<int>(area)));
+				switch (area) {
+				case ROMBANK_0:
+					
+					break;
+				case ROMBANK_1:
+					break;
+				default:
+					break;
+				}
+			}
 			//Perform std::fill with 0
 			void clearMemory();
 			

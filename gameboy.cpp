@@ -7,24 +7,18 @@
 #include <Memory/Cartridge/RomManager.h>
 
 
-//This can be heavily improved, as of now this is a simple code to initialize what is needed and generate the disassembly
 int main(int argc, char** argv){
     if(argc != 2)
         return 1;
 
     std::string filename = argv[1];
 
-    //char* data;
-    //size_t fileSize = loadFileTo(filename, &data);
+	//As this code does not implement a BUS per-se all the "elements" are here.
+	//Maybe later either a BUS or a "board" can be created in order to have those components out of the main function.
 
-	//if(!fileSize)
-    //    return 2;
-
-    //
-    //Load cartridge header
+	//Load cartridge header
     //Memory::Cartridge::RomLoader loader(begin);
 	//loader.load()
-	//TODO: Have to load the first and second bank of the cartridge into memory.
 	
     //TODO: Memory writes MIGHT work as an interrution.
 	//Example is when writting between 2000 - 3FFFF to switch the cartridge bank

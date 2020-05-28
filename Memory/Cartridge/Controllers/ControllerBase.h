@@ -6,9 +6,9 @@ namespace Memory::Cartridge::Controller {
 	//Pure virtual class, will be used as a base to implement each one of the possible controllers
 	class ControllerBase {
 	private:
-		Memory::MemoryArray& mem;
+		Memory::Map& mem;
 	public:
-		ControllerBase(Memory::MemoryArray& mem) : mem(mem) {};
+		ControllerBase(Memory::Map& mem) : mem(mem) {};
 		virtual ~ControllerBase() {};
 
 		virtual void loadCartridge() = 0;

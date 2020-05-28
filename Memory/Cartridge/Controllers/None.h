@@ -3,9 +3,9 @@
 
 namespace Memory::Cartridge::Controller {
 	//Dumb class for cartridges without a controller
-	class None : private ControllerBase {
+	class None : public ControllerBase {
 	public:
-		None(Memory::MemoryArray& mem) : ControllerBase(mem) {};
+		None(Memory::Map& mem) : ControllerBase(mem) {};
 		~None() {};
 
 		void loadCartridge() {

@@ -4,8 +4,10 @@
 #include <fstream>
 using namespace Memory::Cartridge;
 
-RomManager::RomManager(std::string fileName) {
-	this->loadCartridge();
+RomManager::RomManager(std::string fileName, Memory::Map &mem)
+	: mem(mem) 
+{
+	loadCartridge();
 }
 RomManager::~RomManager() {}
 
@@ -31,8 +33,23 @@ void RomManager::loadCartridge() {
 	//Then uses that to load the header.
 	cartridgeBeginPtr = reinterpret_cast<unsigned char*>(data);
 	header.loadData(cartridgeBeginPtr);
+	initController(header.getCartridgeType().mbc);
+
+	loadRom();
+
 }
 
 void RomManager::initController(const MBC &controllerType) {
+	switch (controllerType) {
+	case MBC::NONE:
+		controller.reset(new Controller::None(mem));
+		break;
+	default:
+		break;
+	}
 	
+}
+
+void RomManager::loadRom() {
+
 }
