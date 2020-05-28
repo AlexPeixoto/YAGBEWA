@@ -2,6 +2,7 @@
 
 #include <exception>
 using namespace Memory::Cartridge::RomManager;
+using namespace Memory::Cartridge::MBC;
 
 RomManager::RomManager(std::string fileName) {
 	this->loadCartridge();
@@ -30,4 +31,8 @@ void RomManager::loadCartridge() {
 	//Then uses that to load the header.
 	cartridgeBeginPtr = reinterpret_cast<unsigned char*>(data);
 	header.loadData(cartridgeBeginPtr);
+}
+
+void RomManager::initController(const Cartridge::MBC &controllerType) {
+	
 }

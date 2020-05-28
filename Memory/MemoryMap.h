@@ -1,5 +1,7 @@
+#pragma once
+
 #include <array>
-#include <function>
+#include <functional>
 
 namespace Memory{
 	using MemoryArray = std::array<uint8_t, 0xFFF>;
@@ -35,7 +37,7 @@ namespace Memory{
 				ROMBANK_0,
 				ROMBANK_1,
 				VIDEORAM,
-				SWITCHABLERAM.
+				SWITCHABLERAM,
 				INTERNALRAM_1,
 				INTERNALRAM_2,
 				SPRITEATTRIB,
@@ -55,5 +57,5 @@ namespace Memory{
 			
 			//Method that will be triggered once the interruption memory value is changed
 			void registerInterruptionCallback(std::function<void()> func);
-    }
+	};
 }

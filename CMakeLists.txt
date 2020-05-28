@@ -4,7 +4,6 @@ project (GBEmulator)
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
       set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 endif ()
-
 # Set Modules Dir
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 set(SFML_WINDOWS_ROOT "D:/Developer/SFML-2.1")
@@ -34,4 +33,9 @@ if(SFML_FOUND)
 	  target_link_libraries(${PROJECT_NAME} ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
 endif()
 
-#target_link_libraries(${PROJECT_NAME} ${SFML_AUDIO} ${SFML_GRAPHICS} ${SFML_MAIN} ${SFML_SYSTEM} ${SFML_WINDOW})
+target_link_libraries(${PROJECT_NAME} ${SFML_AUDIO} ${SFML_GRAPHICS} ${SFML_MAIN} ${SFML_SYSTEM} ${SFML_WINDOW})
+
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+            CXX_STANDARD 17
+            )

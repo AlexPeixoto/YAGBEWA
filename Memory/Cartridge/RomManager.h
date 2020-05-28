@@ -1,11 +1,15 @@
 #pragma once
+#include <memory>
+
 #include <Memory/Cartridge/Header.h>
+#include <Memory/Cartridge/Controllers/ControllerBase.h>
+#include <Memory/Cartridge/Controllers/None.h>
 
 namespace Memory::Cartridge{
 	class RomManager{
 	private:
 		Header header;
-		ControllerBase controller;
+		std::unique_ptr<Controller::ControllerBase> controller;
 
 		std::string fileName;
 		size_t cartridgeSize;
@@ -15,6 +19,7 @@ namespace Memory::Cartridge{
 
 		//As of now the load is only done during initialization
 		void loadCartridge();
+		void initController(const Cartridge::MBC &controllerType);
 	public:
 		RomManager(std::string filename);
 		~RomManager();

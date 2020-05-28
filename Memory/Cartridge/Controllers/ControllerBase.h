@@ -1,19 +1,17 @@
-#include <header.h>
+#include <Memory/Cartridge/Header.h>
 #include <Memory/MemoryMap.h>
 
-namespace Memory {
-	namespace Cartridge {
-		namespace Controller {
-			//Pure virtual class, will be used as a base to implement each one of the possible controllers
-			class ControllerBase {
-			private:
-			public:
-				ControllerBase(Memory::MemoryArray& mem);
-				virtual ~ControllerBase() {};
+//As the bank management is done by the cartridge controller, I am just  using this class to manage the load of the data
+namespace Memory::Cartridge::Controller {
+	//Pure virtual class, will be used as a base to implement each one of the possible controllers
+	class ControllerBase {
+	private:
+		Memory::MemoryArray& mem;
+	public:
+		ControllerBase(Memory::MemoryArray& mem) : mem(mem) {};
+		virtual ~ControllerBase() {};
 
-				virtual void loadCartridge() = 0;
-				virtual void executeBankSwitch(uint16_t bank) = 0;
-			};
-		}
-	}
+		virtual void loadCartridge() = 0;
+		virtual void executeBankSwitch(uint16_t bank) = 0;
+	};
 }

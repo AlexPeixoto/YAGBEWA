@@ -1,24 +1,18 @@
-#include <header.h>
+#include <Memory/Cartridge/Header.h>
 #include <Memory/MemoryMap.h>
 
-namespace Memory {
-	namespace Cartridge {
-		namespace Controller {
-			//Dumb class for cartridges without a controller
-			class None {
-			private:
-				Memory::MemoryArray& mem;
-			public:
-				ControllerBase(Memory::MemoryArray& mem) : mem(mem) {};
-				virtual ~ControllerBase();
+namespace Memory::Cartridge::Controller {
+	//Dumb class for cartridges without a controller
+	class None : private ControllerBase {
+	public:
+		None(Memory::MemoryArray& mem) : ControllerBase(mem) {};
+		~None() {};
 
-				void loadCartridge() {
+		void loadCartridge() {
 
-				}
-				inline void executeBankSwitch(uint16_t bank) {
-					std::runtime_error("No bank switching on this specific controller")
-				}
-			};
 		}
-	}
+		inline void executeBankSwitch(uint16_t bank) {
+			std::runtime_error("No bank switching on this specific controller");
+		}
+	};
 }

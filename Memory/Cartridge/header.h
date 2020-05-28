@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cstdint>
-#include <CartridgeType.h>
+#include <Cartridge/CartridgeType.h>
 
 namespace Memory::Cartridge{
     enum class GB_TYPE{
@@ -55,7 +55,9 @@ namespace Memory::Cartridge{
             void setDestination();
         public:
 			Header() {};
-			Header(unsigned char* ptr) : loadData(ptr) {};
+			Header(unsigned char* ptr) {
+				loadData(ptr);
+			}
                 
 			void loadData(unsigned char* ptr) {
 				this->ptr = ptr;
