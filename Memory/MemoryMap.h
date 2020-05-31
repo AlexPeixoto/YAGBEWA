@@ -46,7 +46,7 @@ namespace Memory{
 				INTERRUPTED,
 				CPU //This is like a master value, which can change "anything"
 			};
-			Map();
+			Map() {};
 
 			bool isValidWrite(std::size_t size, MemArea area) const {
 				switch (area) {

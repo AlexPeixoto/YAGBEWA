@@ -1,15 +1,21 @@
 #include <Memory/Cartridge/RomManager.h>
+#include <Bus.h>
 
 #include <exception>
 #include <fstream>
 using namespace Memory::Cartridge;
 
-RomManager::RomManager(std::string fileName, Memory::Map &mem)
-	: mem(mem) 
+RomManager::RomManager(Bus* interface)
+    : bus(bus)
 {
 	loadCartridge();
 }
 RomManager::~RomManager() {}
+
+void RomManager::loadRom(std::string fileName) {
+	this->fileName = fileName;
+	loadCartridge();
+}
 
 void RomManager::loadCartridge() {
 	//Assumes that the first parameter is the name of the file
@@ -35,14 +41,14 @@ void RomManager::loadCartridge() {
 	header.loadData(cartridgeBeginPtr);
 	initController(header.getCartridgeType().mbc);
 
-	loadRom();
+	loadBanks();
 
 }
 
 void RomManager::initController(const MBC &controllerType) {
 	switch (controllerType) {
 	case MBC::NONE:
-		controller.reset(new Controller::None(mem));
+		//controller.reset(new Controller::None(mem));
 		break;
 	default:
 		break;
@@ -50,6 +56,6 @@ void RomManager::initController(const MBC &controllerType) {
 	
 }
 
-void RomManager::loadRom() {
+void RomManager::loadBanks() {
 
 }

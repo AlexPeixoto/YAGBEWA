@@ -1,3 +1,5 @@
+#pragma once
+
 namespace CPU {
 	struct Registers {
 		uint8_t A;
@@ -8,9 +10,9 @@ namespace CPU {
 		uint8_t H;
 		uint8_t L;
 		//Stack pointer
-		uint16_t* SP;
+		uintptr_t SP;
 		//Program counter
-		uint16_t* PC;
+		uintptr_t PC;
 
 		struct F {
 			uint8_t Z : 1;

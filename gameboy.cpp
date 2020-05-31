@@ -4,14 +4,18 @@
 #include <string>
 
 #include <APU/audiocontroller.h>
-#include <Memory/Cartridge/RomManager.h>
+#include <Bus.h>
 
 
 int main(int argc, char** argv){
-    if(argc != 2)
+    /*if(argc != 2)
         return 1;
 
     std::string filename = argv[1];
+	*/
+	Bus bus;
+
+	//bus.cartridgeManager.loadRom("Tetris.gb");
 
 	//As this code does not implement a BUS per-se all the "elements" are here.
 	//Maybe later either a BUS or a "board" can be created in order to have those components out of the main function.

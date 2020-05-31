@@ -4,9 +4,11 @@
 #include <Memory/Cartridge/Header.h>
 #include <Memory/Cartridge/Controllers/ControllerBase.h>
 #include <Memory/Cartridge/Controllers/None.h>
-#include <Memory/MemoryMap.h>
 
+
+class Bus;
 namespace Memory::Cartridge{
+	//Rom manager acts as the "rom controller"
 	class RomManager{
 	private:
 		Header header;
@@ -14,7 +16,7 @@ namespace Memory::Cartridge{
 
 		std::string fileName;
 		size_t cartridgeSize;
-		Memory::Map& mem;
+        Bus* bus;
 
 		//To make everything easier, we store the whole cartrige in memory and close the file.
 		unsigned char* cartridgeBeginPtr;
@@ -24,10 +26,12 @@ namespace Memory::Cartridge{
 		void initController(const Cartridge::MBC &controllerType);
 
 		//Used to load bank 1 and 2 at cartridge initial load
-		void loadRom();
+		void loadBanks();
 	public:
 		//Gets the name of the file being loaded and have access to the memory
-		RomManager(std::string filename, Memory::Map &mem);
+        RomManager(Bus* bus);
 		~RomManager();
+
+		void loadRom(std::string filename);
 	};
 }

@@ -2,7 +2,6 @@
 
 #include <string>
 #include <vector>
-#include <CPU.h>
 #include <Header.h>
 
 namespace Disassembly{

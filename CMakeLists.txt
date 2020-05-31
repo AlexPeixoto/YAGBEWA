@@ -9,7 +9,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 set(SFML_WINDOWS_ROOT "D:/Developer/SFML-2.1")
 
 # Find source files
-file(GLOB_RECURSE SOURCES GameBoy.cpp Memory/*.cpp CPU/*.cpp PPU/*.cpp APU/*.cpp IO/*.cpp)
+file(GLOB_RECURSE SOURCES Gameboy.cpp Bus.cpp Memory/*.cpp CPU/*.cpp PPU/*.cpp APU/*.cpp IO/*.cpp)
 
 # Include header files
 include_directories(.)
