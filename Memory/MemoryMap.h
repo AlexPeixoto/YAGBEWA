@@ -4,31 +4,35 @@
 #include <functional>
 #include <string>
 
+#include <iostream>
+
 namespace Memory{
 	using MemoryArray = std::array<uint8_t, 0xFFFF>;
+
+	struct Segment {
+		uint16_t position;
+		uint16_t size;
+	};
+
+	//MemorySegments
+	const Segment romBank0{ 0x0000, 0x3999 };
+	const Segment romBank1{ 0x4000, 0x3999 };
+	const Segment videoRam{ 0x8000, 0x1999 };
+	const Segment switchableRam{ 0xA000, 0x1999 };
+	const Segment internalRam1{ 0xC000, 0x1999 };
+	const Segment internalRam2{ 0xC000, 0x1999 };
+	//ECHO from 0xC000 until 0xFDFF
+	const Segment spriteAttrib{ 0xFE00, 0x009F };
+	const Segment ioReg{ 0xFF00, 0x007F };
+	const Segment hiRam{ 0xFF80, 0x007E };
+	const Segment interrupted{ 0xFFFF, 0xFFFF };
+
+
     //The whole memory map (As of now) is here
 	//Maybe its worth breaking it up into video, work ram and cartridge ram
     class Map{
         private:
-			struct Segment {
-				uint16_t position;
-				uint16_t size;
-			};
-
 			MemoryArray memory;
-            
-            //MemorySegments
-            const Segment romBank0{0x0000, 0x3999};
-            const Segment romBank1{0x4000, 0x3999};
-            const Segment videoRam{0x8000, 0x1999};
-            const Segment switchableRam{0xA000, 0x1999};
-            const Segment internalRam1{0xC000, 0x1999};
-            const Segment internalRam2{0xC000, 0x1999};
-            //ECHO from 0xC000 until 0xFDFF
-            const Segment spriteAttrib{0xFE00, 0x009F};
-            const Segment ioReg{0xFF00, 0x007F};
-            const Segment hiRam{0xFF80, 0x007E};
-            const Segment interrupted{0xFFFF, 0xFFFF};
         public:
 			//This contains a list of each memory area that an be accesse.
 			//This is used on fillWith to prevent OOB memory from being accessed.
@@ -46,7 +50,11 @@ namespace Memory{
 				INTERRUPTED,
 				CPU //This is like a master value, which can change "anything"
 			};
-			Map() {};
+			Map() {
+				std::cout << "Created" << std::endl;
+				for(int x=0; x< 0xffff; x++)
+					memory.at(x) = static_cast<uint8_t>(134);
+			};
 
 			bool isValidWrite(std::size_t size, MemArea area) const {
 				switch (area) {
@@ -74,6 +82,10 @@ namespace Memory{
 						return true;
 				}
 			};
+
+			void load(uint8_t* data, unsigned short pos, unsigned short size) {
+				std::copy(data, data + size, memory.begin() + pos);
+			}
 
 			//Used to fill certain areas of the memory.
 			//Mem area is used to prevent writing to a wrong memory space

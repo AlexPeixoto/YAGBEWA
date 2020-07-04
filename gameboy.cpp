@@ -15,7 +15,7 @@ int main(int argc, char** argv){
 	*/
 	Bus bus;
 
-	//bus.cartridgeManager.loadRom("Tetris.gb");
+	bus.cartridge.loadRom("Tetris.gb");
 
 	//As this code does not implement a BUS per-se all the "elements" are here.
 	//Maybe later either a BUS or a "board" can be created in order to have those components out of the main function.

@@ -5,10 +5,11 @@
 #include <fstream>
 using namespace Memory::Cartridge;
 
-RomManager::RomManager(Bus* interface)
+RomManager::RomManager(Bus* bus)
     : bus(bus)
 {
-	loadCartridge();
+	std::cout << "Bus: " << bus << std::endl;
+	//loadCartridge();
 }
 RomManager::~RomManager() {}
 
@@ -29,15 +30,15 @@ void RomManager::loadCartridge() {
 	size_t fileSize = file.tellg();
 
 	const uint16_t headerSize = Header::getTotalHeaderSize();
-	char *data = new char[fileSize];
+	cartridgeData = new char[fileSize];
 
 	//Go to the start of the rom file and read its content
 	file.seekg(0, std::ios::beg);
-	file.read(data, fileSize);//copy file into memory
+	file.read(cartridgeData, fileSize);//copy file into memory
 
 	//Get an unsigned char* from the char* (required by file.read).
 	//Then uses that to load the header.
-	cartridgeBeginPtr = reinterpret_cast<unsigned char*>(data);
+	cartridgeBeginPtr = reinterpret_cast<unsigned char*>(cartridgeData);
 	header.loadData(cartridgeBeginPtr);
 	initController(header.getCartridgeType().mbc);
 
@@ -48,7 +49,8 @@ void RomManager::loadCartridge() {
 void RomManager::initController(const MBC &controllerType) {
 	switch (controllerType) {
 	case MBC::NONE:
-		//controller.reset(new Controller::None(mem));
+		//No memory passed to rom manager, most likelly each method that hopes to change it will get its reference.
+		controller.reset(new Controller::None());
 		break;
 	default:
 		break;
@@ -57,5 +59,6 @@ void RomManager::initController(const MBC &controllerType) {
 }
 
 void RomManager::loadBanks() {
-
+	bus->memoryMap.load(reinterpret_cast<uint8_t*>(cartridgeData), Memory::romBank0.position, Memory::romBank0.size);
+	bus->memoryMap.load(reinterpret_cast<unsigned char*>(cartridgeData + Memory::romBank1.position), Memory::romBank1.position, Memory::romBank1.size);
 }

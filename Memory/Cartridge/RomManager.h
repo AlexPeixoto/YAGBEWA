@@ -15,6 +15,7 @@ namespace Memory::Cartridge{
 		std::unique_ptr<Controller::ControllerBase> controller;
 
 		std::string fileName;
+		char* cartridgeData;
 		size_t cartridgeSize;
         Bus* bus;
 
