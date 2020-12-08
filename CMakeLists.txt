@@ -4,12 +4,19 @@ project (GBEmulator)
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
       set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=c++17")
 endif ()
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+
+
 # Set Modules Dir
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 set(SFML_WINDOWS_ROOT "D:/Developer/SFML-2.5/SFML")
 
 # Find source files
 file(GLOB_RECURSE SOURCES Gameboy.cpp Bus.cpp Memory/*.cpp CPU/*.cpp PPU/*.cpp APU/*.cpp IO/*.cpp)
+
+if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+	SET (CMAKE_OSX_ARCHITECTURES "x86_64") 
+endif()
 
 # Include header files
 include_directories(.)
@@ -23,8 +30,6 @@ include_directories(APU)
 
 include_directories(IO)
 
-
-
 find_package(SFML 2 REQUIRED network audio graphics window system)
 if(SFML_FOUND)
           include_directories(${SFML_INCLUDE_DIR})
@@ -32,6 +37,8 @@ if(SFML_FOUND)
 		  #target_link_libraries(${PROJECT_NAME} ${SFML_AUDIO} ${SFML_GRAPHICS} ${SFML_MAIN} ${SFML_SYSTEM} ${SFML_WINDOW})
           target_link_libraries(${PROJECT_NAME} ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
 endif()
+
+message("CMAKE_OSX_ARCHITECTURES: ${CMAKE_OSX_ARCHITECTURES}")
 
 add_custom_target(WindowsCopyDLL	
 	COMMAND ${CMAKE_COMMAND} -E copy ${SFML_WINDOWS_ROOT}/bin/openal32.dll ${CMAKE_BINARY_DIR}

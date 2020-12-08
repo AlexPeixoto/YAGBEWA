@@ -72,12 +72,16 @@ set(FIND_SFML_PATHS
     /sw
     /opt/local
     /opt/csw
-    /opt)
+    /opt
+    /opt/homebrew
+    /opt/homebrew/lib)
 
 # find the SFML include directory
 find_path(SFML_INCLUDE_DIR SFML/Config.hpp
           PATH_SUFFIXES include
-          PATHS ${FIND_SFML_PATHS})
+          PATHS ${FIND_SFML_PATHS}
+          /opt/homebrew/include
+          /opt/homebrew/include/SFML)
 
 # check the version number
 set(SFML_VERSION_OK TRUE)

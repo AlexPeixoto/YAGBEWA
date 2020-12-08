@@ -95,10 +95,10 @@ namespace Memory{
 				if (!isValidWrite(size, area))
 					std::runtime_error("Invalid write for: " + std::to_string(static_cast<int>(area)));
 				switch (area) {
-				case ROMBANK_0:
+				case MemArea::ROMBANK_0:
 					
 					break;
-				case ROMBANK_1:
+				case MemArea::ROMBANK_1:
 					break;
 				default:
 					break;
