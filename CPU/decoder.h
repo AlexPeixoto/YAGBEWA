@@ -4,9 +4,6 @@
 #include <functional>
 #include <string>
 
-#include <OperationMapping.h>
-
-
 namespace CPU{
 //As of now, this class simulates the decoding step
 //This class implements the logic to process the opcode, and retrieve the necessary parameters for the opcode (if any).

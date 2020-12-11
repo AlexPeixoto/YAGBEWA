@@ -1,3 +1,5 @@
+#include <stack>
+
 namespace CPU {
 	struct StackElement {
 		//Pointer containing the program counter

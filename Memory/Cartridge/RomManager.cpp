@@ -48,6 +48,7 @@ void RomManager::loadCartridge() {
 
 void RomManager::initController(const MBC &controllerType) {
 	switch (controllerType) {
+	//Instantiate the controller based on the data on the header
 	case MBC::NONE:
 		//No memory passed to rom manager, most likelly each method that hopes to change it will get its reference.
 		controller.reset(new Controller::None());

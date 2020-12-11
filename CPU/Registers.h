@@ -1,14 +1,22 @@
 #pragma once
 
+#include <cstdint>
+
 namespace CPU {
 	struct Registers {
 		uint8_t A;
-		uint8_t B;
-		uint8_t C;
-		uint8_t D;
-		uint8_t E;
-		uint8_t H;
-		uint8_t L;
+		union BC {
+			uint16_t _pair;
+			uint8_t _reg[2];
+		} BC;
+		union DE {
+			uint16_t _pair;
+			uint8_t _reg[2];
+		} DE;
+		union HL {
+			uint16_t _pair;
+			uint8_t _reg[2];
+		} hl;
 		//Stack pointer
 		uintptr_t SP;
 		//Program counter
