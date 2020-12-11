@@ -22,8 +22,6 @@ namespace CPU {
 
         class Call{
             public:
-                static void NOP(char**, Memory::Map&, const OpStructure&);
-
                 static void LD_REG16_REG16(char**, Memory::Map&, const OpStructure&);
                 static void LD_REG16_REG8(char**, Memory::Map&, const OpStructure&);
                 static void LD_REG8_REG16(char**, Memory::Map&, const OpStructure&);
@@ -37,10 +35,23 @@ namespace CPU {
                 static void LD_REGV_d16(char**, Memory::Map&, const OpStructure&);
                 static void LD_REG_d8(char**, Memory::Map&, const OpStructure&);
 
+                // Maps LD (HL+) A
+                static void LD_HLP_REG(char**, Memory::Map&, const OpStructure&);
+                static void LD_HLM_REG(char**, Memory::Map&, const OpStructure&);
+
+                // Maps LD A (HL+)
+                static void LD_REG_HLP(char**, Memory::Map&, const OpStructure&);
+                static void LD_REG_HLM(char**, Memory::Map&, const OpStructure&);
+
                 // SP specific LD instructions.
                 static void LD_a16_SP(char**, Memory::Map&, const OpStructure&);
                 static void LD_HL_SP_r8(char**, Memory::Map&, const OpStructure&);
                 static void LD_SP_HL(char**, Memory::Map&, const OpStructure&);
+
+                // JUMP
+                static void JR_r8(char**, Memory::Map&, const OpStructure&);
+                static void JR_NZ_r8(char**, Memory::Map&, const OpStructure&);
+                static void JR_Z_r8(char**, Memory::Map&, const OpStructure&);
 
                 static void INC(char**, Memory::Map&, const OpStructure&);
                 static void DEC(char**, Memory::Map&, const OpStructure&);
@@ -53,8 +64,17 @@ namespace CPU {
                 static void XOR(char**, Memory::Map&, const OpStructure&);
                 static void OR(char**, Memory::Map&, const OpStructure&);
                 static void CP(char**, Memory::Map&, const OpStructure&);
+                static void CPL(char**, Memory::Map&, const OpStructure&);
+                static void DDA(char**, Memory::Map&, const OpStructure&);
 
+                static void NOP(char**, Memory::Map&, const OpStructure&);
                 static void RLCA(char**, Memory::Map&, const OpStructure&);
+                static void RRCA(char**, Memory::Map&, const OpStructure&);
+                static void STOP(char**, Memory::Map&, const OpStructure&);
+                static void RLA(char**, Memory::Map&, const OpStructure&);
+                static void RRA(char**, Memory::Map&, const OpStructure&);
+
+
             // 0x[0..f]
             
         };
