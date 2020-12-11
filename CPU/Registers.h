@@ -16,7 +16,7 @@ namespace CPU {
 		union HL {
 			uint16_t _pair;
 			uint8_t _reg[2];
-		} hl;
+		} HL;
 		//Stack pointer
 		uintptr_t SP;
 		//Program counter

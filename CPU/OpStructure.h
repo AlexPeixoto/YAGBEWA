@@ -124,14 +124,14 @@ namespace CPU{
                    uint16_t* register_1, uint8_t* register_2)
                    : OpStructure(cycleCount, call) {
             this->registers_16[0] = register_1;
-            this->registers_8[1] = register_2;
+            this->registers_8[0] = register_2;
         }
 
         OpStructure(int cycleCount, FunctionCallRef call,
                    uint8_t* register_1, uint16_t* register_2)
                    : OpStructure(cycleCount, call) {
             this->registers_8[0] = register_1;
-            this->registers_16[1] = register_2;
+            this->registers_16[0] = register_2;
         }
     };
 }
