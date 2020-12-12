@@ -90,8 +90,7 @@ namespace CPU{
         bool invalid;
         uint8_t cycleCount;
 
-
-        using FunctionCallRef = std::function<void(char**, Memory::Map&, const OpStructure&)>;
+        using FunctionCallRef = std::function<void(char**, Memory::Map&, OpStructure&)>;
         // Call the function, this contains the PC, the memory map and the a reference to itself (so parameters and type can be read)
         FunctionCallRef call;
         

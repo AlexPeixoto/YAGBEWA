@@ -28,6 +28,6 @@ namespace CPU {
 			uint8_t H : 1;
 			uint8_t C : 1;
 			uint8_t _NOTUSED : 4;
-		};
+		} F;
 	};
 }

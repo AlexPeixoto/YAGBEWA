@@ -86,6 +86,14 @@ namespace Memory{
 			void load(uint8_t* data, unsigned short pos, unsigned short size) {
 				std::copy(data, data + size, memory.begin() + pos);
 			}
+			
+			inline void write(uint8_t val, uint16_t addr) {
+				memory[addr] = val;
+			}
+
+			inline uint8_t read(uint16_t addr) {
+				return memory[addr];
+			}
 
 			//Used to fill certain areas of the memory.
 			//Mem area is used to prevent writing to a wrong memory space

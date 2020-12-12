@@ -17,7 +17,9 @@ namespace CPU{
 
 		//OpCodeMapping needs access to the registers.
 		friend class OpCodeMapping;
-	public:LR35902(Bus* bus);
+		friend class OpCodeMapping::Call;
+	public:
+		LR35902(Bus* bus);
 		~LR35902();
 
 		void clock();
