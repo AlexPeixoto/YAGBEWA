@@ -27,7 +27,8 @@ namespace CPU {
 			uint8_t N : 1;
 			uint8_t H : 1;
 			uint8_t C : 1;
-			uint8_t _NOTUSED : 4;
+			uint8_t _C : 1; //This is used so in instructions like RLCA we can use as a temp for C.
+			uint8_t _NOTUSED : 3;
 		} F;
 	};
 }

@@ -39,7 +39,6 @@ namespace CPU {
                 static void LD_REG16_d16(char**, Memory::Map&, OpStructure&);
                 static void LD_REG8_d8(char**, Memory::Map&, OpStructure&);
                 static void LD_REGV_d16(char**, Memory::Map&, OpStructure&);
-                static void LD_REG_d8(char**, Memory::Map&, OpStructure&);
 
                 // Maps LD (HL+) A
                 static void LD_HLP_REG(char**, Memory::Map&, OpStructure&);
@@ -64,7 +63,8 @@ namespace CPU {
                 static void DEC16(char**, Memory::Map&, OpStructure&);
                 static void DEC8(char**, Memory::Map&, OpStructure&);
 
-                static void ADD(char**, Memory::Map&, OpStructure&);
+                static void ADD8(char**, Memory::Map&, OpStructure&);
+                static void ADD16(char**, Memory::Map&, OpStructure&);
                 static void ADC(char**, Memory::Map&, OpStructure&);
                 static void SUB(char**, Memory::Map&, OpStructure&);
                 static void SBC(char**, Memory::Map&, OpStructure&);

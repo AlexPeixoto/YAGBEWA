@@ -4,6 +4,7 @@
 using namespace CPU;
 
 Registers LR35902::registers;
+bool LR35902::stop = false;
 
 LR35902::LR35902(Bus* bus) : bus(bus) {}
 

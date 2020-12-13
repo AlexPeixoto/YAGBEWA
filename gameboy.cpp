@@ -24,10 +24,13 @@ int main(int argc, char** argv){
     //TODO: Memory writes MIGHT work as an interrution.
 	//Example is when writting between 2000 - 3FFFF to switch the cartridge bank
 
+    
 
     //////////////  AUDIO  /////////////
 
-    audioController audio;
+    //audioController audio;
+
+
 
 
 
