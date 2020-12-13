@@ -11,7 +11,7 @@ OpCodeMapping::OpCodeMapping() :
         //1x[0..F]
         {/* 1x0 */ 4, OP::STOP}, {/* 1x1 */ 12, OP::LD_REG16_d16, &LR35902::registers.DE._pair}, {/* 1x2 */ 8, OP::LD_REG16V_REG8, &LR35902::registers.DE._pair, &LR35902::registers.A}, {/* 1x3 */ 8, OP::INC16, &LR35902::registers.DE._pair}, {/* 1x4 */ 4, OP::INC8, &LR35902::registers.DE._reg[0]}, {/* 1x5 */ 4, OP::DEC8, &LR35902::registers.DE._reg[0]}, {/* 1x6 */ 8, OP::LD_REG8_d8, &LR35902::registers.DE._reg[0]}, {/* 1x7 */ 4, OP::RLA}, {/* 1x8 */ 12, OP::JR_r8}, {/* 1x9 */ 8, OP::ADD8, &LR35902::registers.HL._pair, &LR35902::registers.DE._pair}, {/* 1xA */ 8, OP::LD_REG8_REG16V, &LR35902::registers.A, &LR35902::registers.DE._pair}, {/* 1xB */ 8, OP::DEC16, &LR35902::registers.BC._pair}, {/* 1xC */ 4, OP::INC8, &LR35902::registers.DE._reg[1]}, {/* 1xD */ 4, OP::DEC8, &LR35902::registers.DE._reg[1]}, {/* 1xE */ 8, OP::LD_REG8_d8, &LR35902::registers.DE._reg[1]}, {/* 1xF */ 4, OP::RRA},
         //2x[0..F]
-        //{/* 2x0 */ 2, OP::JR_NZ_r8}, {/* 2x1 */ 3, OP::LD_REG16_d16, &LR35902::registers.HL._pair}, {/* 2x2 */ 1, OP::LD_HLP_REG, &LR35902::registers.A}, {/* 2x3 */ 1, OP::INC, &LR35902::registers.HL._pair}, {/* 2x4 */ 1, OP::INC, &LR35902::registers.HL._reg[0]}, {/* 2x5 */ 1, OP::DEC, &LR35902::registers.HL._reg[0]}, {/* 2x6 */ 2, OP::LD_REG_d8, &LR35902::registers.HL._reg[0]}, {/* 2x7 */ 1, OP::DDA}, {/* 2x8 */ 2, OP::JR_Z_r8}, {/* 2x9 */ 1, OP::ADD8, &LR35902::registers.HL._pair, &LR35902::registers.HL._pair}, {/* 2xA */ 1, OP::LD_REG_HLP, &LR35902::registers.A}, {/* 2xB */ 1, OP::DEC, &LR35902::registers.HL._pair}, {/* 2xC */ 1, OP::INC, &LR35902::registers.HL._reg[1]}, {/* 2xD */ 1, OP::DEC, &LR35902::registers.HL._reg[1]}, {/* 1xE */ 1, OP::LD_REG_d8, &LR35902::registers.HL._reg[1]}, {/* 1xF */ 1, OP::CPL}
+        {/* 2x0 */ 8, OP::JR_NZ_r8}, {/* 2x1 */ 12, OP::LD_REG16_d16, &LR35902::registers.HL._pair}, {/* 2x2 */ 8, OP::LD_HLP_REG, &LR35902::registers.A}, {/* 2x3 */ 8, OP::INC16, &LR35902::registers.HL._pair}, {/* 2x4 */ 4, OP::INC8, &LR35902::registers.HL._reg[0]}, {/* 2x5 */ 4, OP::DEC8, &LR35902::registers.HL._reg[0]}, {/* 2x6 */ 8, OP::LD_REG8_d8, &LR35902::registers.HL._reg[0]}, {/* 2x7 */ 4, OP::DAA}, {/* 2x8 */ 8, OP::JR_Z_r8}, {/* 2x9 */ 8, OP::ADD8, &LR35902::registers.HL._pair, &LR35902::registers.HL._pair}, {/* 2xA */ 8, OP::LD_REG_HLP, &LR35902::registers.A}, {/* 2xB */ 8, OP::DEC16, &LR35902::registers.HL._pair}, {/* 2xC */ 4, OP::INC8, &LR35902::registers.HL._reg[1]}, {/* 2xD */ 4, OP::DEC8, &LR35902::registers.HL._reg[1]}, {/* 1xE */ 8, OP::LD_REG8_d8, &LR35902::registers.HL._reg[1]}, {/* 1xF */ 4, OP::CPL}
 
     })
 {}
@@ -57,11 +57,22 @@ void OpCodeMapping::Call::ADD8(char**, Memory::Map&, OpStructure& info){
     *(info.registers_8[1]) += *(info.registers_8[0]);
 }
 void OpCodeMapping::Call::INC8(char**, Memory::Map&, OpStructure& info){
-    (*(info.registers_8[0]))++;
+    LR35902::registers.F.N = 0;
+    // Trick to check half carry (https://robdor.com/2016/08/10/gameboy-emulator-half-carry-flag/)
+                                //Get first 4 bits, add 1 and mask it with 0x10 (5th bit)
+    LR35902::registers.F.C = ( ( ((*(info.registers_8[0]) & 0xF) + 1)     & 0x10) == 0x10);
+
+    (*(info.registers_8[0]))--;
+    LR35902::registers.F.Z = ((*(info.registers_8[0])) == 0);
 }
 void OpCodeMapping::Call::DEC8(char**, Memory::Map&, OpStructure& info){
+    LR35902::registers.F.N = 1;
     (*(info.registers_8[0]))--;
+
+    LR35902::registers.F.C = ( ( ((*(info.registers_8[0]) & 0xF) - 1)) < 0);
 }
+
+//Different from the 8 bit registers, this version does not set any flags
 void OpCodeMapping::Call::INC16(char**, Memory::Map&, OpStructure& info){
     (*(info.registers_16[0]))++;
 }
@@ -105,8 +116,12 @@ void OpCodeMapping::Call::RRA(char** pc, Memory::Map& memMap, OpStructure& info)
 void OpCodeMapping::Call::JR_r8(char** pc, Memory::Map& memMap, OpStructure& info){
     *pc+=*(info.registers_8[0]);
 }
+void OpCodeMapping::Call::JR_NZ_r8(char** pc, Memory::Map& memMap, OpStructure& info){
+    // jump if Z is not set
+    *pc+= (*(info.registers_8[0])) * (!LR35902::registers.F.Z);
+}
 //void OpCodeMapping::Call::JR_Z_r8(char** pc, Memory::Map& memMap, OpStructure& info){}
-//void OpCodeMapping::Call::JR_NZ_r8(char** pc, Memory::Map& memMap, OpStructure& info){}
+
 
 /*
 void OpCodeMapping::Call::LD_REGV_d16(char**, Memory::Map&, OpStructure&){}

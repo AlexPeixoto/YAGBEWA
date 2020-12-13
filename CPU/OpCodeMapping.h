@@ -73,7 +73,7 @@ namespace CPU {
                 static void OR(char**, Memory::Map&, OpStructure&);
                 static void CP(char**, Memory::Map&, OpStructure&);
                 static void CPL(char**, Memory::Map&, OpStructure&);
-                static void DDA(char**, Memory::Map&, OpStructure&);
+                static void DAA(char**, Memory::Map&, OpStructure&);
 
                 static void NOP(char**, Memory::Map&, OpStructure&);
                 static void RLCA(char**, Memory::Map&, OpStructure&);
