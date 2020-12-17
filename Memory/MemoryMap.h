@@ -91,7 +91,7 @@ namespace Memory{
 				memory[addr] = val;
 			}
 
-			inline uint8_t read(uint16_t addr) {
+			inline uint8_t& read(uint16_t addr) {
 				return memory[addr];
 			}
 

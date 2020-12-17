@@ -18,7 +18,7 @@ namespace CPU {
 			uint8_t _reg[2];
 		} HL;
 		//Stack pointer
-		uintptr_t SP;
+		uint16_t SP;
 		//Program counter
 		uintptr_t PC;
 

@@ -39,14 +39,15 @@ namespace CPU {
                 static void LD_REG16_d16(char**, Memory::Map&, OpStructure&);
                 static void LD_REG8_d8(char**, Memory::Map&, OpStructure&);
                 static void LD_REGV_d16(char**, Memory::Map&, OpStructure&);
+                static void LD_REG16V_d8(char**, Memory::Map&, OpStructure&);
 
                 // Maps LD (HL+) A
-                static void LD_HLP_REG(char**, Memory::Map&, OpStructure&);
-                static void LD_HLM_REG(char**, Memory::Map&, OpStructure&);
+                static void LD_HLI_REG(char**, Memory::Map&, OpStructure&);
+                static void LD_HLD_REG(char**, Memory::Map&, OpStructure&);
 
                 // Maps LD A (HL+)
-                static void LD_REG_HLP(char**, Memory::Map&, OpStructure&);
-                static void LD_REG_HLM(char**, Memory::Map&, OpStructure&);
+                static void LD_REG_HLI(char**, Memory::Map&, OpStructure&);
+                static void LD_REG_HLD(char**, Memory::Map&, OpStructure&);
 
                 // SP specific LD instructions.
                 static void LD_a16_SP(char**, Memory::Map&, OpStructure&);
@@ -55,6 +56,8 @@ namespace CPU {
 
                 // JUMP
                 static void JR_r8(char**, Memory::Map&, OpStructure&);
+                static void JR_C_r8(char**, Memory::Map&, OpStructure&);
+                static void JR_NC_r8(char**, Memory::Map&, OpStructure&);
                 static void JR_NZ_r8(char**, Memory::Map&, OpStructure&);
                 static void JR_Z_r8(char**, Memory::Map&, OpStructure&);
 
@@ -62,6 +65,8 @@ namespace CPU {
                 static void INC8(char**, Memory::Map&, OpStructure&);
                 static void DEC16(char**, Memory::Map&, OpStructure&);
                 static void DEC8(char**, Memory::Map&, OpStructure&);
+                static void INC_REG16V(char**, Memory::Map&, OpStructure&);
+                static void DEC_REG16V(char**, Memory::Map&, OpStructure&);
 
                 static void ADD8(char**, Memory::Map&, OpStructure&);
                 static void ADD16(char**, Memory::Map&, OpStructure&);
@@ -74,6 +79,8 @@ namespace CPU {
                 static void CP(char**, Memory::Map&, OpStructure&);
                 static void CPL(char**, Memory::Map&, OpStructure&);
                 static void DAA(char**, Memory::Map&, OpStructure&);
+                static void SCF(char**, Memory::Map&, OpStructure&);
+                static void CCF(char**, Memory::Map&, OpStructure&);
 
                 static void NOP(char**, Memory::Map&, OpStructure&);
                 static void RLCA(char**, Memory::Map&, OpStructure&);
