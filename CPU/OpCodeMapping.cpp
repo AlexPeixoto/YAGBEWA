@@ -13,7 +13,10 @@ OpCodeMapping::OpCodeMapping() :
         //2x[0..F]
         {/* 2x0 */ 8, OP::JR_NZ_r8}, {/* 2x1 */ 12, OP::LD_REG16_d16, &LR35902::registers.HL._pair}, {/* 2x2 */ 8, OP::LD_HLI_REG, &LR35902::registers.A}, {/* 2x3 */ 8, OP::INC16, &LR35902::registers.HL._pair}, {/* 2x4 */ 4, OP::INC8, &LR35902::registers.HL._reg[0]}, {/* 2x5 */ 4, OP::DEC8, &LR35902::registers.HL._reg[0]}, {/* 2x6 */ 8, OP::LD_REG8_d8, &LR35902::registers.HL._reg[0]}, {/* 2x7 */ 4, OP::DAA}, {/* 2x8 */ 8, OP::JR_Z_r8}, {/* 2x9 */ 8, OP::ADD16, &LR35902::registers.HL._pair, &LR35902::registers.HL._pair}, {/* 2xA */ 8, OP::LD_REG_HLI, &LR35902::registers.A}, {/* 2xB */ 8, OP::DEC16, &LR35902::registers.HL._pair}, {/* 2xC */ 4, OP::INC8, &LR35902::registers.HL._reg[1]}, {/* 2xD */ 4, OP::DEC8, &LR35902::registers.HL._reg[1]}, {/* 2xE */ 8, OP::LD_REG8_d8, &LR35902::registers.HL._reg[1]}, {/* 1xF */ 4, OP::CPL},
         //3x[0..F]
-        {/* 3x0 */ 8, OP::JR_NC_r8}, {/* 3x1 */ 12, OP::LD_REG16_d16, &LR35902::registers.HL._pair}, {/* 3x2 */ 8, OP::LD_HLD_REG, &LR35902::registers.A}, {/* 3x3 */ 8, OP::INC16, &LR35902::registers.SP}, {/* 3x4 */ 12, OP::INC_REG16V, &LR35902::registers.HL._pair}, {/* 3x5 */ 12, OP::DEC_REG16V, &LR35902::registers.HL._pair}, {/* 3x6 */ 12, OP::LD_REG16V_d8, &LR35902::registers.HL._pair}, {/* 3x7 */ 4, OP::SCF}, {/* 3x8 */ 8, OP::JR_C_r8}, {/* 3x9 */ 8, OP::ADD16, &LR35902::registers.HL._pair, &LR35902::registers.SP}, {/* 3xA */ 8, OP::LD_REG_HLD, &LR35902::registers.A}, {/* 3xB */ 8, OP::DEC16, &LR35902::registers.SP}, {/* 3xC */ 4, OP::INC8, &LR35902::registers.A}, {/* 3xD */ 4, OP::DEC8, &LR35902::registers.A}, {/* 3xE */ 8, OP::LD_REG8_d8, &LR35902::registers.A}, {/* 3xF */ 4, OP::CCF}
+        {/* 3x0 */ 8, OP::JR_NC_r8}, {/* 3x1 */ 12, OP::LD_REG16_d16, &LR35902::registers.HL._pair}, {/* 3x2 */ 8, OP::LD_HLD_REG, &LR35902::registers.A}, {/* 3x3 */ 8, OP::INC16, &LR35902::registers.SP}, {/* 3x4 */ 12, OP::INC_REG16V, &LR35902::registers.HL._pair}, {/* 3x5 */ 12, OP::DEC_REG16V, &LR35902::registers.HL._pair}, {/* 3x6 */ 12, OP::LD_REG16V_d8, &LR35902::registers.HL._pair}, {/* 3x7 */ 4, OP::SCF}, {/* 3x8 */ 8, OP::JR_C_r8}, {/* 3x9 */ 8, OP::ADD16, &LR35902::registers.HL._pair, &LR35902::registers.SP}, {/* 3xA */ 8, OP::LD_REG_HLD, &LR35902::registers.A}, {/* 3xB */ 8, OP::DEC16, &LR35902::registers.SP}, {/* 3xC */ 4, OP::INC8, &LR35902::registers.A}, {/* 3xD */ 4, OP::DEC8, &LR35902::registers.A}, {/* 3xE */ 8, OP::LD_REG8_d8, &LR35902::registers.A}, {/* 3xF */ 4, OP::CCF},
+        //4x[0..F]
+        //Some instructions that are used for consistency (like LD B, B.. LD C, C are being marked as a NOP)
+        {/* 4x0 */ 4, OP::NOP},  {/* 4x1 */ 4, OP::LD_REG8_REG8, &LR35902::registers.BC._reg[0], &LR35902::registers.BC._reg[1]}, {/* 4x2 */ 4, OP::LD_REG8_REG8, &LR35902::registers.BC._reg[0], &LR35902::registers.DE._reg[0]}, {/* 4x3 */ 4, OP::LD_REG8_REG8, &LR35902::registers.BC._reg[0], &LR35902::registers.DE._reg[1]}, {/* 4x4 */ 4, OP::LD_REG8_REG8, &LR35902::registers.BC._reg[0], &LR35902::registers.HL._reg[0]}, {/* 4x5 */ 4, OP::LD_REG8_REG8, &LR35902::registers.BC._reg[0], &LR35902::registers.HL._reg[1]}, {/* 4x6 */ 8, OP::LD_REG8_REG16V, &LR35902::registers.BC._reg[0], &LR35902::registers.HL._pair}, {/* 4x7 */ 4, OP::LD_REG8_REG8, &LR35902::registers.BC._reg[0], &LR35902::registers.A}, {/* 4x8 */ 4, OP::LD_REG8_REG8, &LR35902::registers.BC._reg[1], &LR35902::registers.BC._reg[0]}, {/* 4x9 */ 4, OP::NOP}, {/* 4xA */ 4, OP::LD_REG8_REG8, &LR35902::registers.BC._reg[1], &LR35902::registers.DE._reg[0]}, {/* 4xB */ 4, OP::LD_REG8_REG8, &LR35902::registers.BC._reg[1], &LR35902::registers.DE._reg[1]}, {/* 4xC */ 4, OP::LD_REG8_REG8, &LR35902::registers.BC._reg[1], &LR35902::registers.HL._reg[0]}, {/* 4xD */ 4, OP::LD_REG8_REG8, &LR35902::registers.BC._reg[1], &LR35902::registers.HL._reg[1]}, {/* 4xE */ 8, OP::LD_REG8_REG16V, &LR35902::registers.BC._reg[1], &LR35902::registers.HL._pair}, {/* 4xF */ 4, OP::LD_REG8_REG8, &LR35902::registers.BC._reg[1], &LR35902::registers.A},
 
     })
 {}
@@ -23,10 +26,15 @@ void OpCodeMapping::Call::STOP(char** pc, Memory::Map&, OpStructure&){
     LR35902::stop = true;
 }
 
+void OpCodeMapping::Call::LD_REG8_REG8(char** pc, Memory::Map& memMap, OpStructure& info){
+    *(info.registers_8[0]) = *(info.registers_8[1]);
+}
+
 void OpCodeMapping::Call::LD_REG8_d8(char** pc, Memory::Map& memMap, OpStructure& info){
     *pc+=1;
     *(info.registers_8[0]) = **pc;
 }
+
 void OpCodeMapping::Call::LD_REG16_d16(char** pc, Memory::Map& memMap, OpStructure& info){
     *pc+=1;
     *(info.registers_16[0]) = **pc;
