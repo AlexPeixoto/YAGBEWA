@@ -21,6 +21,7 @@ namespace CPU {
         void setMapping();
         void setCbMapping();
 
+        //Flags checked from 0x0 to 7xf
         class Call{
             public:
                 /*
@@ -86,12 +87,9 @@ namespace CPU {
                 static void RLCA(char**, Memory::Map&, OpStructure&);
                 static void RRCA(char**, Memory::Map&, OpStructure&);
                 static void STOP(char**, Memory::Map&, OpStructure&);
+                static void HALT(char**, Memory::Map&, OpStructure&);
                 static void RLA(char**, Memory::Map&, OpStructure&);
                 static void RRA(char**, Memory::Map&, OpStructure&);
-
-
-            // 0x[0..f]
-            
         };
     };
 }

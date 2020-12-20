@@ -5,6 +5,7 @@ using namespace CPU;
 
 Registers LR35902::registers;
 bool LR35902::stop = false;
+bool LR35902::halt = false;
 uint8_t LR35902::extraCycles = 0;
 
 LR35902::LR35902(Bus* bus) : bus(bus) {}

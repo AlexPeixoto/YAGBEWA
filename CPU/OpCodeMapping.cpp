@@ -21,8 +21,15 @@ OpCodeMapping::OpCodeMapping() :
         {/* 5x0 */ 4,  OP::LD_REG8_REG8, &LR35902::registers.DE._reg[0], &LR35902::registers.BC._reg[0]},  {/* 5x1 */ 4, OP::LD_REG8_REG8, &LR35902::registers.DE._reg[0], &LR35902::registers.BC._reg[1]}, {/* 5x2 */ 4, OP::LD_REG8_REG8, &LR35902::registers.DE._reg[0], &LR35902::registers.DE._reg[0]}, {/* 5x3 */ 4, OP::LD_REG8_REG8, &LR35902::registers.DE._reg[0], &LR35902::registers.DE._reg[1]}, {/* 5x4 */ 4, OP::LD_REG8_REG8, &LR35902::registers.DE._reg[0], &LR35902::registers.HL._reg[0]}, {/* 5x5 */ 4, OP::LD_REG8_REG8, &LR35902::registers.DE._reg[0], &LR35902::registers.HL._reg[1]}, {/* 5x6 */ 8, OP::LD_REG8_REG16V, &LR35902::registers.DE._reg[0], &LR35902::registers.HL._pair}, {/* 5x7 */ 4, OP::LD_REG8_REG8, &LR35902::registers.DE._reg[0], &LR35902::registers.A}, {/* 5x8 */ 4, OP::LD_REG8_REG8, &LR35902::registers.DE._reg[1], &LR35902::registers.BC._reg[0]}, {/* 5x9 */ 4, OP::LD_REG8_REG8, &LR35902::registers.DE._reg[1], &LR35902::registers.BC._reg[1]}, {/* 5xA */ 4, OP::LD_REG8_REG8, &LR35902::registers.DE._reg[1], &LR35902::registers.DE._reg[0]}, {/* 5xB */ 4, OP::LD_REG8_REG8, &LR35902::registers.DE._reg[1], &LR35902::registers.DE._reg[1]}, {/* 5xC */ 4, OP::LD_REG8_REG8, &LR35902::registers.DE._reg[1], &LR35902::registers.HL._reg[0]}, {/* 5xD */ 4, OP::LD_REG8_REG8, &LR35902::registers.DE._reg[1], &LR35902::registers.HL._reg[1]}, {/* 5xE */ 8, OP::LD_REG8_REG16V, &LR35902::registers.DE._reg[1], &LR35902::registers.HL._pair}, {/* 5xF */ 4, OP::LD_REG8_REG8, &LR35902::registers.DE._reg[1], &LR35902::registers.A},
         //6x[0..F]
         {/* 6x0 */ 4,  OP::LD_REG8_REG8, &LR35902::registers.HL._reg[0], &LR35902::registers.BC._reg[0]},  {/* 6x1 */ 4, OP::LD_REG8_REG8, &LR35902::registers.HL._reg[0], &LR35902::registers.BC._reg[1]}, {/* 6x2 */ 4, OP::LD_REG8_REG8, &LR35902::registers.HL._reg[0], &LR35902::registers.DE._reg[0]}, {/* 6x3 */ 4, OP::LD_REG8_REG8, &LR35902::registers.HL._reg[0], &LR35902::registers.DE._reg[1]}, {/* 6x4 */ 4, OP::LD_REG8_REG8, &LR35902::registers.HL._reg[0], &LR35902::registers.HL._reg[0]}, {/* 6x5 */ 4, OP::LD_REG8_REG8, &LR35902::registers.HL._reg[0], &LR35902::registers.HL._reg[1]}, {/* 6x6 */ 8, OP::LD_REG8_REG16V, &LR35902::registers.HL._reg[0], &LR35902::registers.HL._pair}, {/* 6x7 */ 4, OP::LD_REG8_REG8, &LR35902::registers.HL._reg[0], &LR35902::registers.A}, {/* 6x8 */ 4, OP::LD_REG8_REG8, &LR35902::registers.HL._reg[1], &LR35902::registers.BC._reg[0]}, {/* 6x9 */ 4, OP::LD_REG8_REG8, &LR35902::registers.HL._reg[1], &LR35902::registers.BC._reg[1]}, {/* 6xA */ 4, OP::LD_REG8_REG8, &LR35902::registers.HL._reg[1], &LR35902::registers.DE._reg[0]}, {/* 6xB */ 4, OP::LD_REG8_REG8, &LR35902::registers.HL._reg[1], &LR35902::registers.DE._reg[1]}, {/* 6xC */ 4, OP::LD_REG8_REG8, &LR35902::registers.HL._reg[1], &LR35902::registers.HL._reg[0]}, {/* 6xD */ 4, OP::LD_REG8_REG8, &LR35902::registers.HL._reg[1], &LR35902::registers.HL._reg[1]}, {/* 6xE */ 8, OP::LD_REG8_REG16V, &LR35902::registers.HL._reg[1], &LR35902::registers.HL._pair}, {/* 6xF */ 4, OP::LD_REG8_REG8, &LR35902::registers.HL._reg[1], &LR35902::registers.A},
+        //7x[0..F]
+        {/* 7x0 */ 8,  OP::LD_REG16V_REG8, &LR35902::registers.HL._pair, &LR35902::registers.BC._reg[0]},  {/* 7x1 */ 8, OP::LD_REG16V_REG8, &LR35902::registers.HL._pair, &LR35902::registers.BC._reg[1]}, {/* 7x2 */ 8, OP::LD_REG16V_REG8, &LR35902::registers.HL._pair, &LR35902::registers.DE._reg[0]}, {/* 7x3 */ 8, OP::LD_REG16V_REG8, &LR35902::registers.HL._pair, &LR35902::registers.DE._reg[1]}, {/* 7x4 */ 8, OP::LD_REG16V_REG8, &LR35902::registers.HL._pair, &LR35902::registers.HL._reg[0]}, {/* 7x5 */ 8, OP::LD_REG16V_REG8, &LR35902::registers.HL._pair, &LR35902::registers.HL._reg[1]}, {/* 7x6 */ 4, OP::HALT}, {/* 7x7 */ 8, OP::LD_REG16V_REG8, &LR35902::registers.HL._pair, &LR35902::registers.A}, {/* 7x8 */ 4, OP::LD_REG8_REG8, &LR35902::registers.A, &LR35902::registers.BC._reg[0]}, {/* 7x9 */ 4, OP::LD_REG8_REG8, &LR35902::registers.A, &LR35902::registers.BC._reg[1]}, {/* 7xA */ 4, OP::LD_REG8_REG8, &LR35902::registers.A, &LR35902::registers.DE._reg[0]}, {/* 7xB */ 4, OP::LD_REG8_REG8, &LR35902::registers.A, &LR35902::registers.DE._reg[1]}, {/* 7xC */ 4, OP::LD_REG8_REG8, &LR35902::registers.A, &LR35902::registers.HL._reg[0]}, {/* 7xD */ 4, OP::LD_REG8_REG8, &LR35902::registers.A, &LR35902::registers.HL._reg[1]}, {/* 7xE */ 8, OP::LD_REG8_REG16V, &LR35902::registers.A, &LR35902::registers.HL._pair}, {/* 7xF */ 8, OP::LD_REG8_REG8, &LR35902::registers.A, &LR35902::registers.A},
+
     })
 {}
+void OpCodeMapping::Call::HALT(char** pc, Memory::Map&, OpStructure&){
+    LR35902::halt = true;
+}
+
 void OpCodeMapping::Call::STOP(char** pc, Memory::Map&, OpStructure&){
     //Also known as STOP 0 instruction 10 00.
     *pc+=1;
@@ -94,35 +101,43 @@ void OpCodeMapping::Call::LD_REG_HLD(char** pc, Memory::Map& memMap, OpStructure
 }
 
 void OpCodeMapping::Call::NOP(char** pc, Memory::Map& memMap, OpStructure& info){}
+
 void OpCodeMapping::Call::ADD8(char**, Memory::Map&, OpStructure& info){
     *(info.registers_8[1]) += *(info.registers_8[0]);
 }
 void OpCodeMapping::Call::ADD16(char**, Memory::Map&, OpStructure& info){
+    LR35902::registers.F.H = ((((*(info.registers_16[0]) & 0xF) + ((*(info.registers_16[1]) & 0xF)))  & 0x10) == 0x10);
+    LR35902::registers.F.C = ((static_cast<uint32_t>(*(info.registers_16[0])) + *(info.registers_16[1])) > 0xFFFF);
     *(info.registers_16[1]) += *(info.registers_16[0]);
+    LR35902::registers.F.N = 0;
+    
 }
 void OpCodeMapping::Call::INC8(char**, Memory::Map&, OpStructure& info){
     LR35902::registers.F.N = 0;
     // Trick to check half carry (https://robdor.com/2016/08/10/gameboy-emulator-half-carry-flag/)
                                 //Get first 4 bits, add 1 and mask it with 0x10 (5th bit)
-    LR35902::registers.F.C = ( ( ((*(info.registers_8[0]) & 0xF) + 1)     & 0x10) == 0x10);
+    LR35902::registers.F.H = ( ( ((*(info.registers_8[0]) & 0xF) + 1)     & 0x10) == 0x10);
 
-    (*(info.registers_8[0]))--;
+    (*(info.registers_8[0]))++;
     LR35902::registers.F.Z = ((*(info.registers_8[0])) == 0);
 }
 void OpCodeMapping::Call::DEC8(char**, Memory::Map&, OpStructure& info){
     LR35902::registers.F.N = 1;
+    //This raises the question if the values can be negative here.
+    LR35902::registers.F.H = ( ( (static_cast<int8_t>(*(info.registers_8[0]) & 0xF) - 1)) < 0);
     (*(info.registers_8[0]))--;
 
-    //This raises the question if the values can be negative here.
-    LR35902::registers.F.C = ( ( (static_cast<int8_t>(*(info.registers_8[0]) & 0xF) - 1)) < 0);
+    LR35902::registers.F.Z = ((*(info.registers_8[0])) == 0);
 }
 
 //Different from the 8 bit registers, this version does not set any flags
 void OpCodeMapping::Call::INC16(char**, Memory::Map&, OpStructure& info){
     (*(info.registers_16[0]))++;
+    LR35902::registers.F.N = 0;
 }
 void OpCodeMapping::Call::DEC16(char**, Memory::Map&, OpStructure& info){
     (*(info.registers_16[0]))--;
+    LR35902::registers.F.N = 1;
 }
 
 void OpCodeMapping::Call::INC_REG16V(char**, Memory::Map& memMap, OpStructure& info){
