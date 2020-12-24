@@ -102,11 +102,26 @@ void OpCodeMapping::Call::LD_REG_HLD(char** pc, Memory::Map& memMap, OpStructure
 
 void OpCodeMapping::Call::NOP(char** pc, Memory::Map& memMap, OpStructure& info){}
 
-void OpCodeMapping::Call::ADD8(char**, Memory::Map&, OpStructure& info){
-    *(info.registers_8[1]) += *(info.registers_8[0]);
+void OpCodeMapping::Call::ADC8(char**, Memory::Map&, OpStructure& info){
+    
+    LR35902::registers.F.C = ((static_cast<uint32_t>(LR35902::registers.A) + *(info.registers_8[0]) + LR35902::registers.F._C) > 0xFF);
+    //Overflow from 4th (or 3rd starting from 0) bit (1111) = > 16
+    LR35902::registers.F.H = ((static_cast<uint32_t>(LR35902::registers.A) + *(info.registers_8[0]) + LR35902::registers.F._C) > 0xF);;
+    LR35902::registers.A += *(info.registers_8[0]) + LR35902::registers.F._C;
+    LR35902::registers.F.Z = LR35902::registers.A;
+    LR35902::registers.F.N = 0;
 }
+
+void OpCodeMapping::Call::ADD8(char**, Memory::Map&, OpStructure& info){
+    LR35902::registers.F.H = ((((*(info.registers_8[0]) & 0xF) + ((*(info.registers_8[1])& 0xF)))  & 0x10) == 0x10);
+    LR35902::registers.F.C = ((static_cast<uint16_t>(*(info.registers_8[0])) + *(info.registers_8[1])) > 0xFF);
+    *(info.registers_8[1]) += *(info.registers_8[0]);
+    LR35902::registers.F.Z = (*(info.registers_8[1]) == 0);
+    LR35902::registers.F.N = 0;
+}
+
 void OpCodeMapping::Call::ADD16(char**, Memory::Map&, OpStructure& info){
-    LR35902::registers.F.H = ((((*(info.registers_16[0]) & 0xF) + ((*(info.registers_16[1]) & 0xF)))  & 0x10) == 0x10);
+    LR35902::registers.F.H = (((static_cast<int32_t>(*(info.registers_16[0]) & 0xFF) + ((*(info.registers_16[1]) & 0xFF))) & 0x100) == 0x100);
     LR35902::registers.F.C = ((static_cast<uint32_t>(*(info.registers_16[0])) + *(info.registers_16[1])) > 0xFFFF);
     *(info.registers_16[1]) += *(info.registers_16[0]);
     LR35902::registers.F.N = 0;

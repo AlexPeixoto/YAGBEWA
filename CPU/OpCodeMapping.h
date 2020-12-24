@@ -70,8 +70,10 @@ namespace CPU {
                 static void DEC_REG16V(char**, Memory::Map&, OpStructure&);
 
                 static void ADD8(char**, Memory::Map&, OpStructure&);
+                static void ADD8_REG16V(char**, Memory::Map&, OpStructure&);
                 static void ADD16(char**, Memory::Map&, OpStructure&);
-                static void ADC(char**, Memory::Map&, OpStructure&);
+                static void ADC8(char**, Memory::Map&, OpStructure&);
+                static void ADC8_REG16(char**, Memory::Map&, OpStructure&);
                 static void SUB(char**, Memory::Map&, OpStructure&);
                 static void SBC(char**, Memory::Map&, OpStructure&);
                 static void AND(char**, Memory::Map&, OpStructure&);
