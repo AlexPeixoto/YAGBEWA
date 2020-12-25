@@ -38,8 +38,6 @@ if(SFML_FOUND)
           target_link_libraries(${PROJECT_NAME} ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
 endif()
 
-message("CMAKE_OSX_ARCHITECTURES: ${CMAKE_OSX_ARCHITECTURES}")
-
 add_custom_target(WindowsCopyDLL	
 	COMMAND ${CMAKE_COMMAND} -E copy ${SFML_WINDOWS_ROOT}/bin/openal32.dll ${CMAKE_BINARY_DIR}
 	COMMAND ${CMAKE_COMMAND} -E copy ${SFML_WINDOWS_ROOT}/bin/sfml-audio-2.dll ${CMAKE_BINARY_DIR}
@@ -61,3 +59,6 @@ add_custom_target(WindowsCopyRom
 set_target_properties(${PROJECT_NAME} PROPERTIES
             CXX_STANDARD 17
             )
+
+
+add_subdirectory(UnitTests)
