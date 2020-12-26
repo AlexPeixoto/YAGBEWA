@@ -30,6 +30,8 @@ include_directories(APU)
 
 include_directories(IO)
 
+#Rework the code to use add_library
+
 find_package(SFML 2 REQUIRED network audio graphics window system)
 if(SFML_FOUND)
           include_directories(${SFML_INCLUDE_DIR})

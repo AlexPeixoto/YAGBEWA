@@ -1,13 +1,20 @@
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 #include <Catch/catch2.hpp>
 
-unsigned int Factorial( unsigned int number ) {
-    return number <= 1 ? number : Factorial(number-1)*number;
-}
+//Hack for UT
+#define private public
+#include <CPU/OpCodeMapping.h>
+#include <CPU/OpStructure.h>
 
+namespace {
+    CPU::OpCodeMapping mapping;
+    Memory::Map memMap;
+}
+//Have to add the .o files from the CPU folder
 TEST_CASE( "Factorials are computed", "[factorial]" ) {
-    REQUIRE( Factorial(1) == 1 );
-    REQUIRE( Factorial(2) == 2 );
-    REQUIRE( Factorial(3) == 6 );
-    REQUIRE( Factorial(10) == 3628800 );
+    char **pc = nullptr;
+
+    
+    auto _instruction = mapping.instructions[0];
+    _instruction.call(pc, memMap, _instruction);
 }
