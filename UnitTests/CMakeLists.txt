@@ -5,7 +5,7 @@ include_directories(.)
 
 file( GLOB TESTS *.cpp )
 
-
+include_directories(../CPU)
 
 enable_testing()
 foreach( testsourcefile ${TESTS} )
