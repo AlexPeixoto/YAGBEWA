@@ -66,8 +66,9 @@ void OpCodeMapping::Call::LD_REG8_REG16V(char** pc, Memory::Map& memMap, OpStruc
 }
 
 void OpCodeMapping::Call::LD_REG16V_d8(char** pc, Memory::Map& memMap, OpStructure& info){
+    *pc+=1;
     memMap.write(
-        *(info.registers_8[0]), //Write this value
+        **pc, //Write this value
         *(info.registers_16[0]) //At this location of the memory
     );
 }
