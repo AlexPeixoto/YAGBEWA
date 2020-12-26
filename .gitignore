@@ -5,9 +5,11 @@ CMakeCache.txt
 Makefile
 Tetris.gb
 GBEmulator
-cmake_install.cmake
+*.cmake
 UnitTests/cmake_install.cmake
 UnitTests/Example
 UnitTests/CMakeFiles/*
 UnitTests/CMakeCache.txt
+UnitTests/CTest*.cmake
+UnitTests/Instructions
 UnitTests/UnitTests/CTestTestfile.cmake
