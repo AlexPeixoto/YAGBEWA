@@ -51,9 +51,8 @@ namespace Memory{
 				CPU //This is like a master value, which can change "anything"
 			};
 			Map() {
-				std::cout << "Created" << std::endl;
-				for(int x=0; x< 0xffff; x++)
-					memory.at(x) = static_cast<uint8_t>(134);
+				//for(int x=0; x< 0xffff; x++)
+				//	memory.at(x) = static_cast<uint8_t>(134);
 			};
 
 			bool isValidWrite(std::size_t size, MemArea area) const {

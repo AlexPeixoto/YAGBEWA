@@ -110,7 +110,7 @@ void OpCodeMapping::Call::ADC8(char**, Memory::Map&, OpStructure& info){
     //Overflow from 4th (or 3rd starting from 0) bit (1111) = > 16
     LR35902::registers.F.H = ((static_cast<uint32_t>(LR35902::registers.A) + *(info.registers_8[0]) + LR35902::registers.F._C) > 0xF);;
     LR35902::registers.A += *(info.registers_8[0]) + LR35902::registers.F._C;
-    LR35902::registers.F.Z = LR35902::registers.A;
+    LR35902::registers.F.Z = (LR35902::registers.A == 0);
     LR35902::registers.F.N = 0;
 }
 
