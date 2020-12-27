@@ -53,44 +53,38 @@ namespace Memory{
 			Map() {
 				//for(int x=0; x< 0xffff; x++)
 				//	memory.at(x) = static_cast<uint8_t>(134);
-				/* Powerup Sequence
-				  	AF=$01B0
-					BC=$0013
-					DE=$00D8
-					HL=$014D
-					Stack Pointer=$FFFE
-					[$FF05] = $00   ; TIMA
-					[$FF06] = $00   ; TMA
-					[$FF07] = $00   ; TAC
-					[$FF10] = $80   ; NR10
-					[$FF11] = $BF   ; NR11
-					[$FF12] = $F3   ; NR12
-					[$FF14] = $BF   ; NR14
-					[$FF16] = $3F   ; NR21
-					[$FF17] = $00   ; NR22
-					[$FF19] = $BF   ; NR24
-					[$FF1A] = $7F   ; NR30
-					[$FF1B] = $FF   ; NR31
-					[$FF1C] = $9F   ; NR32
-					[$FF1E] = $BF   ; NR34
-					[$FF20] = $FF   ; NR41
-					[$FF21] = $00   ; NR42
-					[$FF22] = $00   ; NR43
-					[$FF23] = $BF   ; NR44
-					[$FF24] = $77   ; NR50
-					[$FF25] = $F3   ; NR51
-					[$FF26] = $F1-GB, $F0-SGB ; NR52
-					[$FF40] = $91   ; LCDC
-					[$FF42] = $00   ; SCY
-					[$FF43] = $00   ; SCX
-					[$FF45] = $00   ; LYC
-					[$FF47] = $FC   ; BGP
-					[$FF48] = $FF   ; OBP0
-					[$FF49] = $FF   ; OBP1
-					[$FF4A] = $00   ; WY
-					[$FF4B] = $00   ; WX
-					[$FFFF] = $00   ; IE
-					*/
+				// Power up sequence
+				memory.at(0xFF05) = 0x00; //TIMA
+				memory.at(0xFF06) = 0x00; //TMA
+				memory.at(0xFF07) = 0x00; //TAC
+				memory.at(0xFF10) = 0x80; //NR10
+				memory.at(0xFF11) = 0xBF; //NR11
+				memory.at(0xFF12) = 0xF3; //NR12
+				memory.at(0xFF14) = 0xBF; //NR14
+				memory.at(0xFF16) = 0x3F; //NR21
+				memory.at(0xFF17) = 0x00; //NR22
+				memory.at(0xFF19) = 0xBF; //NR24
+				memory.at(0xFF1A) = 0x7F; //NR30
+				memory.at(0xFF1B) = 0xFF; //NR31
+				memory.at(0xFF1C) = 0x9F; //NR32
+				memory.at(0xFF1E) = 0xBF; //NR34
+				memory.at(0xFF20) = 0xFF; //NR41
+				memory.at(0xFF21) = 0x00; //NR42
+				memory.at(0xFF22) = 0x00; //NR43
+				memory.at(0xFF23) = 0xBF; //NR44
+				memory.at(0xFF24) = 0x77; //NR50
+				memory.at(0xFF25) = 0xF3; //NR51
+				memory.at(0xFF26) = 0x00; //TODO: Check this later... F1; //-GB, $F0-SGB ; NR52
+				memory.at(0xFF40) = 0x91; //LCDC
+				memory.at(0xFF42) = 0x00; //SCY
+				memory.at(0xFF43) = 0x00; //SCX
+				memory.at(0xFF45) = 0x00; //LYC
+				memory.at(0xFF47) = 0xFC; //BGP
+				memory.at(0xFF48) = 0xFF; //OBP0
+				memory.at(0xFF49) = 0xFF; //OBP1
+				memory.at(0xFF4A) = 0x00; //WY
+				memory.at(0xFF4B) = 0x00; //WX
+				memory.at(0xFFFF) = 0x00; //IE
 				//Set FF00 as F and prevent any further writes to it until IO is done 
 			};
 

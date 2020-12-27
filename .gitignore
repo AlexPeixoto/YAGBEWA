@@ -6,6 +6,7 @@ Makefile
 Tetris.gb
 GBEmulator
 *.cmake
+cmake_install.cmake
 UnitTests/cmake_install.cmake
 UnitTests/Example
 UnitTests/CMakeFiles/*
