@@ -7,7 +7,8 @@
 #include <iostream>
 
 namespace Memory{
-	using MemoryArray = std::array<uint8_t, 0xFFFF>;
+	// 0xFFFF + 1.... (interrupted segment)
+	using MemoryArray = std::array<uint8_t, 0x10000>;
 
 	struct Segment {
 		uint16_t position;

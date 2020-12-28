@@ -35,4 +35,41 @@ TEST_CASE( "Test ADC8", "[INSTRUCTIONS]" ) {
     REQUIRE(LR35902::registers.F.H == 0);
     REQUIRE(LR35902::registers.F.C == 0);
     REQUIRE(LR35902::registers.A == 11);
+
+    delete _instruction.registers_8[0];
+}
+
+TEST_CASE( "Test ADC8 Half", "[INSTRUCTIONS]" ) {
+    char **pc = new char*();
+    *pc = new char[16]{0x0, 0x1};
+    
+    auto _instruction = mapping.instructions[0x88];
+    LR35902::registers.A = 0xF;
+    _instruction.registers_8[0] = new uint8_t();
+    *(_instruction.registers_8[0]) = static_cast<char>(0);
+    _instruction.call(pc, memMap, _instruction);
+    REQUIRE(LR35902::registers.F.H == 0);
+    // Now do a half overflow
+    *(_instruction.registers_8[0]) = static_cast<char>(1);
+    _instruction.call(pc, memMap, _instruction);
+    REQUIRE(LR35902::registers.F.H == 1);
+    REQUIRE(LR35902::registers.F.C == 0);
+    delete _instruction.registers_8[0];
+}
+
+TEST_CASE( "Test ADC8 Carry", "[INSTRUCTIONS]" ) {
+    char **pc = new char*();
+    *pc = new char[16]{0x0, 0x1};
+    
+    auto _instruction = mapping.instructions[0x88];
+    LR35902::registers.A = 0xFF;
+    _instruction.registers_8[0] = new uint8_t();
+    *(_instruction.registers_8[0]) = static_cast<char>(0);
+    _instruction.call(pc, memMap, _instruction);
+    REQUIRE(LR35902::registers.F.C == 0);
+    // Now do a half overflow
+    *(_instruction.registers_8[0]) = static_cast<char>(1);
+    _instruction.call(pc, memMap, _instruction);
+    REQUIRE(LR35902::registers.F.C == 1);
+    delete _instruction.registers_8[0];
 }
