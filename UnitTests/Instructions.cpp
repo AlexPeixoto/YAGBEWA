@@ -12,9 +12,25 @@ using namespace Memory;
 namespace {
     OpCodeMapping mapping;
     Map memMap;
+
+    void resetRegisters(){
+        LR35902::registers.A = 0;
+        LR35902::registers.BC._pair = 0;
+        LR35902::registers.DE._pair = 0;
+        LR35902::registers.HL._pair = 0;
+        LR35902::registers.SP = 0;
+        LR35902::registers.PC = 0;
+
+        LR35902::registers.F.Z = 0;
+        LR35902::registers.F.N = 0;
+        LR35902::registers.F.H = 0;
+        LR35902::registers.F.C = 0;
+        LR35902::registers.F._C = 0;
+    }
 }
 
 TEST_CASE( "Check for STOP", "[INSTRUCTIONS]" ) {
+    resetRegisters();
     REQUIRE(CPU::LR35902::halt == false);
     auto _instruction = mapping.instructions[0x76];
     _instruction.call(nullptr, memMap, _instruction);
@@ -22,6 +38,7 @@ TEST_CASE( "Check for STOP", "[INSTRUCTIONS]" ) {
 }
 
 TEST_CASE( "Test ADC8", "[INSTRUCTIONS]" ) {
+    resetRegisters();
     char **pc = new char*();
     *pc = new char[16]{0x0, 0x1};
     
@@ -40,6 +57,7 @@ TEST_CASE( "Test ADC8", "[INSTRUCTIONS]" ) {
 }
 
 TEST_CASE( "Test ADC8 Half", "[INSTRUCTIONS]" ) {
+    resetRegisters();
     char **pc = new char*();
     *pc = new char[16]{0x0, 0x1};
     
@@ -72,4 +90,15 @@ TEST_CASE( "Test ADC8 Carry", "[INSTRUCTIONS]" ) {
     _instruction.call(pc, memMap, _instruction);
     REQUIRE(LR35902::registers.F.C == 1);
     delete _instruction.registers_8[0];
+}
+
+TEST_CASE( "Test DAA", "[INSTRUCTIONS]" ) {
+    resetRegisters();
+    char **pc = new char*();
+    *pc = new char[16]{0x0, 0x1};
+    
+    auto _instruction = mapping.instructions[0x27];
+    LR35902::registers.A = 14;
+    _instruction.call(pc, memMap, _instruction);
+    REQUIRE(static_cast<uint32_t>(LR35902::registers.A) == 0x14);
 }

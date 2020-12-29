@@ -228,8 +228,9 @@ void OpCodeMapping::Call::DAA(char**, Memory::Map&, OpStructure&){
     // From https://forums.nesdev.com/viewtopic.php?t=15944.
     if (!LR35902::registers.F.N) {  
         // after an addition, adjust if (half-)carry occurred or if result is out of bounds
-        if (LR35902::registers.F.C || a > 0x99) { a += 0x60; LR35902::registers.F.C = 1; }
-        if (LR35902::registers.F.H || (a & 0x0f) > 0x09) { a += 0x6; }
+        if (LR35902::registers.F.C || a > 0x9F) { a += 0x60; LR35902::registers.F.C = 1; }
+        if (LR35902::registers.F.H || (a & 0xF) > 9) { a += 0x6; }
+        
     } else {  
         // after a subtraction, only adjust if (half-)carry occurred
         if (LR35902::registers.F.C) { a -= 0x60; }
@@ -238,6 +239,7 @@ void OpCodeMapping::Call::DAA(char**, Memory::Map&, OpStructure&){
     // these flags are always updated
     LR35902::registers.F.Z = (a == 0); // the usual z flag
     LR35902::registers.F.H = 0; // h flag is always cleared
+    LR35902::registers.A = a;
 }
 
 void OpCodeMapping::Call::JR_r8(char** pc, Memory::Map& memMap, OpStructure& info){
