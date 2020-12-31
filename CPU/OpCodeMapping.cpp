@@ -108,31 +108,54 @@ void OpCodeMapping::Call::LD_REG_HLD(char** pc, Memory::Map& memMap, OpStructure
 void OpCodeMapping::Call::NOP(char** pc, Memory::Map& memMap, OpStructure& info){}
 
 void OpCodeMapping::Call::ADC8(char**, Memory::Map&, OpStructure& info){
+    const uint8_t val = *(info.registers_8[1]);
     LR35902::registers.F._C = LR35902::registers.F.C;
-    LR35902::registers.F.C = ((static_cast<uint32_t>(LR35902::registers.A) + *(info.registers_8[0]) + LR35902::registers.F._C) > 0xFF);
+    LR35902::registers.F.C = ((static_cast<uint32_t>(*(info.registers_8[0])) + val + LR35902::registers.F._C) > 0xFF);
     //Overflow from 4th (or 3rd starting from 0) bit (1111) = > 16
-    LR35902::registers.F.H = ((static_cast<uint32_t>(LR35902::registers.A) + *(info.registers_8[0]) + LR35902::registers.F._C) > 0xF);;
-    LR35902::registers.A += *(info.registers_8[0]) + LR35902::registers.F._C;
-    LR35902::registers.F.Z = (LR35902::registers.A == 0);
+    LR35902::registers.F.H = ((static_cast<uint32_t>(*(info.registers_8[0])) + val + LR35902::registers.F._C) > 0xF);;
+    *(info.registers_8[0]) += val + LR35902::registers.F._C;
+    LR35902::registers.F.Z = (*(info.registers_8[0]) == 0);
     LR35902::registers.F.N = 0;
 }
 
 void OpCodeMapping::Call::ADC8_REG16V(char**, Memory::Map& memMap, OpStructure& info){
     const uint8_t val = memMap.read(*(info.registers_16[0]));
     LR35902::registers.F._C = LR35902::registers.F.C;
-    LR35902::registers.F.C = ((static_cast<uint32_t>(LR35902::registers.A) + val + LR35902::registers.F._C) > 0xFF);
+    LR35902::registers.F.C = ((static_cast<uint32_t>(*(info.registers_8[0])) + val + LR35902::registers.F._C) > 0xFF);
     //Overflow from 4th (or 3rd starting from 0) bit (1111) = > 16
-    LR35902::registers.F.H = ((static_cast<uint32_t>(LR35902::registers.A) + val + LR35902::registers.F._C) > 0xF);;
-    LR35902::registers.A += val + LR35902::registers.F._C;
-    LR35902::registers.F.Z = (LR35902::registers.A == 0);
+    LR35902::registers.F.H = ((static_cast<uint32_t>(*(info.registers_8[0])) + val + LR35902::registers.F._C) > 0xF);
+    *(info.registers_8[0]) += val + LR35902::registers.F._C;
+    LR35902::registers.F.Z = (*(info.registers_8[0]) == 0);
+    LR35902::registers.F.N = 0;
+}
+
+void OpCodeMapping::Call::SBC8(char**, Memory::Map&, OpStructure& info){
+    const uint8_t val = *(info.registers_8[1]);
+    LR35902::registers.F._C = LR35902::registers.F.C;
+    LR35902::registers.F.C = ((static_cast<uint32_t>(*(info.registers_8[0])) - val - LR35902::registers.F._C) > 0xFF);
+    //Overflow from 4th (or 3rd starting from 0) bit (1111) = > 16
+    LR35902::registers.F.H = ((static_cast<uint32_t>(*(info.registers_8[0])) - val - LR35902::registers.F._C) > 0xF);
+    *(info.registers_8[0]) -= val - LR35902::registers.F._C;
+    LR35902::registers.F.Z = (*(info.registers_8[0]) == 0);
+    LR35902::registers.F.N = 0;
+}
+
+void OpCodeMapping::Call::SBC8_REG16V(char**, Memory::Map& memMap, OpStructure& info){
+    const uint8_t val = memMap.read(*(info.registers_16[0]));
+    LR35902::registers.F._C = LR35902::registers.F.C;
+    LR35902::registers.F.H = ((static_cast<int8_t>(*(info.registers_8[0]) & 0xF) - (val & 0xF) - LR35902::registers.F._C) < 0);
+    LR35902::registers.F.C = ((static_cast<int16_t>(*(info.registers_8[0])) - val - LR35902::registers.F._C) < 0);
+    *(info.registers_8[0]) -= val - LR35902::registers.F._C;
+    LR35902::registers.F.Z = (*(info.registers_8[0]) == 0);
     LR35902::registers.F.N = 0;
 }
 
 void OpCodeMapping::Call::SUB8(char**, Memory::Map&, OpStructure& info){
+    const uint8_t val = *(info.registers_8[1]);
     //alternative LR35902::registers.F.H = ((*(info.registers_8[0]) & 0xF) < (sub & 0xF));
-    LR35902::registers.F.H = ((( static_cast<int8_t>(*(info.registers_8[0]) & 0xF) - ((*(info.registers_8[1])& 0xF)))) < 0);
-    LR35902::registers.F.C = ((static_cast<int16_t>(*(info.registers_8[0])) - *(info.registers_8[1])) < 0);
-    *(info.registers_8[0]) -= *(info.registers_8[1]);
+    LR35902::registers.F.H = ((static_cast<int8_t>(*(info.registers_8[0]) & 0xF) - (val & 0xF)) < 0);
+    LR35902::registers.F.C = ((static_cast<int16_t>(*(info.registers_8[0])) - val) < 0);
+    *(info.registers_8[0]) -= val;
     LR35902::registers.F.Z = (*(info.registers_8[0]) == 0);
     LR35902::registers.F.N = 1;
 }
@@ -140,7 +163,7 @@ void OpCodeMapping::Call::SUB8(char**, Memory::Map&, OpStructure& info){
 void OpCodeMapping::Call::SUB8_REG16V(char**, Memory::Map& memMap, OpStructure& info){
     const uint8_t val = memMap.read(*(info.registers_16[0]));
     //alternative LR35902::registers.F.H = ((*(info.registers_8[0]) & 0xF) < (sub & 0xF));
-    LR35902::registers.F.H = ((( static_cast<int8_t>(*(info.registers_8[0]) & 0xF) - ((val & 0xF)))) < 0);
+    LR35902::registers.F.H = ((static_cast<int8_t>(*(info.registers_8[0]) & 0xF) - (val & 0xF)) < 0);
     LR35902::registers.F.C = ((static_cast<int16_t>(*(info.registers_8[0])) - val) < 0);
     *(info.registers_8[0]) -= val;
     LR35902::registers.F.Z = (val == 0);
@@ -148,9 +171,10 @@ void OpCodeMapping::Call::SUB8_REG16V(char**, Memory::Map& memMap, OpStructure& 
 }
 
 void OpCodeMapping::Call::ADD8(char**, Memory::Map&, OpStructure& info){
-    LR35902::registers.F.H = ((((*(info.registers_8[0]) & 0xF) + ((*(info.registers_8[1])& 0xF)))  & 0x10) == 0x10);
-    LR35902::registers.F.C = ((static_cast<uint16_t>(*(info.registers_8[0])) + *(info.registers_8[1])) > 0xFF);
-    *(info.registers_8[0]) += *(info.registers_8[1]);
+    const uint8_t val = *(info.registers_8[1]);
+    LR35902::registers.F.H = ((((*(info.registers_8[0]) & 0xF) + (val & 0xF)) & 0x10) == 0x10);
+    LR35902::registers.F.C = ((static_cast<uint16_t>(*(info.registers_8[0])) + val) > 0xFF);
+    *(info.registers_8[0]) += val;
     LR35902::registers.F.Z = (*(info.registers_8[0]) == 0);
     LR35902::registers.F.N = 0;
 }
@@ -176,7 +200,6 @@ void OpCodeMapping::Call::INC8(char**, Memory::Map&, OpStructure& info){
     // Trick to check half carry (https://robdor.com/2016/08/10/gameboy-emulator-half-carry-flag/)
                                 //Get first 4 bits, add 1 and mask it with 0x10 (5th bit)
     LR35902::registers.F.H = ( ( ((*(info.registers_8[0]) & 0xF) + 1)     & 0x10) == 0x10);
-
     (*(info.registers_8[0]))++;
     LR35902::registers.F.Z = ((*(info.registers_8[0])) == 0);
 }
@@ -185,7 +208,6 @@ void OpCodeMapping::Call::DEC8(char**, Memory::Map&, OpStructure& info){
     //This raises the question if the values can be negative here.
     LR35902::registers.F.H = ( ( (static_cast<int8_t>(*(info.registers_8[0]) & 0xF) - 1)) < 0);
     (*(info.registers_8[0]))--;
-
     LR35902::registers.F.Z = ((*(info.registers_8[0])) == 0);
 }
 
@@ -205,7 +227,6 @@ void OpCodeMapping::Call::INC_REG16V(char**, Memory::Map& memMap, OpStructure& i
 void OpCodeMapping::Call::DEC_REG16V(char**, Memory::Map& memMap, OpStructure& info){
     memMap.read(*(info.registers_16[0]))--;
 }
-
 
 // In some instances here the 0x1 is redundant, but its left to make the intentions clear.
 void OpCodeMapping::Call::RLCA(char**, Memory::Map&, OpStructure& info){
@@ -276,13 +297,13 @@ void OpCodeMapping::Call::DAA(char**, Memory::Map&, OpStructure&){
 }
 
 void OpCodeMapping::Call::JR_r8(char** pc, Memory::Map& memMap, OpStructure& info){
-    *pc+=*(info.registers_8[0]);
+    *pc+=static_cast<int8_t>(*(*pc++));
 }
 
 void OpCodeMapping::Call::JR_Z_r8(char** pc, Memory::Map& memMap, OpStructure& info){
     // jump if Z is set
     if( LR35902::registers.F.Z ) {
-       *pc+= (*(info.registers_8[0]));
+       *pc+=static_cast<int8_t>(*(*pc++));
        LR35902::extraCycles=1;
     }
 }
@@ -290,7 +311,7 @@ void OpCodeMapping::Call::JR_Z_r8(char** pc, Memory::Map& memMap, OpStructure& i
 void OpCodeMapping::Call::JR_C_r8(char** pc, Memory::Map& memMap, OpStructure& info){
     // jump if Z is set
     if( LR35902::registers.F.C ) {
-       *pc+= (*(info.registers_8[0]));
+       *pc+=static_cast<int8_t>(*(*pc++));
        LR35902::extraCycles=1;
     }
 }
@@ -299,7 +320,7 @@ void OpCodeMapping::Call::JR_C_r8(char** pc, Memory::Map& memMap, OpStructure& i
 void OpCodeMapping::Call::JR_NZ_r8(char** pc, Memory::Map& memMap, OpStructure& info){
     // jump if Z is not set
     if( !LR35902::registers.F.Z ) {
-       *pc+= (*(info.registers_8[0]));
+       *pc+=static_cast<int8_t>(*(*pc++));
        LR35902::extraCycles=1;
     }
 }
@@ -307,7 +328,7 @@ void OpCodeMapping::Call::JR_NZ_r8(char** pc, Memory::Map& memMap, OpStructure& 
 void OpCodeMapping::Call::JR_NC_r8(char** pc, Memory::Map& memMap, OpStructure& info){
     // jump if C is not set
     if( !LR35902::registers.F.C ) {
-       *pc+= (*(info.registers_8[0]));
+       *pc+=static_cast<int8_t>(*(*pc++));
        LR35902::extraCycles=1;
     }
 }
