@@ -233,7 +233,7 @@ void OpCodeMapping::Call::AND8(char**, Memory::Map&, OpStructure& info){
     LR35902::registers.F.H = 1;
     LR35902::registers.F.C = 0;
 }
-void OpCodeMapping::Call::AND8_REG16V(char**, Memory::Map&, OpStructure& info){
+void OpCodeMapping::Call::AND8_REG16V(char**, Memory::Map& memMap, OpStructure& info){
     uint8_t val = memMap.read(*(info.registers_16[0]));
     //info.registers_8[0]
     LR35902::registers.A &= val;
@@ -250,7 +250,7 @@ void OpCodeMapping::Call::XOR8(char**, Memory::Map&, OpStructure& info){
     LR35902::registers.F.H = 0;
     LR35902::registers.F.C = 0;
 }
-void OpCodeMapping::Call::XOR8_REG16V(char**, Memory::Map&, OpStructure& info){
+void OpCodeMapping::Call::XOR8_REG16V(char**, Memory::Map& memMap, OpStructure& info){
     uint8_t val = memMap.read(*(info.registers_16[0]));
     //info.registers_8[0]
     LR35902::registers.A |= val;
@@ -380,6 +380,8 @@ void bit(){
     int a = 1 << N;
 }
 /*
+For Jump convert the memory address, not the value
+reinterpret_cast should work as expected
 void OpCodeMapping::Call::LD_REGV_d16(char**, Memory::Map&, OpStructure&){}
 void OpCodeMapping::Call::LD_REG16_REG8(char** pc, Memory::Map& memMap, OpStructure& info){}
 void OpCodeMapping::Call::LD_REG8_REG16(char** pc, Memory::Map& memMap, OpStructure& info){}
