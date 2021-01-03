@@ -103,6 +103,7 @@ namespace CPU {
                 static void RRA(Memory::Map&, OpStructure&);
 
                 static void RET(Memory::Map&, OpStructure&);
+                static void RET_NZ(Memory::Map&, OpStructure&);
 
             private:
                 //Internal push/pop instructions, those are not mapped to opcodes, but insteasd used
