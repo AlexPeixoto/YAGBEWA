@@ -31,78 +31,78 @@ namespace CPU {
                  * to avoid the cost of de-reference it (even if the compiler might be able to optimize it), cases like XOR or AND that always operates
                  * on top of Register.A will still pass it via OpStructure, even if its not "called" via OpStructure.
                  */
-                static void LD_REG16_REG16(char**, Memory::Map&, OpStructure&);
-                static void LD_REG16_REG8(char**, Memory::Map&, OpStructure&);
-                static void LD_REG8_REG16(char**, Memory::Map&, OpStructure&);
-                static void LD_REG8_REG8(char**, Memory::Map&, OpStructure&);
+                static void LD_REG16_REG16(Memory::Map&, OpStructure&);
+                static void LD_REG16_REG8(Memory::Map&, OpStructure&);
+                static void LD_REG8_REG16(Memory::Map&, OpStructure&);
+                static void LD_REG8_REG8(Memory::Map&, OpStructure&);
 
                 /* REGV, instead of taking the value itself this is treated as a pointer */
-                static void LD_REG16V_REG8(char**, Memory::Map&, OpStructure&);
-                static void LD_REG8_REG16V(char**, Memory::Map&, OpStructure&);
+                static void LD_REG16V_REG8(Memory::Map&, OpStructure&);
+                static void LD_REG8_REG16V(Memory::Map&, OpStructure&);
 
-                static void LD_REG16_d16(char**, Memory::Map&, OpStructure&);
-                static void LD_REG8_d8(char**, Memory::Map&, OpStructure&);
-                static void LD_REGV_d16(char**, Memory::Map&, OpStructure&);
-                static void LD_REG16V_d8(char**, Memory::Map&, OpStructure&);
+                static void LD_REG16_d16(Memory::Map&, OpStructure&);
+                static void LD_REG8_d8(Memory::Map&, OpStructure&);
+                static void LD_REGV_d16(Memory::Map&, OpStructure&);
+                static void LD_REG16V_d8(Memory::Map&, OpStructure&);
 
                 // Maps LD (HL+) A
-                static void LD_HLI_REG(char**, Memory::Map&, OpStructure&);
-                static void LD_HLD_REG(char**, Memory::Map&, OpStructure&);
+                static void LD_HLI_REG(Memory::Map&, OpStructure&);
+                static void LD_HLD_REG(Memory::Map&, OpStructure&);
 
                 // Maps LD A (HL+)
-                static void LD_REG_HLI(char**, Memory::Map&, OpStructure&);
-                static void LD_REG_HLD(char**, Memory::Map&, OpStructure&);
+                static void LD_REG_HLI(Memory::Map&, OpStructure&);
+                static void LD_REG_HLD(Memory::Map&, OpStructure&);
 
                 // SP specific LD instructions.
-                static void LD_a16_SP(char**, Memory::Map&, OpStructure&);
-                static void LD_HL_SP_r8(char**, Memory::Map&, OpStructure&);
-                static void LD_SP_HL(char**, Memory::Map&, OpStructure&);
+                static void LD_a16_SP(Memory::Map&, OpStructure&);
+                static void LD_HL_SP_r8(Memory::Map&, OpStructure&);
+                static void LD_SP_HL(Memory::Map&, OpStructure&);
 
                 // JUMP
-                static void JR_r8(char**, Memory::Map&, OpStructure&);
-                static void JR_C_r8(char**, Memory::Map&, OpStructure&);
-                static void JR_NC_r8(char**, Memory::Map&, OpStructure&);
-                static void JR_NZ_r8(char**, Memory::Map&, OpStructure&);
-                static void JR_Z_r8(char**, Memory::Map&, OpStructure&);
+                static void JR_r8(Memory::Map&, OpStructure&);
+                static void JR_C_r8(Memory::Map&, OpStructure&);
+                static void JR_NC_r8(Memory::Map&, OpStructure&);
+                static void JR_NZ_r8(Memory::Map&, OpStructure&);
+                static void JR_Z_r8(Memory::Map&, OpStructure&);
 
-                static void INC16(char**, Memory::Map&, OpStructure&);
-                static void INC8(char**, Memory::Map&, OpStructure&);
-                static void DEC16(char**, Memory::Map&, OpStructure&);
-                static void DEC8(char**, Memory::Map&, OpStructure&);
-                static void INC_REG16V(char**, Memory::Map&, OpStructure&);
-                static void DEC_REG16V(char**, Memory::Map&, OpStructure&);
+                static void INC16(Memory::Map&, OpStructure&);
+                static void INC8(Memory::Map&, OpStructure&);
+                static void DEC16(Memory::Map&, OpStructure&);
+                static void DEC8(Memory::Map&, OpStructure&);
+                static void INC_REG16V(Memory::Map&, OpStructure&);
+                static void DEC_REG16V(Memory::Map&, OpStructure&);
 
-                static void ADD8(char**, Memory::Map&, OpStructure&);
-                static void ADD8_REG16V(char**, Memory::Map&, OpStructure&);
-                static void ADD16(char**, Memory::Map&, OpStructure&);
-                static void ADC8(char**, Memory::Map&, OpStructure&);
-                static void ADC8_REG16V(char**, Memory::Map&, OpStructure&);
-                static void SUB8(char**, Memory::Map&, OpStructure&);
-                static void SUB8_REG16V(char**, Memory::Map&, OpStructure&);
-                static void SBC8(char**, Memory::Map&, OpStructure&);
-                static void SBC8_REG16V(char**, Memory::Map&, OpStructure&);
-                static void AND8(char**, Memory::Map&, OpStructure&);
-                static void AND8_REG16V(char**, Memory::Map&, OpStructure&);
-                static void XOR8(char**, Memory::Map&, OpStructure&);
-                static void XOR8_REG16V(char**, Memory::Map&, OpStructure&);
-                static void OR8(char**, Memory::Map&, OpStructure&);
-                static void OR8_REG16V(char**, Memory::Map&, OpStructure&);
-                static void CP8(char**, Memory::Map&, OpStructure&);
-                static void CP8_REG16V(char**, Memory::Map&, OpStructure&);
-                static void CPL(char**, Memory::Map&, OpStructure&);
-                static void DAA(char**, Memory::Map&, OpStructure&);
-                static void SCF(char**, Memory::Map&, OpStructure&);
-                static void CCF(char**, Memory::Map&, OpStructure&);
+                static void ADD8(Memory::Map&, OpStructure&);
+                static void ADD8_REG16V(Memory::Map&, OpStructure&);
+                static void ADD16(Memory::Map&, OpStructure&);
+                static void ADC8(Memory::Map&, OpStructure&);
+                static void ADC8_REG16V(Memory::Map&, OpStructure&);
+                static void SUB8(Memory::Map&, OpStructure&);
+                static void SUB8_REG16V(Memory::Map&, OpStructure&);
+                static void SBC8(Memory::Map&, OpStructure&);
+                static void SBC8_REG16V(Memory::Map&, OpStructure&);
+                static void AND8(Memory::Map&, OpStructure&);
+                static void AND8_REG16V(Memory::Map&, OpStructure&);
+                static void XOR8(Memory::Map&, OpStructure&);
+                static void XOR8_REG16V(Memory::Map&, OpStructure&);
+                static void OR8(Memory::Map&, OpStructure&);
+                static void OR8_REG16V(Memory::Map&, OpStructure&);
+                static void CP8(Memory::Map&, OpStructure&);
+                static void CP8_REG16V(Memory::Map&, OpStructure&);
+                static void CPL(Memory::Map&, OpStructure&);
+                static void DAA(Memory::Map&, OpStructure&);
+                static void SCF(Memory::Map&, OpStructure&);
+                static void CCF(Memory::Map&, OpStructure&);
 
-                static void NOP(char**, Memory::Map&, OpStructure&);
-                static void RLCA(char**, Memory::Map&, OpStructure&);
-                static void RRCA(char**, Memory::Map&, OpStructure&);
-                static void STOP(char**, Memory::Map&, OpStructure&);
-                static void HALT(char**, Memory::Map&, OpStructure&);
-                static void RLA(char**, Memory::Map&, OpStructure&);
-                static void RRA(char**, Memory::Map&, OpStructure&);
+                static void NOP(Memory::Map&, OpStructure&);
+                static void RLCA(Memory::Map&, OpStructure&);
+                static void RRCA(Memory::Map&, OpStructure&);
+                static void STOP(Memory::Map&, OpStructure&);
+                static void HALT(Memory::Map&, OpStructure&);
+                static void RLA(Memory::Map&, OpStructure&);
+                static void RRA(Memory::Map&, OpStructure&);
 
-                static void RET(char**, Memory::Map&, OpStructure&);
+                static void RET(Memory::Map&, OpStructure&);
 
             private:
                 //Internal push/pop instructions, those are not mapped to opcodes, but insteasd used
