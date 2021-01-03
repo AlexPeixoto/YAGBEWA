@@ -20,7 +20,7 @@ namespace CPU {
 		//Stack pointer
 		uint16_t SP;
 		//Program counter
-		uintptr_t PC;
+		uint8_t  *PC;
 
 		struct F {
 			uint8_t Z : 1;

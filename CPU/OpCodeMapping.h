@@ -27,6 +27,9 @@ namespace CPU {
                 /*
                  * Instead of mapping it 1-1 based on the instructions table.
                  * The idea here is to map all the possible instructions and store the data on the OpStructure
+                 * Have in mind that even if some instructions will have both registers as operands mapped, they might not be used
+                 * to avoid the cost of de-reference it (even if the compiler might be able to optimize it), cases like XOR or AND that always operates
+                 * on top of Register.A will still pass it via OpStructure, even if its not "called" via OpStructure.
                  */
                 static void LD_REG16_REG16(char**, Memory::Map&, OpStructure&);
                 static void LD_REG16_REG8(char**, Memory::Map&, OpStructure&);
@@ -82,8 +85,10 @@ namespace CPU {
                 static void AND8_REG16V(char**, Memory::Map&, OpStructure&);
                 static void XOR8(char**, Memory::Map&, OpStructure&);
                 static void XOR8_REG16V(char**, Memory::Map&, OpStructure&);
-                static void OR(char**, Memory::Map&, OpStructure&);
-                static void CP(char**, Memory::Map&, OpStructure&);
+                static void OR8(char**, Memory::Map&, OpStructure&);
+                static void OR8_REG16V(char**, Memory::Map&, OpStructure&);
+                static void CP8(char**, Memory::Map&, OpStructure&);
+                static void CP8_REG16V(char**, Memory::Map&, OpStructure&);
                 static void CPL(char**, Memory::Map&, OpStructure&);
                 static void DAA(char**, Memory::Map&, OpStructure&);
                 static void SCF(char**, Memory::Map&, OpStructure&);
@@ -96,6 +101,15 @@ namespace CPU {
                 static void HALT(char**, Memory::Map&, OpStructure&);
                 static void RLA(char**, Memory::Map&, OpStructure&);
                 static void RRA(char**, Memory::Map&, OpStructure&);
+
+                static void RET(char**, Memory::Map&, OpStructure&);
+
+            private:
+                //Internal push/pop instructions, those are not mapped to opcodes, but insteasd used
+                static void _push8(Memory::Map&, uint8_t);
+                static void _push16(Memory::Map&, uint16_t);
+                static uint8_t _pop8(Memory::Map&);
+                static uint16_t _pop16(Memory::Map&);
         };
     };
 }
