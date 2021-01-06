@@ -32,7 +32,7 @@ OpCodeMapping::OpCodeMapping() :
         //Bx[0..F]
         {/* Bx0 */ 4,  OP::OR8, &LR35902::registers.A, &LR35902::registers.BC._reg[0]},  {/* Bx1 */ 4,  OP::OR8, &LR35902::registers.A, &LR35902::registers.BC._reg[1]}, {/* Bx2 */ 4,  OP::OR8, &LR35902::registers.A, &LR35902::registers.DE._reg[0]}, {/* Bx3 */ 4,  OP::OR8, &LR35902::registers.A, &LR35902::registers.DE._reg[1]}, {/* Bx4 */ 4,  OP::OR8, &LR35902::registers.A, &LR35902::registers.HL._reg[0]}, {/* Bx5 */ 4,  OP::OR8, &LR35902::registers.A, &LR35902::registers.HL._reg[1]}, {/* Bx6 */ 8,  OP::OR8_REG16V, &LR35902::registers.A, &LR35902::registers.HL._pair}, {/* Bx7 */ 4,  OP::OR8, &LR35902::registers.A, &LR35902::registers.A}, {/* Bx8 */ 4,  OP::CP8, &LR35902::registers.A, &LR35902::registers.BC._reg[0]}, {/* Bx9 */ 4,  OP::CP8, &LR35902::registers.A, &LR35902::registers.BC._reg[1]}, {/* BxA */ 4,  OP::CP8, &LR35902::registers.A, &LR35902::registers.DE._reg[0]}, {/* BxB */ 4,  OP::CP8, &LR35902::registers.A, &LR35902::registers.DE._reg[1]}, {/* BxC */ 4,  OP::CP8, &LR35902::registers.A, &LR35902::registers.HL._reg[0]}, {/* BxD */ 4,  OP::CP8, &LR35902::registers.A, &LR35902::registers.HL._reg[1]}, {/* BxE */ 8,  OP::CP8_REG16V, &LR35902::registers.A, &LR35902::registers.HL._pair}, {/* BxF */ 4,  OP::CP8, &LR35902::registers.A, &LR35902::registers.A},
         //Cx[0..F]
-        {/* Cx0 */ 8,  OP::RET_NZ}, {/* Cx1 */ 12,  OP::POP, &LR35902::registers.BC._pair}, {/* Cx2 */ 12,  OP::JP_NZ_a16}, {/* Cx2 */ 16,  OP::JP_a16}, {/* Cx3 */ 12,  OP::CALL_NZ_a16}, {/* Cx4 */ 12,  OP::PUSH, &LR35902::registers.BC._pair},  {/* Cx3 */ 8,  OP::ADD8_d8, &LR35902::registers.A}, 
+        {/* Cx0 */ 8,  OP::RET_NZ}, {/* Cx1 */ 12,  OP::POP, &LR35902::registers.BC._pair}, {/* Cx2 */ 12,  OP::JP_NZ_a16}, {/* Cx2 */ 16,  OP::JP_a16}, {/* Cx3 */ 12,  OP::CALL_NZ_a16}, {/* Cx4 */ 12,  OP::PUSH, &LR35902::registers.BC._pair},  {/* Cx3 */ 8,  OP::ADD8_d8, &LR35902::registers.A}, {/* Cx3 */ 16, OP::RST_00}, {/* Cx3 */ 8, OP::RET_Z}, {/* Cx3 */ 8, OP::RET}, {/* Cx3 */ 12, OP::JP_Z_a16}
 
     })
 {}
@@ -556,6 +556,39 @@ void OpCodeMapping::Call::CALL_C_a16(Memory::Map& memMap, OpStructure& info){
     }
 }
 
+void OpCodeMapping::Call::RST_00(Memory::Map& memMap, OpStructure&){
+    _rst(memMap, 0);
+}
+
+void OpCodeMapping::Call::RST_10(Memory::Map& memMap, OpStructure&){
+    _rst(memMap, 10);
+}
+
+void OpCodeMapping::Call::RST_20(Memory::Map& memMap, OpStructure&){
+    _rst(memMap, 20);
+}
+
+void OpCodeMapping::Call::RST_30(Memory::Map& memMap, OpStructure&){
+    _rst(memMap, 30);
+}
+
+void OpCodeMapping::Call::RST_08(Memory::Map& memMap, OpStructure&){
+    _rst(memMap, 8);
+}
+
+void OpCodeMapping::Call::RST_18(Memory::Map& memMap, OpStructure&){
+    _rst(memMap, 18);
+}
+
+void OpCodeMapping::Call::RST_28(Memory::Map& memMap, OpStructure&){
+    _rst(memMap, 28);
+}
+
+void OpCodeMapping::Call::RST_38(Memory::Map& memMap, OpStructure&){
+    _rst(memMap, 38);
+}
+
+
 void OpCodeMapping::Call::EL(Memory::Map&, OpStructure& ){
     LR35902::enableInterruptions = true;
 }
@@ -578,6 +611,15 @@ uint16_t OpCodeMapping::Call::_pop16(Memory::Map& memMap){
     val |= memMap.read(LR35902::registers.SP++);
     return val;
 }
+
+void OpCodeMapping::Call::_rst(Memory::Map& memMap, uint16_t target){
+    uint16_t index = *reinterpret_cast<uint8_t*>((*LR35902::registers.PC)++);
+    index |=(*reinterpret_cast<uint8_t*>((*LR35902::registers.PC)++)) << 8;
+
+    _push16(memMap, static_cast<uint16_t>(index));
+    *LR35902::registers.PC=memMap.getMemoryAt(target);
+}
+
 //void OpCodeMapping::Call::JR_Z_r8(Memory::Map& memMap, OpStructure& info){}
 
 template<int N>

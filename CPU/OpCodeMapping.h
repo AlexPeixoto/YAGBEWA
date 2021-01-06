@@ -133,6 +133,16 @@ namespace CPU {
                 static void RRA(Memory::Map&, OpStructure&);
                 static void EL(Memory::Map&, OpStructure&);
 
+                //RST
+                static void RST_00(Memory::Map&, OpStructure&);
+                static void RST_10(Memory::Map&, OpStructure&);
+                static void RST_20(Memory::Map&, OpStructure&);
+                static void RST_30(Memory::Map&, OpStructure&);
+                static void RST_08(Memory::Map&, OpStructure&);
+                static void RST_18(Memory::Map&, OpStructure&);
+                static void RST_28(Memory::Map&, OpStructure&);
+                static void RST_38(Memory::Map&, OpStructure&);
+
                 //Here I will read the next byte to figure out which cbInstruction I should call.
                 static void CB(Memory::Map&, OpStructure&);
 
@@ -142,6 +152,9 @@ namespace CPU {
                 static void _push16(Memory::Map&, uint16_t);
                 static uint8_t _pop8(Memory::Map&);
                 static uint16_t _pop16(Memory::Map&);
+
+                //Internal rst instruction
+                static void _rst(Memory::Map&, uint16_t);
         };
     };
 }

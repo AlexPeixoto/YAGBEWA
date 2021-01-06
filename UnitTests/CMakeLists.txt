@@ -16,8 +16,8 @@ file(GLOB_RECURSE SOURCES ../Memory/*.cpp ../CPU/*.cpp ../PPU/*.cpp ../IO/*.cpp)
 
 enable_testing()
 foreach( testsourcefile ${TESTS} )
-    get_filename_component(filename ${testsourcefile} NAME_WE)
-    string( REPLACE ".cpp" "" testname ${filename} )
+    get_filename_component(filename ${testsourcefile} NAME)
+    string( REPLACE ".cpp" "_test" testname ${filename} )
     add_executable( ${testname} ${testsourcefile} ${SOURCES})
     add_test(NAME ${testname} COMMAND ${testname})
     set_target_properties(${testname} PROPERTIES
