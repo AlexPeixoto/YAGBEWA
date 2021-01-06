@@ -122,6 +122,7 @@ namespace CPU {
                 static void SCF(Memory::Map&, OpStructure&);
                 static void CCF(Memory::Map&, OpStructure&);
 
+                static void PUSH(Memory::Map&, OpStructure&);
                 static void POP(Memory::Map&, OpStructure&);
                 static void NOP(Memory::Map&, OpStructure&);
                 static void RLCA(Memory::Map&, OpStructure&);

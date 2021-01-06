@@ -32,8 +32,7 @@ OpCodeMapping::OpCodeMapping() :
         //Bx[0..F]
         {/* Bx0 */ 4,  OP::OR8, &LR35902::registers.A, &LR35902::registers.BC._reg[0]},  {/* Bx1 */ 4,  OP::OR8, &LR35902::registers.A, &LR35902::registers.BC._reg[1]}, {/* Bx2 */ 4,  OP::OR8, &LR35902::registers.A, &LR35902::registers.DE._reg[0]}, {/* Bx3 */ 4,  OP::OR8, &LR35902::registers.A, &LR35902::registers.DE._reg[1]}, {/* Bx4 */ 4,  OP::OR8, &LR35902::registers.A, &LR35902::registers.HL._reg[0]}, {/* Bx5 */ 4,  OP::OR8, &LR35902::registers.A, &LR35902::registers.HL._reg[1]}, {/* Bx6 */ 8,  OP::OR8_REG16V, &LR35902::registers.A, &LR35902::registers.HL._pair}, {/* Bx7 */ 4,  OP::OR8, &LR35902::registers.A, &LR35902::registers.A}, {/* Bx8 */ 4,  OP::CP8, &LR35902::registers.A, &LR35902::registers.BC._reg[0]}, {/* Bx9 */ 4,  OP::CP8, &LR35902::registers.A, &LR35902::registers.BC._reg[1]}, {/* BxA */ 4,  OP::CP8, &LR35902::registers.A, &LR35902::registers.DE._reg[0]}, {/* BxB */ 4,  OP::CP8, &LR35902::registers.A, &LR35902::registers.DE._reg[1]}, {/* BxC */ 4,  OP::CP8, &LR35902::registers.A, &LR35902::registers.HL._reg[0]}, {/* BxD */ 4,  OP::CP8, &LR35902::registers.A, &LR35902::registers.HL._reg[1]}, {/* BxE */ 8,  OP::CP8_REG16V, &LR35902::registers.A, &LR35902::registers.HL._pair}, {/* BxF */ 4,  OP::CP8, &LR35902::registers.A, &LR35902::registers.A},
         //Cx[0..F]
-        {/* Cx0 */ 8,  OP::RET_NZ}, {/* Cx1 */ 12,  OP::POP, &LR35902::registers.BC._pair}, {/* Cx2 */ 12,  OP::JP_NZ_a16}, {/* Cx2 */ 16,  OP::JP_a16},
-
+        {/* Cx0 */ 8,  OP::RET_NZ}, {/* Cx1 */ 12,  OP::POP, &LR35902::registers.BC._pair}, {/* Cx2 */ 12,  OP::JP_NZ_a16}, {/* Cx2 */ 16,  OP::JP_a16}, {/* Cx3 */ 12,  OP::CALL_NZ_a16}, {/* Cx4 */ 12,  OP::PUSH, &LR35902::registers.BC._pair},  {/* Cx3 */ 8,  OP::ADD8_d8, &LR35902::registers.A}, 
 
     })
 {}
@@ -363,6 +362,10 @@ void OpCodeMapping::Call::RET_C(Memory::Map& memMap, OpStructure&){
     }
 }
 
+void OpCodeMapping::Call::PUSH(Memory::Map& memMap, OpStructure& info){
+    _push16(memMap, *(info.registers_16[0]));
+}
+
 void OpCodeMapping::Call::POP(Memory::Map& memMap, OpStructure& info){
     info.registers_16[0] = reinterpret_cast<uint16_t*>(_pop16(memMap));
 }
@@ -443,7 +446,7 @@ void OpCodeMapping::Call::JR_NZ_r8(Memory::Map& memMap, OpStructure& info){
     // jump if Z is not set
     if(!LR35902::registers.F.Z ) {
        *LR35902::registers.PC+=*reinterpret_cast<uint8_t*>((*LR35902::registers.PC)++);
-       LR35902::extraCycles=1;
+       LR35902::extraCycles=4;
     }
 }
 
@@ -451,7 +454,7 @@ void OpCodeMapping::Call::JR_Z_r8(Memory::Map& memMap, OpStructure& info){
     // jump if Z is set
     if(LR35902::registers.F.Z ) {
        *LR35902::registers.PC+=*reinterpret_cast<uint8_t*>((*LR35902::registers.PC)++);
-       LR35902::extraCycles=1;
+       LR35902::extraCycles=4;
     }
 }
 
@@ -459,7 +462,7 @@ void OpCodeMapping::Call::JR_NC_r8(Memory::Map& memMap, OpStructure& info){
     // jump if C is not set
     if(!LR35902::registers.F.C ) {
        *LR35902::registers.PC+=*reinterpret_cast<uint8_t*>((*LR35902::registers.PC)++);
-       LR35902::extraCycles=1;
+       LR35902::extraCycles=4;
     }
 }
 
@@ -467,7 +470,7 @@ void OpCodeMapping::Call::JR_C_r8(Memory::Map& memMap, OpStructure& info){
     // jump if Z is set
     if(LR35902::registers.F.C ) {
        *LR35902::registers.PC+=*reinterpret_cast<uint8_t*>((*LR35902::registers.PC)++);
-       LR35902::extraCycles=1;
+       LR35902::extraCycles=4;
     }
 }
 
@@ -481,40 +484,32 @@ void OpCodeMapping::Call::JP_a16(Memory::Map& memMap, OpStructure& info){
 void OpCodeMapping::Call::JP_NZ_a16(Memory::Map& memMap, OpStructure& info) {
     // jump if Z is not set
     if(!LR35902::registers.F.Z ) {
-       uint16_t pos = *reinterpret_cast<uint8_t*>((*LR35902::registers.PC)++);
-       pos |=(*reinterpret_cast<uint8_t*>((*LR35902::registers.PC)++)) << 8;
-       *LR35902::registers.PC=memMap.getMemoryAt(pos);
-       LR35902::extraCycles=3;
+       JP_a16(memMap, info);
+       LR35902::extraCycles=4;
     }
 }
 
 void OpCodeMapping::Call::JP_Z_a16(Memory::Map& memMap, OpStructure& info){
     // jump if Z is set
     if(LR35902::registers.F.Z ) {
-       uint16_t pos = *reinterpret_cast<uint8_t*>((*LR35902::registers.PC)++);
-       pos |=(*reinterpret_cast<uint8_t*>((*LR35902::registers.PC)++)) << 8;
-       *LR35902::registers.PC=memMap.getMemoryAt(pos);
-       LR35902::extraCycles=12;
+       JP_a16(memMap, info);
+       LR35902::extraCycles=4;
     }
 }
 
 void OpCodeMapping::Call::JP_NC_a16(Memory::Map& memMap, OpStructure& info){
     // jump if C is not set
     if(!LR35902::registers.F.C ) {
-       uint16_t pos = *reinterpret_cast<uint8_t*>((*LR35902::registers.PC)++);
-       pos |=(*reinterpret_cast<uint8_t*>((*LR35902::registers.PC)++)) << 8;
-       *LR35902::registers.PC=memMap.getMemoryAt(pos);
-       LR35902::extraCycles=12;
+       JP_a16(memMap, info);
+       LR35902::extraCycles=4;
     }
 }
 
 void OpCodeMapping::Call::JP_C_a16(Memory::Map& memMap, OpStructure& info){
     // jump if Z is set
     if(LR35902::registers.F.C ) {
-       uint16_t pos = *reinterpret_cast<uint8_t*>((*LR35902::registers.PC)++);
-       pos |=(*reinterpret_cast<uint8_t*>((*LR35902::registers.PC)++)) << 8;
-       *LR35902::registers.PC=memMap.getMemoryAt(pos);
-       LR35902::extraCycles=12;
+       JP_a16(memMap, info);
+       LR35902::extraCycles=4;
     }
 }
 
@@ -532,12 +527,7 @@ void OpCodeMapping::Call::CALL_a16(Memory::Map& memMap, OpStructure& info){
 void OpCodeMapping::Call::CALL_NZ_a16(Memory::Map& memMap, OpStructure& info) {
     // jump if Z is not set
     if(!LR35902::registers.F.Z ) {
-        uint16_t target = *reinterpret_cast<uint8_t*>((*LR35902::registers.PC)++);
-        target |=(*reinterpret_cast<uint8_t*>((*LR35902::registers.PC)++)) << 8;
-
-        const ptrdiff_t index = (*LR35902::registers.PC - memMap.getRomStart());
-        _push16(memMap, static_cast<uint16_t>(index));
-        *LR35902::registers.PC=memMap.getMemoryAt(target);
+        CALL_a16(memMap, info);
         LR35902::extraCycles=12;
     }
 }
@@ -545,12 +535,7 @@ void OpCodeMapping::Call::CALL_NZ_a16(Memory::Map& memMap, OpStructure& info) {
 void OpCodeMapping::Call::CALL_Z_a16(Memory::Map& memMap, OpStructure& info){
     // jump if Z is set
     if(LR35902::registers.F.Z ) {
-       uint16_t target = *reinterpret_cast<uint8_t*>((*LR35902::registers.PC)++);
-        target |=(*reinterpret_cast<uint8_t*>((*LR35902::registers.PC)++)) << 8;
-
-        const ptrdiff_t index = (*LR35902::registers.PC - memMap.getRomStart());
-        _push16(memMap, static_cast<uint16_t>(index));
-        *LR35902::registers.PC=memMap.getMemoryAt(target);
+        CALL_a16(memMap, info);
         LR35902::extraCycles=12;
     }
 }
@@ -558,12 +543,7 @@ void OpCodeMapping::Call::CALL_Z_a16(Memory::Map& memMap, OpStructure& info){
 void OpCodeMapping::Call::CALL_NC_a16(Memory::Map& memMap, OpStructure& info){
     // jump if C is not set
     if(!LR35902::registers.F.C ) {
-       uint16_t target = *reinterpret_cast<uint8_t*>((*LR35902::registers.PC)++);
-        target |=(*reinterpret_cast<uint8_t*>((*LR35902::registers.PC)++)) << 8;
-
-        const ptrdiff_t index = (*LR35902::registers.PC - memMap.getRomStart());
-        _push16(memMap, static_cast<uint16_t>(index));
-        *LR35902::registers.PC=memMap.getMemoryAt(target);
+        CALL_a16(memMap, info);
         LR35902::extraCycles=12;
     }
 }
@@ -571,12 +551,7 @@ void OpCodeMapping::Call::CALL_NC_a16(Memory::Map& memMap, OpStructure& info){
 void OpCodeMapping::Call::CALL_C_a16(Memory::Map& memMap, OpStructure& info){
     // jump if Z is set
     if(LR35902::registers.F.C ) {
-       uint16_t target = *reinterpret_cast<uint8_t*>((*LR35902::registers.PC)++);
-        target |=(*reinterpret_cast<uint8_t*>((*LR35902::registers.PC)++)) << 8;
-
-        const ptrdiff_t index = (*LR35902::registers.PC - memMap.getRomStart());
-        _push16(memMap, static_cast<uint16_t>(index));
-        *LR35902::registers.PC=memMap.getMemoryAt(target);
+        CALL_a16(memMap, info);
         LR35902::extraCycles=12;
     }
 }
