@@ -89,6 +89,14 @@ namespace Memory{
 				//Set FF00 as F and prevent any further writes to it until IO is done 
 			};
 
+			uint8_t* getRomStart() {
+				return &memory.at(0x00);
+			}
+
+			uint8_t* getMemoryAt(uint16_t pos) {
+				return &memory.at(pos);
+			}
+
 			bool isValidWrite(std::size_t size, MemArea area) const {
 				switch (area) {
 					case MemArea::ROMBANK_0:

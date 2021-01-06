@@ -16,6 +16,8 @@ namespace CPU{
 		static bool stop;
 		// Maps to halt instruction.
 		static bool halt;
+		// To re-enable interruptions on the next loop
+		static bool enableInterruptions;
         Bus* bus;
 		OpCodeMapping mapping;
 		// Cycles contains the "used cycles by the instruction"
