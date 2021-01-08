@@ -12,8 +12,8 @@ namespace CPU {
         private:
         // The instruction function is the one responsible for moving the PC.
         // Instead of having 1 method per instruction, we can have a lookup table with some arguments
-        std::vector<OpStructure> instructions;
-        std::vector<OpStructure> cbInstructions;
+        static std::vector<OpStructure> instructions;
+        static std::vector<OpStructure> cbInstructions;
 
         public:
         OpCodeMapping();
@@ -133,18 +133,15 @@ namespace CPU {
                 static void RRA(Memory::Map&, OpStructure&);
                 static void EL(Memory::Map&, OpStructure&);
 
-                //RST
-                static void RST_00(Memory::Map&, OpStructure&);
-                static void RST_10(Memory::Map&, OpStructure&);
-                static void RST_20(Memory::Map&, OpStructure&);
-                static void RST_30(Memory::Map&, OpStructure&);
-                static void RST_08(Memory::Map&, OpStructure&);
-                static void RST_18(Memory::Map&, OpStructure&);
-                static void RST_28(Memory::Map&, OpStructure&);
-                static void RST_38(Memory::Map&, OpStructure&);
-
                 //Here I will read the next byte to figure out which cbInstruction I should call.
-                static void CB(Memory::Map&, OpStructure&);
+                static void CB_OPCODE(Memory::Map&, OpStructure&);
+
+                //Internal rst instruction
+                template<int target>
+                static void _rst(Memory::Map&, OpStructure&);
+
+                //Maps invalid instructions
+                static void ABORT(Memory::Map&, OpStructure&);
 
             private:
                 //Internal push/pop instructions, those are not mapped to opcodes, but insteasd used
@@ -153,8 +150,7 @@ namespace CPU {
                 static uint8_t _pop8(Memory::Map&);
                 static uint16_t _pop16(Memory::Map&);
 
-                //Internal rst instruction
-                static void _rst(Memory::Map&, uint16_t);
+                
         };
     };
 }
