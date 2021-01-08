@@ -100,12 +100,15 @@ namespace CPU {
                 static void ADD8_REG16V(Memory::Map&, OpStructure&);
                 static void ADD8_d8(Memory::Map&, OpStructure&);
                 static void ADD16(Memory::Map&, OpStructure&);
-                static void ADC8(Memory::Map&, OpStructure&);
-                static void ADC8_REG16V(Memory::Map&, OpStructure&);
                 static void SUB8(Memory::Map&, OpStructure&);
                 static void SUB8_REG16V(Memory::Map&, OpStructure&);
+                static void SUB8_d8(Memory::Map&, OpStructure&);
+                static void ADC8(Memory::Map&, OpStructure&);
+                static void ADC8_REG16V(Memory::Map&, OpStructure&);
+                static void ADC8_d8(Memory::Map&, OpStructure&);
                 static void SBC8(Memory::Map&, OpStructure&);
                 static void SBC8_REG16V(Memory::Map&, OpStructure&);
+                static void SBC8_d8(Memory::Map&, OpStructure&);
 
                 //AND, XOR, OR, CP
                 static void AND8(Memory::Map&, OpStructure&);
@@ -149,6 +152,18 @@ namespace CPU {
                 static void _push16(Memory::Map&, uint16_t);
                 static uint8_t _pop8(Memory::Map&);
                 static uint16_t _pop16(Memory::Map&);
+
+                //Maps a more simple/generic ADC, SBC, ADD, SUB
+                static void _adc(uint8_t);
+                static void _sbc(uint8_t);
+                static void _add(uint8_t);
+                static void _sub(uint8_t);
+
+                //Maps a more simple/generic AND, OR, XOR, CP
+                static void _and(uint8_t);
+                static void _or(uint8_t);
+                static void _xor(uint8_t);
+                static void _cp(uint8_t);
 
                 
         };
