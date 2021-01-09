@@ -113,12 +113,16 @@ namespace CPU {
                 //AND, XOR, OR, CP
                 static void AND8(Memory::Map&, OpStructure&);
                 static void AND8_REG16V(Memory::Map&, OpStructure&);
+                static void AND8_d8(Memory::Map&, OpStructure&);
                 static void XOR8(Memory::Map&, OpStructure&);
                 static void XOR8_REG16V(Memory::Map&, OpStructure&);
+                static void XOR8_d8(Memory::Map&, OpStructure&);
                 static void OR8(Memory::Map&, OpStructure&);
                 static void OR8_REG16V(Memory::Map&, OpStructure&);
+                static void OR8_d8(Memory::Map&, OpStructure&);
                 static void CP8(Memory::Map&, OpStructure&);
                 static void CP8_REG16V(Memory::Map&, OpStructure&);
+                static void CP8_d8(Memory::Map&, OpStructure&);
 
                 static void CPL(Memory::Map&, OpStructure&);
                 static void DAA(Memory::Map&, OpStructure&);
@@ -134,7 +138,8 @@ namespace CPU {
                 static void HALT(Memory::Map&, OpStructure&);
                 static void RLA(Memory::Map&, OpStructure&);
                 static void RRA(Memory::Map&, OpStructure&);
-                static void EL(Memory::Map&, OpStructure&);
+                static void EI(Memory::Map&, OpStructure&);
+                static void DI(Memory::Map&, OpStructure&);
 
                 //Here I will read the next byte to figure out which cbInstruction I should call.
                 static void CB_OPCODE(Memory::Map&, OpStructure&);
@@ -164,6 +169,10 @@ namespace CPU {
                 static void _or(uint8_t);
                 static void _xor(uint8_t);
                 static void _cp(uint8_t);
+
+                ////Maps a more simple/generic RL** and RR**
+                static void _rr(uint8_t);
+                static void _rl(uint8_t);
 
                 
         };

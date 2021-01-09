@@ -276,16 +276,19 @@ void OpCodeMapping::Call::_and(uint8_t val){
 }
 
 void OpCodeMapping::Call::AND8(Memory::Map&, OpStructure& info){
-    //info.registers_8[0]
     const uint8_t val = *(info.registers_8[1]);
     _and(val);
 }
 void OpCodeMapping::Call::AND8_REG16V(Memory::Map& memMap, OpStructure& info){
     const uint8_t val = memMap.read(*(info.registers_16[0]));
-    //info.registers_8[0]
     _and(val);
 }
 
+void OpCodeMapping::Call::AND8_d8(Memory::Map&, OpStructure&){
+    *LR35902::registers.PC+=1;
+    const uint8_t val = **LR35902::registers.PC;
+    _and(val);
+}
 void OpCodeMapping::Call::_xor(uint8_t val){
     LR35902::registers.A |= val;
     LR35902::registers.F.Z = (LR35902::registers.A == 0);
@@ -302,6 +305,12 @@ void OpCodeMapping::Call::XOR8(Memory::Map&, OpStructure& info){
 void OpCodeMapping::Call::XOR8_REG16V(Memory::Map& memMap, OpStructure& info){
     uint8_t val = memMap.read(*(info.registers_16[0]));
     //info.registers_8[0]
+    _xor(val);
+}
+
+void OpCodeMapping::Call::XOR8_d8(Memory::Map&, OpStructure&){
+    *LR35902::registers.PC+=1;
+    const uint8_t val = **LR35902::registers.PC;
     _xor(val);
 }
 
@@ -323,6 +332,12 @@ void OpCodeMapping::Call::OR8_REG16V(Memory::Map& memMap, OpStructure& info){
     _or(val);
 }
 
+void OpCodeMapping::Call::OR8_d8(Memory::Map&, OpStructure&){
+    *LR35902::registers.PC+=1;
+    const uint8_t val = **LR35902::registers.PC;
+    _or(val);
+}
+
 void OpCodeMapping::Call::_cp(uint8_t val){
     uint8_t result = LR35902::registers.A - val;
     LR35902::registers.F.Z = (result == 0);
@@ -340,6 +355,13 @@ void OpCodeMapping::Call::CP8_REG16V(Memory::Map& memMap, OpStructure& info){
     uint8_t val = memMap.read(*(info.registers_16[0]));
     _cp(val);
 }
+
+void OpCodeMapping::Call::CP8_d8(Memory::Map&, OpStructure&){
+    *LR35902::registers.PC+=1;
+    const uint8_t val = **LR35902::registers.PC;
+    _cp(val);
+}
+
 void OpCodeMapping::Call::INC_REG16V(Memory::Map& memMap, OpStructure& info){
     memMap.read(*(info.registers_16[0]))++;
 }
@@ -353,7 +375,7 @@ void OpCodeMapping::Call::RET(Memory::Map& memMap, OpStructure& info){
 }
 
 void OpCodeMapping::Call::RETI(Memory::Map& memMap, OpStructure& info){
-    EL(memMap, info);
+    EI(memMap, info);
     *LR35902::registers.PC = memMap.getMemoryAt(_pop16(memMap));
 }
 
@@ -402,36 +424,39 @@ void OpCodeMapping::Call::POP(Memory::Map& memMap, OpStructure& info){
 }
 
 // In some instances here the 0x1 is redundant, but its left to make the intentions clear.
-void OpCodeMapping::Call::RLCA(Memory::Map&, OpStructure& info){
-    LR35902::registers.F.C = (LR35902::registers.A >> 7) & 0x1;
-    LR35902::registers.A = LR35902::registers.A << 1 | LR35902::registers.F.C & 0x1;
+void OpCodeMapping::Call::_rl(uint8_t reg){
+    LR35902::registers.A = LR35902::registers.A << 1 | reg & 0x1;
     LR35902::registers.F.Z = (LR35902::registers.A == 0);
     LR35902::registers.F.H = LR35902::registers.F.N = 0;
+}
 
+void OpCodeMapping::Call::RLCA(Memory::Map&, OpStructure& info){
+    LR35902::registers.F.C = (LR35902::registers.A >> 7) & 0x1;
+    _rl(LR35902::registers.F.C);
 }
 
 void OpCodeMapping::Call::RLA(Memory::Map& memMap, OpStructure& info){
     LR35902::registers.F._C = LR35902::registers.F.C;
     LR35902::registers.F.C = (LR35902::registers.A >> 7) & 0x1;
-    LR35902::registers.A = LR35902::registers.A << 1 | LR35902::registers.F._C & 0x1;
+    _rl(LR35902::registers.F._C);
+}
+
+void OpCodeMapping::Call::_rr(uint8_t reg){
+    LR35902::registers.A = LR35902::registers.A >> 1 | reg << 7;
     LR35902::registers.F.Z = (LR35902::registers.A == 0);
     LR35902::registers.F.H = LR35902::registers.F.N = 0;
 }
 
 void OpCodeMapping::Call::RRCA(Memory::Map& memMap, OpStructure& info){
     LR35902::registers.F.C = LR35902::registers.A & 0x1;
-    LR35902::registers.A = LR35902::registers.A >> 1 | LR35902::registers.F.C << 7;
-    LR35902::registers.F.Z = (LR35902::registers.A == 0);
-    LR35902::registers.F.H = LR35902::registers.F.N = 0;
+    _rr(LR35902::registers.F.C);
 }
 
 
 void OpCodeMapping::Call::RRA(Memory::Map& memMap, OpStructure& info){
     LR35902::registers.F._C = LR35902::registers.F.C;
     LR35902::registers.F.C = LR35902::registers.A & 0x1;
-    LR35902::registers.A = LR35902::registers.A >> 1 | LR35902::registers.F._C << 7;
-    LR35902::registers.F.Z = (LR35902::registers.A == 0);
-    LR35902::registers.F.H = LR35902::registers.F.N = 0;
+    _rr(LR35902::registers.F._C);
 }
 
 void OpCodeMapping::Call::CPL(Memory::Map&, OpStructure&){
@@ -587,10 +612,12 @@ void OpCodeMapping::Call::CALL_C_a16(Memory::Map& memMap, OpStructure& info){
     }
 }
 
-
-
-void OpCodeMapping::Call::EL(Memory::Map&, OpStructure& ){
+void OpCodeMapping::Call::EI(Memory::Map&, OpStructure& ){
     LR35902::enableInterruptions = true;
+}
+
+void OpCodeMapping::Call::DI(Memory::Map&, OpStructure& ){
+    LR35902::enableInterruptions = false;
 }
 
 void OpCodeMapping::Call::_push8(Memory::Map& memMap, uint8_t val){
@@ -621,54 +648,7 @@ void OpCodeMapping::Call::_rst(Memory::Map& memMap, OpStructure&){
     *LR35902::registers.PC=memMap.getMemoryAt(target);
 }
 
-//void OpCodeMapping::Call::JR_Z_r8(Memory::Map& memMap, OpStructure& info){}
-
 template<int N>
 void bit(){
     int a = 1 << N;
 }
-/*
-For Jump convert the memory address, not the value
-reinterpret_cast should work as expected
-void OpCodeMapping::Call::LD_REGV_d16(Memory::Map&, OpStructure&){}
-void OpCodeMapping::Call::LD_REG16_REG8(Memory::Map& memMap, OpStructure& info){}
-void OpCodeMapping::Call::LD_REG8_REG16(Memory::Map& memMap, OpStructure& info){}
-void OpCodeMapping::Call::LD_REG8_REG8(Memory::Map& memMap, OpStructure& info){}
-
-
- 
-
-void OpCodeMapping::Call::LD_REG_HLI(Memory::Map& memMap, OpStructure& info){}
-void OpCodeMapping::Call::LD_REG_HLD(Memory::Map& memMap, OpStructure& info){}
-void OpCodeMapping::Call::LD_HLI_REG(Memory::Map& memMap, OpStructure& info){}
-void OpCodeMapping::Call::LD_HLD_REG(Memory::Map& memMap, OpStructure& info){}
-
-
-
-
-
-void OpCodeMapping::Call::LD_HL_SP_r8(Memory::Map&, OpStructure&){}
-void OpCodeMapping::Call::LD_SP_HL(Memory::Map&, OpStructure&){}
-
-
-
-
-
-
-
-
-void OpCodeMapping::Call::ADC(Memory::Map&, OpStructure&){}
-void OpCodeMapping::Call::SUB(Memory::Map&, OpStructure&){}
-void OpCodeMapping::Call::SBC(Memory::Map&, OpStructure&){}
-void OpCodeMapping::Call::AND(Memory::Map&, OpStructure&){}
-void OpCodeMapping::Call::XOR(Memory::Map&, OpStructure&){}
-void OpCodeMapping::Call::OR(Memory::Map&, OpStructure&){}
-void OpCodeMapping::Call::CP(Memory::Map&, OpStructure&){}
-
-
-
-void OpCodeMapping::Call::STOP(Memory::Map&, OpStructure&){}
-
-
-
-*/
