@@ -45,11 +45,11 @@ namespace CPU {
                 static void LD_REGV_d16(Memory::Map&, OpStructure&);
                 static void LD_REG16V_d8(Memory::Map&, OpStructure&);
 
-                // Maps LD (HL+) A
+                // Maps LD (HL+) A/LD (HL-) A
                 static void LD_HLI_REG(Memory::Map&, OpStructure&);
                 static void LD_HLD_REG(Memory::Map&, OpStructure&);
 
-                // Maps LD A (HL+)
+                // Maps LD A (HL+)/LD A (HL-)
                 static void LD_REG_HLI(Memory::Map&, OpStructure&);
                 static void LD_REG_HLD(Memory::Map&, OpStructure&);
 
@@ -57,6 +57,13 @@ namespace CPU {
                 static void LD_a16_SP(Memory::Map&, OpStructure&);
                 static void LD_HL_SP_r8(Memory::Map&, OpStructure&);
                 static void LD_SP_HL(Memory::Map&, OpStructure&);
+
+                static void LDH_a8_A(Memory::Map&, OpStructure&);
+                static void LDH_A_a8(Memory::Map&, OpStructure&);
+                static void LD_C_A(Memory::Map&, OpStructure&);
+                static void LD_A_C(Memory::Map&, OpStructure&);
+                static void LD_a16_A(Memory::Map&, OpStructure&);
+                static void LD_A_a16(Memory::Map&, OpStructure&);
 
                 // JUMP relative, adds to the current address
                 static void JR_r8(Memory::Map&, OpStructure&);
@@ -71,15 +78,16 @@ namespace CPU {
                 static void JP_Z_a16(Memory::Map&, OpStructure&);
                 static void JP_NC_a16(Memory::Map&, OpStructure&);
                 static void JP_C_a16(Memory::Map&, OpStructure&);
+                static void JP_HL(Memory::Map&, OpStructure&);
                 
-                //JP
+                //CALL
                 static void CALL_a16(Memory::Map&, OpStructure&);
                 static void CALL_NZ_a16(Memory::Map&, OpStructure&);
                 static void CALL_Z_a16(Memory::Map&, OpStructure&);
                 static void CALL_NC_a16(Memory::Map&, OpStructure&);
                 static void CALL_C_a16(Memory::Map&, OpStructure&);
 
-                // RET
+                //RET
                 static void RET_NZ(Memory::Map&, OpStructure&);
                 static void RET_Z(Memory::Map&, OpStructure&);
                 static void RET_NC(Memory::Map&, OpStructure&);
@@ -100,6 +108,7 @@ namespace CPU {
                 static void ADD8_REG16V(Memory::Map&, OpStructure&);
                 static void ADD8_d8(Memory::Map&, OpStructure&);
                 static void ADD16(Memory::Map&, OpStructure&);
+                static void ADD_SP_r8(Memory::Map&, OpStructure&);
                 static void SUB8(Memory::Map&, OpStructure&);
                 static void SUB8_REG16V(Memory::Map&, OpStructure&);
                 static void SUB8_d8(Memory::Map&, OpStructure&);
@@ -130,7 +139,9 @@ namespace CPU {
                 static void CCF(Memory::Map&, OpStructure&);
 
                 static void PUSH(Memory::Map&, OpStructure&);
+                static void PUSH_AF(Memory::Map&, OpStructure&);
                 static void POP(Memory::Map&, OpStructure&);
+                static void POP_AF(Memory::Map&, OpStructure&);
                 static void NOP(Memory::Map&, OpStructure&);
                 static void RLCA(Memory::Map&, OpStructure&);
                 static void RRCA(Memory::Map&, OpStructure&);
