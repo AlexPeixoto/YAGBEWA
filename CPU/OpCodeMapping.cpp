@@ -6,9 +6,9 @@ using namespace CPU;
 using OP = OpCodeMapping::Call;
 std::vector<OpStructure> OpCodeMapping::instructions = {
     //0x[0..F]
-    {/* 0x0 */ 4, OP::NOP}, {/* 0x1 */ 12, OP::LD_REG16_d16, &LR35902::registers.BC._pair}, {/* 0x2 */ 8, OP::LD_REG16V_REG8, &LR35902::registers.BC._pair, &LR35902::registers.A}, {/* 0x3 */ 8, OP::INC16, &LR35902::registers.BC._pair}, {/* 0x4 */ 4, OP::INC8, &LR35902::registers.BC._reg[0]}, {/* 0x5 */ 4, OP::DEC8, &LR35902::registers.BC._reg[0]}, {/* 0x6 */ 8, OP::LD_REG8_d8, &LR35902::registers.BC._reg[0]}, {/* 0x7 */ 4, OP::RLCA}, {/* 0x8 */ 20, OP::LD_a16_SP}, {/* 0x9 */ 8, OP::ADD16, &LR35902::registers.HL._pair, &LR35902::registers.BC._pair}, {/* 0xA */ 8, OP::LD_REG8_REG16V, &LR35902::registers.A, &LR35902::registers.BC._pair}, {/* 0xB */ 8, OP::DEC16, &LR35902::registers.BC._pair}, {/* 0xC */ 4, OP::INC8, &LR35902::registers.BC._reg[1]}, {/* 0xD */ 4, OP::DEC8, &LR35902::registers.BC._reg[1]}, {/* 0xE */ 8, OP::LD_REG8_d8, &LR35902::registers.BC._reg[1]}, {/* 0xF */ 4, OP::RRCA},
+    {/* 0x0 */ 4, OP::NOP}, {/* 0x1 */ 12, OP::LD_REG16_d16, &LR35902::registers.BC._pair}, {/* 0x2 */ 8, OP::LD_REG16V_REG8, &LR35902::registers.BC._pair, &LR35902::registers.A}, {/* 0x3 */ 8, OP::INC16, &LR35902::registers.BC._pair}, {/* 0x4 */ 4, OP::INC8, &LR35902::registers.BC._reg[0]}, {/* 0x5 */ 4, OP::DEC8, &LR35902::registers.BC._reg[0]}, {/* 0x6 */ 8, OP::LD_REG8_d8, &LR35902::registers.BC._reg[0]}, {/* 0x7 */ 4, OP::RLCA, &LR35902::registers.A}, {/* 0x8 */ 20, OP::LD_a16_SP}, {/* 0x9 */ 8, OP::ADD16, &LR35902::registers.HL._pair, &LR35902::registers.BC._pair}, {/* 0xA */ 8, OP::LD_REG8_REG16V, &LR35902::registers.A, &LR35902::registers.BC._pair}, {/* 0xB */ 8, OP::DEC16, &LR35902::registers.BC._pair}, {/* 0xC */ 4, OP::INC8, &LR35902::registers.BC._reg[1]}, {/* 0xD */ 4, OP::DEC8, &LR35902::registers.BC._reg[1]}, {/* 0xE */ 8, OP::LD_REG8_d8, &LR35902::registers.BC._reg[1]}, {/* 0xF */ 4, OP::RRCA, &LR35902::registers.A},
     //1x[0..F]
-    {/* 1x0 */ 4, OP::STOP}, {/* 1x1 */ 12, OP::LD_REG16_d16, &LR35902::registers.DE._pair}, {/* 1x2 */ 8, OP::LD_REG16V_REG8, &LR35902::registers.DE._pair, &LR35902::registers.A}, {/* 1x3 */ 8, OP::INC16, &LR35902::registers.DE._pair}, {/* 1x4 */ 4, OP::INC8, &LR35902::registers.DE._reg[0]}, {/* 1x5 */ 4, OP::DEC8, &LR35902::registers.DE._reg[0]}, {/* 1x6 */ 8, OP::LD_REG8_d8, &LR35902::registers.DE._reg[0]}, {/* 1x7 */ 4, OP::RLA}, {/* 1x8 */ 12, OP::JR_r8}, {/* 1x9 */ 8, OP::ADD16, &LR35902::registers.HL._pair, &LR35902::registers.DE._pair}, {/* 1xA */ 8, OP::LD_REG8_REG16V, &LR35902::registers.A, &LR35902::registers.DE._pair}, {/* 1xB */ 8, OP::DEC16, &LR35902::registers.BC._pair}, {/* 1xC */ 4, OP::INC8, &LR35902::registers.DE._reg[1]}, {/* 1xD */ 4, OP::DEC8, &LR35902::registers.DE._reg[1]}, {/* 1xE */ 8, OP::LD_REG8_d8, &LR35902::registers.DE._reg[1]}, {/* 1xF */ 4, OP::RRA},
+    {/* 1x0 */ 4, OP::STOP}, {/* 1x1 */ 12, OP::LD_REG16_d16, &LR35902::registers.DE._pair}, {/* 1x2 */ 8, OP::LD_REG16V_REG8, &LR35902::registers.DE._pair, &LR35902::registers.A}, {/* 1x3 */ 8, OP::INC16, &LR35902::registers.DE._pair}, {/* 1x4 */ 4, OP::INC8, &LR35902::registers.DE._reg[0]}, {/* 1x5 */ 4, OP::DEC8, &LR35902::registers.DE._reg[0]}, {/* 1x6 */ 8, OP::LD_REG8_d8, &LR35902::registers.DE._reg[0]}, {/* 1x7 */ 4, OP::RLA, &LR35902::registers.A}, {/* 1x8 */ 12, OP::JR_r8}, {/* 1x9 */ 8, OP::ADD16, &LR35902::registers.HL._pair, &LR35902::registers.DE._pair}, {/* 1xA */ 8, OP::LD_REG8_REG16V, &LR35902::registers.A, &LR35902::registers.DE._pair}, {/* 1xB */ 8, OP::DEC16, &LR35902::registers.BC._pair}, {/* 1xC */ 4, OP::INC8, &LR35902::registers.DE._reg[1]}, {/* 1xD */ 4, OP::DEC8, &LR35902::registers.DE._reg[1]}, {/* 1xE */ 8, OP::LD_REG8_d8, &LR35902::registers.DE._reg[1]}, {/* 1xF */ 4, OP::RRA, &LR35902::registers.A},
     //2x[0..F]
     {/* 2x0 */ 8, OP::JR_NZ_r8}, {/* 2x1 */ 12, OP::LD_REG16_d16, &LR35902::registers.HL._pair}, {/* 2x2 */ 8, OP::LD_HLI_REG, &LR35902::registers.A}, {/* 2x3 */ 8, OP::INC16, &LR35902::registers.HL._pair}, {/* 2x4 */ 4, OP::INC8, &LR35902::registers.HL._reg[0]}, {/* 2x5 */ 4, OP::DEC8, &LR35902::registers.HL._reg[0]}, {/* 2x6 */ 8, OP::LD_REG8_d8, &LR35902::registers.HL._reg[0]}, {/* 2x7 */ 4, OP::DAA}, {/* 2x8 */ 8, OP::JR_Z_r8}, {/* 2x9 */ 8, OP::ADD16, &LR35902::registers.HL._pair, &LR35902::registers.HL._pair}, {/* 2xA */ 8, OP::LD_REG_HLI, &LR35902::registers.A}, {/* 2xB */ 8, OP::DEC16, &LR35902::registers.HL._pair}, {/* 2xC */ 4, OP::INC8, &LR35902::registers.HL._reg[1]}, {/* 2xD */ 4, OP::DEC8, &LR35902::registers.HL._reg[1]}, {/* 2xE */ 8, OP::LD_REG8_d8, &LR35902::registers.HL._reg[1]}, {/* 1xF */ 4, OP::CPL},
     //3x[0..F]
@@ -40,8 +40,12 @@ std::vector<OpStructure> OpCodeMapping::instructions = {
     {/* Fx0 */ 12,  OP::LDH_A_a8}, {/* Fx1 */ 12,  OP::POP_AF}, {/* Fx2 */ 8,  OP::LD_A_C}, {/* Fx3 */ 4,  OP::DI}, {/* Fx4 */ 1,  OP::ABORT}, {/* Fx5 */ 16,  OP::PUSH_AF},  {/* Fx6 */ 8,  OP::OR8_d8}, {/* Fx7 */ 16, OP::_rst<0x30>}, {/* Fx8 */ 12, OP::LD_HL_SP_r8}, {/* Fx9 */ 8, OP::LD_SP_HL}, {/* FxA */ 4, OP::LD_A_a16}, {/* FxB */ 1, OP::EI}, {/* FxC */ 1, OP::ABORT}, {/* FxD */ 12, OP::ABORT}, {/* FxE */ 12, OP::CP8_d8, &LR35902::registers.A}, {/* FxF */ 16, OP::_rst<0x38>},
 
 };
-//LD_CV_A IS relative to 0xFF
-std::vector<OpStructure> OpCodeMapping::cbInstructions = {};
+
+std::vector<OpStructure> OpCodeMapping::cbInstructions = {
+    //0x[0..F]
+    {/* 0x0 */ 4, OP::RLC, &LR35902::registers.BC._reg[0]}, {/* 0x1 */ 4, OP::RLC, &LR35902::registers.BC._reg[1]}, {/* 0x2 */ 4, OP::RLC, &LR35902::registers.DE._reg[0]}, {/* 0x3 */ 4, OP::RLC, &LR35902::registers.DE._reg[1]}, {/* 0x4 */ 4, OP::RLC, &LR35902::registers.HL._reg[0]}, {/* 0x5 */ 4, OP::RLC, &LR35902::registers.HL._reg[1]}
+
+};
 
 OpCodeMapping::OpCodeMapping()
 {}
@@ -174,8 +178,6 @@ void OpCodeMapping::Call::LD_HL_SP_r8(Memory::Map& memMap, OpStructure& info){
 void OpCodeMapping::Call::LD_SP_HL(Memory::Map& memMap, OpStructure& info){
     LR35902::registers.SP = LR35902::registers.HL._pair;
 }
-
-
 
 void OpCodeMapping::Call::NOP(Memory::Map& memMap, OpStructure& info){}
 
@@ -499,39 +501,140 @@ void OpCodeMapping::Call::POP_AF(Memory::Map& memMap, OpStructure& info){
 }
 
 // In some instances here the 0x1 is redundant, but its left to make the intentions clear.
-void OpCodeMapping::Call::_rl(uint8_t reg){
-    LR35902::registers.A = LR35902::registers.A << 1 | reg & 0x1;
-    LR35902::registers.F.Z = (LR35902::registers.A == 0);
+// Also, for *RLCA and other ***A variants the check is not performed (as it is a faster variant).
+void OpCodeMapping::Call::_rl(OpStructure& info, uint8_t reg, bool check = true){
+    *(info.registers_8[0]) = *(info.registers_8[0]) << 1 | reg & 0x1;
+    if(check)
+        LR35902::registers.F.Z = (*(info.registers_8[0]) == 0);
     LR35902::registers.F.H = LR35902::registers.F.N = 0;
 }
 
 void OpCodeMapping::Call::RLCA(Memory::Map&, OpStructure& info){
-    LR35902::registers.F.C = (LR35902::registers.A >> 7) & 0x1;
-    _rl(LR35902::registers.F.C);
+    LR35902::registers.F.C = (*(info.registers_8[0]) >> 7) & 0x1;
+    _rl(info, LR35902::registers.F.C, false);
 }
 
-void OpCodeMapping::Call::RLA(Memory::Map& memMap, OpStructure& info){
+void OpCodeMapping::Call::RLA(Memory::Map&, OpStructure& info){
     LR35902::registers.F._C = LR35902::registers.F.C;
-    LR35902::registers.F.C = (LR35902::registers.A >> 7) & 0x1;
-    _rl(LR35902::registers.F._C);
+    LR35902::registers.F.C = (*(info.registers_8[0]) >> 7) & 0x1;
+    _rl(info, LR35902::registers.F._C, false);
 }
 
-void OpCodeMapping::Call::_rr(uint8_t reg){
-    LR35902::registers.A = LR35902::registers.A >> 1 | reg << 7;
-    LR35902::registers.F.Z = (LR35902::registers.A == 0);
+void OpCodeMapping::Call::RLC(Memory::Map&, OpStructure& info){
+    LR35902::registers.F.C = (*(info.registers_8[0]) >> 7) & 0x1;
+    _rl(info, LR35902::registers.F.C);
+}
+
+void OpCodeMapping::Call::RL(Memory::Map&, OpStructure& info){
+    LR35902::registers.F._C = LR35902::registers.F.C;
+    LR35902::registers.F.C = (*(info.registers_8[0]) >> 7) & 0x1;
+    _rl(info, LR35902::registers.F._C);
+}
+
+void OpCodeMapping::Call::_rr(OpStructure& info, uint8_t reg, bool check = true){
+    *(info.registers_8[0]) = *(info.registers_8[0]) >> 1 | reg << 7;
+    if(check)
+        LR35902::registers.F.Z = (*(info.registers_8[0]) == 0);
     LR35902::registers.F.H = LR35902::registers.F.N = 0;
 }
 
-void OpCodeMapping::Call::RRCA(Memory::Map& memMap, OpStructure& info){
-    LR35902::registers.F.C = LR35902::registers.A & 0x1;
-    _rr(LR35902::registers.F.C);
+void OpCodeMapping::Call::RRCA(Memory::Map&, OpStructure& info){
+    LR35902::registers.F.C = *(info.registers_8[0]) & 0x1;
+    _rr(info, LR35902::registers.F.C, false);
 }
 
-
-void OpCodeMapping::Call::RRA(Memory::Map& memMap, OpStructure& info){
+void OpCodeMapping::Call::RRA(Memory::Map&, OpStructure& info){
     LR35902::registers.F._C = LR35902::registers.F.C;
-    LR35902::registers.F.C = LR35902::registers.A & 0x1;
-    _rr(LR35902::registers.F._C);
+    LR35902::registers.F.C = *(info.registers_8[0]) & 0x1;
+    _rr(info, LR35902::registers.F._C, false);
+}
+
+void OpCodeMapping::Call::RRC(Memory::Map&, OpStructure& info){
+    LR35902::registers.F.C = *(info.registers_8[0]) & 0x1;
+    _rr(info, LR35902::registers.F.C);
+}
+
+void OpCodeMapping::Call::RR(Memory::Map&, OpStructure& info){
+    LR35902::registers.F._C = LR35902::registers.F.C;
+    LR35902::registers.F.C = *(info.registers_8[0]) & 0x1;
+    _rr(info, LR35902::registers.F._C);
+}
+
+void OpCodeMapping::Call::SLA(Memory::Map&, OpStructure& info){
+    //Check if after the shift it will "overflow"
+    LR35902::registers.F.C = *(info.registers_8[0]) & 0b10000000;
+    *(info.registers_8[0]) <<= 1;
+    LR35902::registers.F.Z = (*(info.registers_8[0]) == 0);
+    LR35902::registers.F.N = 0;
+    LR35902::registers.F.H = 0;
+}
+
+void OpCodeMapping::Call::SLA_HL(Memory::Map& memMap, OpStructure&){
+    uint8_t val = memMap.read(LR35902::registers.HL._pair);
+    LR35902::registers.F.C = val & 0b10000000;
+    val <<= 1;
+    LR35902::registers.F.Z = (val == 0);
+    LR35902::registers.F.N = 0;
+    LR35902::registers.F.H = 0;
+    memMap.write(val, LR35902::registers.HL._pair);
+}
+
+void OpCodeMapping::Call::SRA(Memory::Map&, OpStructure& info){
+    LR35902::registers.F.C = *(info.registers_8[0]) & 0b00000001;
+    //shift right arithmetic (b7=b7)
+    *(info.registers_8[0]) = *(info.registers_8[0]) >> 1 | *(info.registers_8[0]) & 0b10000000;
+    LR35902::registers.F.Z = (*(info.registers_8[0]) == 0);
+    LR35902::registers.F.N = 0;
+    LR35902::registers.F.H = 0;
+}
+
+void OpCodeMapping::Call::SRA_HL(Memory::Map& memMap, OpStructure&){
+    uint8_t val = memMap.read(LR35902::registers.HL._pair);
+    LR35902::registers.F.C = val & 0b00000001;
+    //shift right arithmetic (b7=b7)
+    val = val >> 1 | val & 0b10000000;
+    LR35902::registers.F.Z = (val == 0);
+    LR35902::registers.F.N = 0;
+    LR35902::registers.F.H = 0;
+    memMap.write(val, LR35902::registers.HL._pair);
+}
+
+void OpCodeMapping::Call::SRL(Memory::Map& memMap, OpStructure& info){
+    //Check if after the shift it will "overflow"
+    LR35902::registers.F.C = *(info.registers_8[0]) & 0b10000000;
+    *(info.registers_8[0]) >>= 1;
+    LR35902::registers.F.Z = (*(info.registers_8[0]) == 0);
+    LR35902::registers.F.N = 0;
+    LR35902::registers.F.H = 0;
+}
+
+void OpCodeMapping::Call::SRL_HL(Memory::Map& memMap, OpStructure&){
+    uint8_t val = memMap.read(LR35902::registers.HL._pair);
+    LR35902::registers.F.C = val & 0b00000001;
+    //shift right arithmetic (b7=b7)
+    val >>=1;
+    LR35902::registers.F.Z = (val == 0);
+    LR35902::registers.F.N = 0;
+    LR35902::registers.F.H = 0;
+    memMap.write(val, LR35902::registers.HL._pair);
+}
+
+void OpCodeMapping::Call::SWAP(Memory::Map& memMap, OpStructure& info){
+    *(info.registers_8[0]) = *(info.registers_8[0]) << 4 | *(info.registers_8[0]) >> 4;
+    LR35902::registers.F.Z = (*(info.registers_8[0]) == 0);
+    LR35902::registers.F.N = 0;
+    LR35902::registers.F.H = 0;
+    LR35902::registers.F.C = 0;
+}
+
+void OpCodeMapping::Call::SWAP_HL(Memory::Map& memMap, OpStructure& info){
+    uint8_t val = memMap.read(LR35902::registers.HL._pair);
+    val = val << 4 | val >> 4;
+    LR35902::registers.F.Z = (val == 0);
+    LR35902::registers.F.N = 0;
+    LR35902::registers.F.H = 0;
+    LR35902::registers.F.C = 0;
+    memMap.write(val, LR35902::registers.HL._pair);
 }
 
 void OpCodeMapping::Call::CPL(Memory::Map&, OpStructure&){
@@ -724,6 +827,40 @@ void OpCodeMapping::Call::_rst(Memory::Map& memMap, OpStructure&){
 }
 
 template<int N>
-void bit(){
-    int a = 1 << N;
+void OpCodeMapping::Call::_bit(Memory::Map&, OpStructure& info){
+    LR35902::registers.F.Z = ((*(info.registers_8[0]) & (1UL << N)) == 0);
+    LR35902::registers.F.N = 0;
+    LR35902::registers.F.H = 1;
+}
+
+template<int N>
+void OpCodeMapping::Call::_bit_hl(Memory::Map& memMap, OpStructure& info){
+    uint8_t val = memMap.read(LR35902::registers.HL._pair);
+    LR35902::registers.F.Z = ((val & (1UL << N)) == 0);
+    LR35902::registers.F.N = 0;
+    LR35902::registers.F.H = 1;
+}
+
+template<int N>
+void OpCodeMapping::Call::_res(Memory::Map&, OpStructure& info){
+    *(info.registers_8[0]) &= ~(1UL << N);
+}
+
+template<int N>
+void OpCodeMapping::Call::_res_hl(Memory::Map& memMap, OpStructure&){
+    uint8_t val = memMap.read(LR35902::registers.HL._pair);
+    val &= ~(1UL << N);
+    memMap.write(val, LR35902::registers.HL._pair);
+}
+
+template<int N>
+void OpCodeMapping::Call::_set(Memory::Map&, OpStructure& info){
+    *(info.registers_8[0]) |= (1UL << N);
+}
+
+template<int N>
+void OpCodeMapping::Call::_set_hl(Memory::Map& memMap, OpStructure&){
+    uint8_t val = memMap.read(LR35902::registers.HL._pair);
+    val |= (1UL << N);
+    memMap.write(val, LR35902::registers.HL._pair);    
 }

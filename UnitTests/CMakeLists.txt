@@ -14,6 +14,7 @@ include_directories(../PPU)
 include_directories(../IO)
 file(GLOB_RECURSE SOURCES ../Memory/*.cpp ../CPU/*.cpp ../PPU/*.cpp ../IO/*.cpp)
 
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 enable_testing()
 foreach( testsourcefile ${TESTS} )
     get_filename_component(filename ${testsourcefile} NAME)

@@ -133,6 +133,35 @@ namespace CPU {
                 static void CP8_REG16V(Memory::Map&, OpStructure&);
                 static void CP8_d8(Memory::Map&, OpStructure&);
 
+                //RR and RL
+                static void RLC(Memory::Map&, OpStructure&);
+                static void RRC(Memory::Map&, OpStructure&);
+                static void RL(Memory::Map&, OpStructure&);
+                static void RR(Memory::Map&, OpStructure&);
+
+                //HL Variant
+                static void RLC_HL(Memory::Map&, OpStructure&);
+                static void RRC_HL(Memory::Map&, OpStructure&);
+                static void RL_HL(Memory::Map&, OpStructure&);
+                static void RR_HL(Memory::Map&, OpStructure&);
+
+                //A variant of the above (no Z check)
+                static void RLCA(Memory::Map&, OpStructure&);
+                static void RRCA(Memory::Map&, OpStructure&);
+                static void RLA(Memory::Map&, OpStructure&);
+                static void RRA(Memory::Map&, OpStructure&);
+
+                //Bit shift operations
+                static void SLA(Memory::Map&, OpStructure&);
+                static void SLA_HL(Memory::Map&, OpStructure&);
+                static void SRA(Memory::Map&, OpStructure&);
+                static void SRA_HL(Memory::Map&, OpStructure&);
+                static void SRL(Memory::Map&, OpStructure&);
+                static void SRL_HL(Memory::Map&, OpStructure&);
+
+                static void SWAP(Memory::Map&, OpStructure&);
+                static void SWAP_HL(Memory::Map&, OpStructure&);
+
                 static void CPL(Memory::Map&, OpStructure&);
                 static void DAA(Memory::Map&, OpStructure&);
                 static void SCF(Memory::Map&, OpStructure&);
@@ -143,12 +172,8 @@ namespace CPU {
                 static void POP(Memory::Map&, OpStructure&);
                 static void POP_AF(Memory::Map&, OpStructure&);
                 static void NOP(Memory::Map&, OpStructure&);
-                static void RLCA(Memory::Map&, OpStructure&);
-                static void RRCA(Memory::Map&, OpStructure&);
                 static void STOP(Memory::Map&, OpStructure&);
                 static void HALT(Memory::Map&, OpStructure&);
-                static void RLA(Memory::Map&, OpStructure&);
-                static void RRA(Memory::Map&, OpStructure&);
                 static void EI(Memory::Map&, OpStructure&);
                 static void DI(Memory::Map&, OpStructure&);
 
@@ -158,6 +183,20 @@ namespace CPU {
                 //Internal rst instruction
                 template<int target>
                 static void _rst(Memory::Map&, OpStructure&);
+
+                //Bit operations
+                template<int N>
+                static void _bit(Memory::Map&, OpStructure&);
+                template<int N>
+                static void _bit_hl(Memory::Map&, OpStructure&);
+                template<int N>
+                static void _res(Memory::Map&, OpStructure&);
+                template<int N>
+                static void _res_hl(Memory::Map&, OpStructure&);
+                template<int N>
+                static void _set(Memory::Map&, OpStructure&);
+                template<int N>
+                static void _set_hl(Memory::Map&, OpStructure&);
 
                 //Maps invalid instructions
                 static void ABORT(Memory::Map&, OpStructure&);
@@ -181,9 +220,9 @@ namespace CPU {
                 static void _xor(uint8_t);
                 static void _cp(uint8_t);
 
-                ////Maps a more simple/generic RL** and RR**
-                static void _rr(uint8_t);
-                static void _rl(uint8_t);
+                //Maps a more simple/generic RL** and RR**
+                static void _rr(OpStructure&, uint8_t, bool);
+                static void _rl(OpStructure&, uint8_t, bool);
 
                 
         };
