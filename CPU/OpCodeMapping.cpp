@@ -514,21 +514,38 @@ void OpCodeMapping::Call::RLCA(Memory::Map&, OpStructure& info){
     _rl(info, LR35902::registers.F.C, false);
 }
 
+//RL operations use the previous carry value, while RL do not
 void OpCodeMapping::Call::RLA(Memory::Map&, OpStructure& info){
     LR35902::registers.F._C = LR35902::registers.F.C;
-    LR35902::registers.F.C = (*(info.registers_8[0]) >> 7) & 0x1;
+    LR35902::registers.F.C = *(info.registers_8[0]) & 0b10000000;
     _rl(info, LR35902::registers.F._C, false);
 }
 
 void OpCodeMapping::Call::RLC(Memory::Map&, OpStructure& info){
-    LR35902::registers.F.C = (*(info.registers_8[0]) >> 7) & 0x1;
+    LR35902::registers.F.C = *(info.registers_8[0]) & 0b10000000;
     _rl(info, LR35902::registers.F.C);
+}
+
+void OpCodeMapping::Call::RLC_HL(Memory::Map& memMap, OpStructure& info){
+    uint8_t& val = memMap.read(LR35902::registers.HL._pair);
+    LR35902::registers.F.C = val & 0b10000000;
+    val = val << 1 | LR35902::registers.F.C & 0x1;
+    LR35902::registers.F.Z = (val == 0);
+    LR35902::registers.F.H = LR35902::registers.F.N = 0;
 }
 
 void OpCodeMapping::Call::RL(Memory::Map&, OpStructure& info){
     LR35902::registers.F._C = LR35902::registers.F.C;
-    LR35902::registers.F.C = (*(info.registers_8[0]) >> 7) & 0x1;
+    LR35902::registers.F.C = *(info.registers_8[0]) & 0b10000000;
     _rl(info, LR35902::registers.F._C);
+}
+void OpCodeMapping::Call::RL_HL(Memory::Map& memMap, OpStructure& info){
+    uint8_t& val = memMap.read(LR35902::registers.HL._pair);
+    LR35902::registers.F._C = LR35902::registers.F.C;
+    LR35902::registers.F.C = val & 0b10000000;
+    val = val << 1 | LR35902::registers.F.C;
+    LR35902::registers.F.Z = (val == 0);
+    LR35902::registers.F.H = LR35902::registers.F.N = 0;
 }
 
 void OpCodeMapping::Call::_rr(OpStructure& info, uint8_t reg, bool check = true){
@@ -554,10 +571,27 @@ void OpCodeMapping::Call::RRC(Memory::Map&, OpStructure& info){
     _rr(info, LR35902::registers.F.C);
 }
 
+void OpCodeMapping::Call::RRC_HL(Memory::Map& memMap, OpStructure& info){
+    uint8_t& val = memMap.read(LR35902::registers.HL._pair);
+    LR35902::registers.F.C = *(info.registers_8[0]) & 0x1;
+    val = val >> 1 | LR35902::registers.F.C << 7;
+    LR35902::registers.F.Z = (val == 0);
+    LR35902::registers.F.H = LR35902::registers.F.N = 0;
+}
+
 void OpCodeMapping::Call::RR(Memory::Map&, OpStructure& info){
     LR35902::registers.F._C = LR35902::registers.F.C;
     LR35902::registers.F.C = *(info.registers_8[0]) & 0x1;
     _rr(info, LR35902::registers.F._C);
+}
+
+void OpCodeMapping::Call::RR_HL(Memory::Map& memMap, OpStructure& info){
+    uint8_t& val = memMap.read(LR35902::registers.HL._pair);
+    LR35902::registers.F._C = LR35902::registers.F.C;
+    LR35902::registers.F.C = *(info.registers_8[0]) & 0x1;
+    val = val >> 1 | LR35902::registers.F.C << 7;
+    LR35902::registers.F.Z = (val == 0);
+    LR35902::registers.F.H = LR35902::registers.F.N = 0;
 }
 
 void OpCodeMapping::Call::SLA(Memory::Map&, OpStructure& info){
@@ -565,18 +599,15 @@ void OpCodeMapping::Call::SLA(Memory::Map&, OpStructure& info){
     LR35902::registers.F.C = *(info.registers_8[0]) & 0b10000000;
     *(info.registers_8[0]) <<= 1;
     LR35902::registers.F.Z = (*(info.registers_8[0]) == 0);
-    LR35902::registers.F.N = 0;
-    LR35902::registers.F.H = 0;
+    LR35902::registers.F.N = LR35902::registers.F.H = 0;
 }
 
 void OpCodeMapping::Call::SLA_HL(Memory::Map& memMap, OpStructure&){
-    uint8_t val = memMap.read(LR35902::registers.HL._pair);
+    uint8_t& val = memMap.read(LR35902::registers.HL._pair);
     LR35902::registers.F.C = val & 0b10000000;
     val <<= 1;
     LR35902::registers.F.Z = (val == 0);
-    LR35902::registers.F.N = 0;
-    LR35902::registers.F.H = 0;
-    memMap.write(val, LR35902::registers.HL._pair);
+    LR35902::registers.F.N = LR35902::registers.F.H = 0;
 }
 
 void OpCodeMapping::Call::SRA(Memory::Map&, OpStructure& info){
@@ -584,19 +615,16 @@ void OpCodeMapping::Call::SRA(Memory::Map&, OpStructure& info){
     //shift right arithmetic (b7=b7)
     *(info.registers_8[0]) = *(info.registers_8[0]) >> 1 | *(info.registers_8[0]) & 0b10000000;
     LR35902::registers.F.Z = (*(info.registers_8[0]) == 0);
-    LR35902::registers.F.N = 0;
-    LR35902::registers.F.H = 0;
+    LR35902::registers.F.N = LR35902::registers.F.H = 0;
 }
 
 void OpCodeMapping::Call::SRA_HL(Memory::Map& memMap, OpStructure&){
-    uint8_t val = memMap.read(LR35902::registers.HL._pair);
+    uint8_t& val = memMap.read(LR35902::registers.HL._pair);
     LR35902::registers.F.C = val & 0b00000001;
     //shift right arithmetic (b7=b7)
     val = val >> 1 | val & 0b10000000;
     LR35902::registers.F.Z = (val == 0);
-    LR35902::registers.F.N = 0;
-    LR35902::registers.F.H = 0;
-    memMap.write(val, LR35902::registers.HL._pair);
+    LR35902::registers.F.N = LR35902::registers.F.H = 0;
 }
 
 void OpCodeMapping::Call::SRL(Memory::Map& memMap, OpStructure& info){
@@ -604,37 +632,29 @@ void OpCodeMapping::Call::SRL(Memory::Map& memMap, OpStructure& info){
     LR35902::registers.F.C = *(info.registers_8[0]) & 0b10000000;
     *(info.registers_8[0]) >>= 1;
     LR35902::registers.F.Z = (*(info.registers_8[0]) == 0);
-    LR35902::registers.F.N = 0;
-    LR35902::registers.F.H = 0;
+    LR35902::registers.F.N = LR35902::registers.F.H = 0;
 }
 
 void OpCodeMapping::Call::SRL_HL(Memory::Map& memMap, OpStructure&){
-    uint8_t val = memMap.read(LR35902::registers.HL._pair);
+    uint8_t& val = memMap.read(LR35902::registers.HL._pair);
     LR35902::registers.F.C = val & 0b00000001;
     //shift right arithmetic (b7=b7)
     val >>=1;
     LR35902::registers.F.Z = (val == 0);
-    LR35902::registers.F.N = 0;
-    LR35902::registers.F.H = 0;
-    memMap.write(val, LR35902::registers.HL._pair);
+    LR35902::registers.F.N = LR35902::registers.F.H = 0;
 }
 
 void OpCodeMapping::Call::SWAP(Memory::Map& memMap, OpStructure& info){
     *(info.registers_8[0]) = *(info.registers_8[0]) << 4 | *(info.registers_8[0]) >> 4;
     LR35902::registers.F.Z = (*(info.registers_8[0]) == 0);
-    LR35902::registers.F.N = 0;
-    LR35902::registers.F.H = 0;
-    LR35902::registers.F.C = 0;
+    LR35902::registers.F.N = LR35902::registers.F.H = LR35902::registers.F.C = 0;
 }
 
 void OpCodeMapping::Call::SWAP_HL(Memory::Map& memMap, OpStructure& info){
-    uint8_t val = memMap.read(LR35902::registers.HL._pair);
+    uint8_t& val = memMap.read(LR35902::registers.HL._pair);
     val = val << 4 | val >> 4;
     LR35902::registers.F.Z = (val == 0);
-    LR35902::registers.F.N = 0;
-    LR35902::registers.F.H = 0;
-    LR35902::registers.F.C = 0;
-    memMap.write(val, LR35902::registers.HL._pair);
+    LR35902::registers.F.N = LR35902::registers.F.H = LR35902::registers.F.C = 0;
 }
 
 void OpCodeMapping::Call::CPL(Memory::Map&, OpStructure&){
