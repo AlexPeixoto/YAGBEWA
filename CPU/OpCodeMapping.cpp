@@ -73,7 +73,7 @@ std::vector<OpStructure> OpCodeMapping::cbInstructions = {
     //Ex[0..F]
     {/* Ex0 */ 4, OP::_set<4>, &LR35902::registers.BC._reg[0]}, {/* Ex1 */ 4, OP::_set<4>, &LR35902::registers.BC._reg[1]}, {/* Ex2 */ 4, OP::_set<4>, &LR35902::registers.DE._reg[0]}, {/* Ex3 */ 4, OP::_set<4>, &LR35902::registers.DE._reg[1]}, {/* Ex4 */ 4, OP::_set<4>, &LR35902::registers.HL._reg[0]}, {/* Ex5 */ 4, OP::_set<4>, &LR35902::registers.HL._reg[1]}, {/* Ex6 */ 12, OP::_set_hl<4>}, {/* Ex7 */ 4, OP::_set<4>, &LR35902::registers.A},{/* Ex8 */ 4, OP::_set<5>, &LR35902::registers.BC._reg[0]}, {/* Ex9 */ 4, OP::_set<5>, &LR35902::registers.BC._reg[1]}, {/* ExA */ 4, OP::_set<5>, &LR35902::registers.DE._reg[0]}, {/* ExB */ 4, OP::_set<5>, &LR35902::registers.DE._reg[1]}, {/* ExC */ 4, OP::_set<5>, &LR35902::registers.HL._reg[0]}, {/* ExD */ 4, OP::_set<5>, &LR35902::registers.HL._reg[1]}, {/* §E */ 12, OP::_set_hl<5>}, {/* ExF */ 4, OP::_set<5>, &LR35902::registers.A},
     //Fx[0..F]
-    {/* Fx0 */ 4, OP::_set<6>, &LR35902::registers.BC._reg[0]}, {/* Fx1 */ 4, OP::_set<6>, &LR35902::registers.BC._reg[1]}, {/* Fx2 */ 4, OP::_set<6>, &LR35902::registers.DE._reg[0]}, {/* Fx3 */ 4, OP::_set<6>, &LR35902::registers.DE._reg[1]}, {/* Fx4 */ 4, OP::_set<6>, &LR35902::registers.HL._reg[0]}, {/* Fx5 */ 4, OP::_set<6>, &LR35902::registers.HL._reg[1]}, {/* Fx6 */ 12, OP::_set_hl<6>}, {/* Fx7 */ 4, OP::_set<6>, &LR35902::registers.A},{/* Fx8 */ 4, OP::_set<6>, &LR35902::registers.BC._reg[0]}, {/* Fx9 */ 4, OP::_set<6>, &LR35902::registers.BC._reg[1]}, {/* FxA */ 4, OP::_set<6>, &LR35902::registers.DE._reg[0]}, {/* FxB */ 4, OP::_set<6>, &LR35902::registers.DE._reg[1]}, {/* FxC */ 4, OP::_set<6>, &LR35902::registers.HL._reg[0]}, {/* FxD */ 4, OP::_set<6>, &LR35902::registers.HL._reg[1]}, {/* §E */ 12, OP::_set_hl<6>}, {/* FxF */ 4, OP::_set<6>, &LR35902::registers.A}
+    {/* Fx0 */ 150, OP::_set<6>, &LR35902::registers.BC._reg[0]}, {/* Fx1 */ 4, OP::_set<6>, &LR35902::registers.BC._reg[1]}, {/* Fx2 */ 4, OP::_set<6>, &LR35902::registers.DE._reg[0]}, {/* Fx3 */ 4, OP::_set<6>, &LR35902::registers.DE._reg[1]}, {/* Fx4 */ 4, OP::_set<6>, &LR35902::registers.HL._reg[0]}, {/* Fx5 */ 4, OP::_set<6>, &LR35902::registers.HL._reg[1]}, {/* Fx6 */ 12, OP::_set_hl<6>}, {/* Fx7 */ 4, OP::_set<6>, &LR35902::registers.A},{/* Fx8 */ 4, OP::_set<6>, &LR35902::registers.BC._reg[0]}, {/* Fx9 */ 4, OP::_set<6>, &LR35902::registers.BC._reg[1]}, {/* FxA */ 4, OP::_set<6>, &LR35902::registers.DE._reg[0]}, {/* FxB */ 4, OP::_set<6>, &LR35902::registers.DE._reg[1]}, {/* FxC */ 4, OP::_set<6>, &LR35902::registers.HL._reg[0]}, {/* FxD */ 4, OP::_set<6>, &LR35902::registers.HL._reg[1]}, {/* §E */ 12, OP::_set_hl<6>}, {/* FxF */ 4, OP::_set<6>, &LR35902::registers.A}
 };
 
 OpCodeMapping::OpCodeMapping()
@@ -86,7 +86,8 @@ void OpCodeMapping::Call::ABORT(Memory::Map& memMap, OpStructure& info){
 void OpCodeMapping::Call::CB_OPCODE(Memory::Map& memMap, OpStructure& info){
     //Also known as STOP 0 instruction 10 00.
     *LR35902::registers.PC+=1;
-    cbInstructions.at(**LR35902::registers.PC).call(memMap, info);
+    OpStructure& cbInfo = cbInstructions.at(**LR35902::registers.PC);
+    cbInfo.call(memMap, cbInfo);
 }
 
 void OpCodeMapping::Call::HALT(Memory::Map&, OpStructure&){
