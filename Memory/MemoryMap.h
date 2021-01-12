@@ -133,10 +133,25 @@ namespace Memory{
 			inline void write(uint8_t val, uint16_t addr) {
 				if(addr < videoRam.position)
 					return;
+				static const uint16_t ioEnd = ioReg.position + ioReg.size;
+				if(addr > ioReg.position && addr <= ioEnd)
+					specialWrite(val, addr);
 				//TODO REMOVE THIS
 				if(addr == 0xFF00)
 					return;
 				memory[addr] = val;
+			}
+
+			inline void specialWrite(uint8_t val, uint16_t addr) {
+				switch (addr){
+					case 0xFF04:
+						memory[addr] = 0;
+				}
+			}
+
+			//Used to update the timer (any other write will zero it)
+			inline void timerUpdate(uint8_t val) {
+				memory[0xFF04] = val;
 			}
 
 			inline void writeBank(uint8_t val, uint16_t addr) {

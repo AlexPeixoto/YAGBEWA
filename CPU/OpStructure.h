@@ -2,8 +2,9 @@
 
 #include <cstdint>
 #include <functional>
-
 //This file maps all instructions, parmeters, registers and jump conditions. It also defines the Operation struct that will store the instruction + parameters in a way that is easier to use in order to process.
+
+class Bus;
 namespace CPU{
     enum class INSTRUCTION{
         NOP, LD, INC, DEC, RLCA, ADD, RRCA, STOP, RLA, JR, RRA, CPL, SCF, DAA, CCF, HALT, SUB, ADC, SBC, AND, XOR, OR, CP, RET, POP, JP, PUSH, RST, CB, CALL, RETI, LDH, DI, EI,
@@ -90,7 +91,7 @@ namespace CPU{
         bool invalid;
         uint8_t cycleCount;
 
-        using FunctionCallRef = std::function<void(Memory::Map&, OpStructure&)>;
+        using FunctionCallRef = std::function<void(Bus&, OpStructure&)>;
         // Call the function, this contains the PC, the memory map and the a reference to itself (so parameters and type can be read)
         FunctionCallRef call;
         

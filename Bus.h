@@ -6,8 +6,6 @@
 
 class Bus {
 private:
-	
-
 public:
 	//Cpu, PPU, APU and cartridge are public here as the buss just connects them.
 
@@ -19,11 +17,16 @@ public:
     CPU::LR35902 cpu;
     Memory::Cartridge::RomManager cartridge;
 
-	
-
     Bus ();
     ~Bus ();
 
 	void runCycle();
+	void clockUpdate();
+
+	void requestWrite(uint8_t val, uint16_t addr);
+
+	Memory::Map& getMemoryMap(){
+		return memoryMap;
+	}
 
 };

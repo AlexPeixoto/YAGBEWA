@@ -6,6 +6,7 @@
 #include <CPU/OpCodeMapping.h>
 #include <CPU/OpStructure.h>
 #include <CPU/LR35902.h>
+#include <Bus.h>
 
 using namespace CPU;
 using namespace Memory;

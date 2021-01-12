@@ -33,6 +33,6 @@ namespace CPU{
 		~LR35902();
 
 		void initPC();
-		void tick();
+		uint32_t tick();
 	};
 }
