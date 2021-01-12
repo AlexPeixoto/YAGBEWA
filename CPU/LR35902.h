@@ -18,6 +18,8 @@ namespace CPU{
 		static bool halt;
 		// To re-enable interruptions on the next loop
 		static bool enableInterruptions;
+		// Check if moved the PC to another address, to prevent PC increment
+		static bool changedPC;
         Bus* bus;
 		OpCodeMapping mapping;
 		// Cycles contains the "used cycles by the instruction"

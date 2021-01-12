@@ -6,6 +6,8 @@ using namespace CPU;
 Registers LR35902::registers;
 bool LR35902::stop = false;
 bool LR35902::halt = false;
+bool LR35902::changedPC = false;
+
 bool LR35902::enableInterruptions = false;
 uint8_t LR35902::extraCycles = 0;
 
@@ -30,8 +32,12 @@ void LR35902::tick() {
     if(cycles == 0){
         //do its stuff
         cycles += LR35902::mapping.executeNext(bus->memoryMap);
-        //Move to next opcode
-        LR35902::registers.PC++;
+        //Move to next opcode, if there was no operation that changed PC
+        if(!changedPC){
+            LR35902::registers.PC++;
+        }
+        changedPC = false;
+        
     }
     cycles--;
 }
