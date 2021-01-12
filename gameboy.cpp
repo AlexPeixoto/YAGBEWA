@@ -16,6 +16,7 @@ int main(int argc, char** argv){
 	Bus bus;
 
 	bus.cartridge.loadRom("Tetris.gb");
+    bus.runCycle();
 
 	//Load cartridge header
     //Memory::Cartridge::RomLoader loader(begin);

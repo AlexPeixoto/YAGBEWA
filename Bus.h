@@ -24,6 +24,6 @@ public:
     Bus ();
     ~Bus ();
 
-	void tick();
+	void runCycle();
 
 };

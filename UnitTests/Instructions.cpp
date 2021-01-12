@@ -109,8 +109,7 @@ TEST_CASE( "Test DAA", "[INSTRUCTIONS]" ) {
 TEST_CASE( "Test SET", "[INSTRUCTIONS]" ) {
     resetRegisters();
     auto _instruction = mapping.instructions[0xcb];
-    LR35902::registers.PC = new uint8_t*();
-    (*LR35902::registers.PC) = new uint8_t[2]{0xF0, 0xF0};
+    LR35902::registers.PC = new uint8_t[2]{0xF0, 0xF0};
     LR35902::registers.BC._reg[0] = 0;
     _instruction.call(memMap, _instruction);
     REQUIRE(static_cast<uint32_t>(LR35902::registers.BC._reg[0]) == 0b01000000);

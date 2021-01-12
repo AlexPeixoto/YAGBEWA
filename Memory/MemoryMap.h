@@ -129,6 +129,14 @@ namespace Memory{
 			}
 			
 			inline void write(uint8_t val, uint16_t addr) {
+				if(addr < videoRam.position)
+					return;
+				memory[addr] = val;
+			}
+
+			inline void writeBank(uint8_t val, uint16_t addr) {
+				if(addr >= videoRam.position)
+					return;
 				memory[addr] = val;
 			}
 

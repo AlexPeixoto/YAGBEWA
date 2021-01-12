@@ -23,10 +23,15 @@ LR35902::LR35902(Bus* bus) : bus(bus) {
 
 LR35902::~LR35902() {}
 
-
-void LR35902::clock() {
+void LR35902::initPC() {
+    LR35902::registers.PC = bus->memoryMap.getMemoryAt(0x100);
+}
+void LR35902::tick() {
     if(cycles == 0){
         //do its stuff
+        cycles += LR35902::mapping.executeNext(bus->memoryMap);
+        //Move to next opcode
+        LR35902::registers.PC++;
     }
     cycles--;
 }

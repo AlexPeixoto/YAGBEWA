@@ -30,6 +30,7 @@ namespace CPU{
 		LR35902(Bus* bus);
 		~LR35902();
 
-		void clock();
+		void initPC();
+		void tick();
 	};
 }

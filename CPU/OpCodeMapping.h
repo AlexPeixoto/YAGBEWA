@@ -20,6 +20,7 @@ namespace CPU {
 
         void setMapping();
         void setCbMapping();
+        uint16_t executeNext(Memory::Map& memMap);
 
         //Flags checked from 0x0 to 7xf
         class Call{
