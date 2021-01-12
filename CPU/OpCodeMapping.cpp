@@ -517,10 +517,11 @@ void OpCodeMapping::Call::PUSH(Memory::Map& memMap, OpStructure& info){
 
 void OpCodeMapping::Call::PUSH_AF(Memory::Map& memMap, OpStructure& info){
     uint8_t f = 0;
-    f |= LR35902::registers.F.Z;
-    f |= LR35902::registers.F.N << 1;
-    f |= LR35902::registers.F.H << 2;
-    f |= LR35902::registers.F.C << 3;
+    //Writes to the top 4 bits
+    f |= LR35902::registers.F.Z << 7;
+    f |= LR35902::registers.F.N << 6;
+    f |= LR35902::registers.F.H << 5;
+    f |= LR35902::registers.F.C << 4;
     _push8(memMap, LR35902::registers.A);
     _push8(memMap, f);
 }
@@ -532,10 +533,10 @@ void OpCodeMapping::Call::POP(Memory::Map& memMap, OpStructure& info){
 void OpCodeMapping::Call::POP_AF(Memory::Map& memMap, OpStructure& info){
     const uint8_t f = _pop8(memMap);
     LR35902::registers.A = _pop8(memMap);
-    LR35902::registers.F.Z = f & 0b00000001;
-    LR35902::registers.F.N = f & 0b00000010;
-    LR35902::registers.F.H = f & 0b00000100;
-    LR35902::registers.F.C = f & 0b00001000;
+    LR35902::registers.F.Z = f & 0b10000000;
+    LR35902::registers.F.N = f & 0b01000000;
+    LR35902::registers.F.H = f & 0b00100000;
+    LR35902::registers.F.C = f & 0b00010000;
 }
 
 // In some instances here the 0x1 is redundant, but its left to make the intentions clear.

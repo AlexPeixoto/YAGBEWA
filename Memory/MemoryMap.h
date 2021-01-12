@@ -21,8 +21,8 @@ namespace Memory{
 	const Segment videoRam{ 0x8000, 0x1999 };
 	const Segment switchableRam{ 0xA000, 0x1999 };
 	const Segment internalRam1{ 0xC000, 0x1999 };
-	const Segment internalRam2{ 0xC000, 0x1999 };
-	//ECHO from 0xC000 until 0xFDFF
+	const Segment internalRam2{ 0xD000, 0x1999 };
+	//ECHO from 0xE000 until 0xFDFF
 	const Segment spriteAttrib{ 0xFE00, 0x009F };
 	const Segment ioReg{ 0xFF00, 0x007F };
 	const Segment hiRam{ 0xFF80, 0x007E };
@@ -52,8 +52,8 @@ namespace Memory{
 				CPU //This is like a master value, which can change "anything"
 			};
 			Map() {
-				//for(int x=0; x< 0xffff; x++)
-				//	memory.at(x) = static_cast<uint8_t>(134);
+				for(int x=0; x< 0xffff; x++)
+					memory.at(x) = static_cast<uint8_t>(00);
 				// Power up sequence
 				memory.at(0xFF05) = 0x00; //TIMA
 				memory.at(0xFF06) = 0x00; //TMA
@@ -86,6 +86,8 @@ namespace Memory{
 				memory.at(0xFF4A) = 0x00; //WY
 				memory.at(0xFF4B) = 0x00; //WX
 				memory.at(0xFFFF) = 0x00; //IE
+				memory.at(0xFF00) = 0xff; //JOYP
+				
 				//Set FF00 as F and prevent any further writes to it until IO is done 
 			};
 
@@ -130,6 +132,9 @@ namespace Memory{
 			
 			inline void write(uint8_t val, uint16_t addr) {
 				if(addr < videoRam.position)
+					return;
+				//TODO REMOVE THIS
+				if(addr == 0xFF00)
 					return;
 				memory[addr] = val;
 			}
