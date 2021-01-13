@@ -6,6 +6,7 @@
 
 #include <iostream>
 
+class Bus;
 namespace Memory{
 	// 0xFFFF + 1.... (interrupted segment)
 	using MemoryArray = std::array<uint8_t, 0x10000>;
@@ -29,11 +30,13 @@ namespace Memory{
 	const Segment interrupted{ 0xFFFF, 0xFFFF };
 
 
-    //The whole memory map (As of now) is here
-	//Maybe its worth breaking it up into video, work ram and cartridge ram
+    //Maps the memory, dont see this as a RAM module, but more as an orchestrator for memory access.
+	//This also works as a translator when a memory segment is accessed that is not "memory per se",
+	//but more like a memory map controller.
     class Map{
         private:
 			MemoryArray memory;
+			Bus* bus;
         public:
 			//This contains a list of each memory area that an be accesse.
 			//This is used on fillWith to prevent OOB memory from being accessed.
@@ -51,7 +54,10 @@ namespace Memory{
 				INTERRUPTED,
 				CPU //This is like a master value, which can change "anything"
 			};
-			Map() {
+			//Mainly used for UT
+			Map(){}
+
+			Map(Bus* bus) : bus(bus) {
 				for(int x=0; x< 0xffff; x++)
 					memory.at(x) = static_cast<uint8_t>(00);
 				// Power up sequence
@@ -90,6 +96,8 @@ namespace Memory{
 				
 				//Set FF00 as F and prevent any further writes to it until IO is done 
 			};
+
+			uint8_t& operator[](std::size_t index) { return memory.at(index); }
 
 			uint8_t* getRomStart() {
 				return &memory.at(0x00);
@@ -133,25 +141,10 @@ namespace Memory{
 			inline void write(uint8_t val, uint16_t addr) {
 				if(addr < videoRam.position)
 					return;
-				static const uint16_t ioEnd = ioReg.position + ioReg.size;
-				if(addr > ioReg.position && addr <= ioEnd)
-					specialWrite(val, addr);
 				//TODO REMOVE THIS
 				if(addr == 0xFF00)
 					return;
 				memory[addr] = val;
-			}
-
-			inline void specialWrite(uint8_t val, uint16_t addr) {
-				switch (addr){
-					case 0xFF04:
-						memory[addr] = 0;
-				}
-			}
-
-			//Used to update the timer (any other write will zero it)
-			inline void timerUpdate(uint8_t val) {
-				memory[0xFF04] = val;
 			}
 
 			inline void writeBank(uint8_t val, uint16_t addr) {

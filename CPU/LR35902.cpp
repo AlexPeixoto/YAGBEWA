@@ -28,12 +28,13 @@ LR35902::~LR35902() {}
 void LR35902::initPC() {
     LR35902::registers.PC = bus->memoryMap.getMemoryAt(0x100);
 }
-uint32_t LR35902::tick() {
-    uint32_t cycleCount = LR35902::mapping.executeNext(*bus);
+uint16_t LR35902::tick() {
+    //do its stuff
+    uint16_t val = LR35902::mapping.executeNext(bus->memoryMap);
     //Move to next opcode, if there was no operation that changed PC
     if(!changedPC){
         LR35902::registers.PC++;
     }
     changedPC = false;
-    return cycleCount;
+    return val;
 }

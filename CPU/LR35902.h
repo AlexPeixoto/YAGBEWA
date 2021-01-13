@@ -33,6 +33,8 @@ namespace CPU{
 		~LR35902();
 
 		void initPC();
-		uint32_t tick();
+		uint16_t tick();
+
+		static bool stopped() { return LR35902::stop; }
 	};
 }

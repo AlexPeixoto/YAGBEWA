@@ -12,7 +12,7 @@ include_directories(../Memory)
 include_directories(../CPU)
 include_directories(../PPU)
 include_directories(../IO)
-file(GLOB_RECURSE SOURCES ../Bus.cpp ../Memory/*.cpp ../CPU/*.cpp ../PPU/*.cpp ../IO/*.cpp)
+file(GLOB_RECURSE SOURCES ../Memory/*.cpp ../CPU/*.cpp ../PPU/*.cpp ../IO/*.cpp)
 
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 enable_testing()

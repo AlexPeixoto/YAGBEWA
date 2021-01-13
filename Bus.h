@@ -6,27 +6,23 @@
 
 class Bus {
 private:
-public:
 	//Cpu, PPU, APU and cartridge are public here as the buss just connects them.
 
 	//Has to be moved to private later
 	//Memory writing operations can trigger interruptions.
 	//This has to come before cpu and cartridge to ensure the ordering of the object creation
-	Memory::Map memoryMap;
-
+	
+	uint16_t inputClockSelect;
     CPU::LR35902 cpu;
-    Memory::Cartridge::RomManager cartridge;
+    
+	void updateTimerValue();
+	void clockUpdate();
 
+public:
+	Memory::Map memoryMap;
+	Memory::Cartridge::RomManager cartridge;
     Bus ();
     ~Bus ();
 
 	void runCycle();
-	void clockUpdate();
-
-	void requestWrite(uint8_t val, uint16_t addr);
-
-	Memory::Map& getMemoryMap(){
-		return memoryMap;
-	}
-
 };

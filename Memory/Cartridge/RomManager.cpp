@@ -6,11 +6,7 @@
 using namespace Memory::Cartridge;
 
 RomManager::RomManager(Bus* bus)
-    : bus(bus)
-{
-	std::cout << "Bus: " << bus << std::endl;
-	//loadCartridge();
-}
+    : bus(bus) {}
 RomManager::~RomManager() {}
 
 void RomManager::loadRom(std::string fileName) {

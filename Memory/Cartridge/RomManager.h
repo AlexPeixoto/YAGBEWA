@@ -5,6 +5,7 @@
 #include <Memory/Cartridge/Controllers/ControllerBase.h>
 #include <Memory/Cartridge/Controllers/None.h>
 
+
 class Bus;
 namespace Memory::Cartridge{
 	//Rom manager acts as the "rom controller"
