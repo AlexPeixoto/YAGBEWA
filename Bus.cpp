@@ -26,12 +26,16 @@ void Bus::runCycle() {
 	while(true){
 	//Run 1 frame
 	//while(clock < CYCLES_PER_FRAME){
-		//This is to create a cycle acurrate emulation, where we "burn the cycles"
-		//clock+=
-		cpu.tick();
+		//Check for halt here
+		if(CPU::LR35902::getHaltType() != CPU::HaltType::None)
+		{
+			CPU::LR35902::enableInterruptionIfOnNext();
+			//This is to create a cycle acurrate emulation, where we "burn the cycles"
+			clock+=cpu.tick();
+			//Timer
+			updateTimerValue();
+		}
 		//Interruptions
-		//Timer
-		updateTimerValue();
 		performInterruption();
 	//}
 	}

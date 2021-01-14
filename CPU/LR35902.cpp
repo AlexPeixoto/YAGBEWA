@@ -6,9 +6,8 @@ using namespace CPU;
 Registers LR35902::registers;
 bool LR35902::stop = false;
 bool LR35902::changedPC = false;
+IMEType  LR35902::imeType = CPU::IMEType::None;
 HaltType LR35902::haltType = CPU::HaltType::None;
-
-bool LR35902::enableInterruptions = false;
 uint8_t LR35902::extraCycles = 0;
 
 LR35902::LR35902(Bus* bus) : bus(bus) {

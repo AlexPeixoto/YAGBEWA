@@ -13,6 +13,11 @@ namespace CPU{
 		NoInterruption,
 		None
 	};
+	enum class IMEType{
+		OnNext,
+		Enabled,
+		None
+	};
 	class LR35902 {
 	private:
 		//Perhaps make it non-static and pass this as a parameter for OpCodeMapping
@@ -21,10 +26,10 @@ namespace CPU{
 		static uint8_t extraCycles;
 		// Maps to stop instruction (can be resumed by a button press).
 		static bool stop;
-		// To re-enable interruptions on the next loop
-		static bool enableInterruptions;
 		// Check if moved the PC to another address, to prevent PC increment
 		static bool changedPC;
+		// To re-enable interruptions on the next loop
+		static IMEType imeType;
 		//Manages halt mode and halt bug
 		static HaltType haltType;
 
@@ -51,8 +56,13 @@ namespace CPU{
 		void setPC(uint16_t target);
 
 		static bool stopped() { return stop; }
-		static bool interruptionsEnabled() { return enableInterruptions; }
-		static bool disableInterruptions() { return enableInterruptions = false; }
+		static bool interruptionsEnabled() { return imeType == IMEType::Enabled; }
+		static void disableInterruptions() { imeType = IMEType::None; }
+		//Interruptions are enabled on next loop
+		static void enableInterruptionIfOnNext() { 
+			if(imeType == IMEType::OnNext)
+				imeType = IMEType::Enabled;
+		}
 		static HaltType getHaltType() { return haltType; }
 		static void resetHalt() { haltType = HaltType::None; }
 		

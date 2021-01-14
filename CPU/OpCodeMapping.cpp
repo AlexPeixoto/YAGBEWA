@@ -106,7 +106,7 @@ void OpCodeMapping::Call::CB_OPCODE(Memory::Map& memMap, OpStructure& info){
 }
 
 void OpCodeMapping::Call::HALT(Memory::Map& memMap, OpStructure&){
-    if(!LR35902::enableInterruptions){
+    if(LR35902::imeType == IMEType::Enabled){
         if((memMap[0xFFFF] & memMap[0xFF0F] & 0x1F) != 0){
             LR35902::haltType = HaltType::Revert;
         }
@@ -889,11 +889,11 @@ void OpCodeMapping::Call::CALL_C_a16(Memory::Map& memMap, OpStructure& info){
 }
 
 void OpCodeMapping::Call::EI(Memory::Map&, OpStructure& ){
-    LR35902::enableInterruptions = true;
+    LR35902::imeType = IMEType::OnNext;
 }
 
 void OpCodeMapping::Call::DI(Memory::Map&, OpStructure& ){
-    LR35902::enableInterruptions = false;
+    LR35902::imeType = IMEType::None;
 }
 
 void OpCodeMapping::Call::_push8(Memory::Map& memMap, uint8_t val){
