@@ -4,6 +4,8 @@
 #include <Memory/Cartridge/RomManager.h>
 #include <Memory/MemoryMap.h>
 
+//Probably BUS is not the best name to call this.
+//But this is the "glue code" that call all the main operations (cpu tick, ppu tick, timer update and interruption check)
 class Bus {
 private:
 	//Cpu, PPU, APU and cartridge are public here as the buss just connects them.
@@ -17,6 +19,7 @@ private:
     
 	void updateTimerValue();
 	void clockUpdate();
+	void performInterruption();
 
 public:
 	Memory::Map memoryMap;

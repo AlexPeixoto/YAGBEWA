@@ -28,9 +28,23 @@ LR35902::~LR35902() {}
 void LR35902::initPC() {
     LR35902::registers.PC = bus->memoryMap.getMemoryAt(0x100);
 }
+
+void LR35902::setPC(uint16_t target) { 
+    LR35902::registers.PC = bus->memoryMap.getMemoryAt(target);
+}
+
+void LR35902::pushPC() {
+    const ptrdiff_t index = (LR35902::registers.PC - bus->memoryMap.getRomStart());
+    mapping.push16(bus->memoryMap, index);
+}
+
+void LR35902::popPC() {
+    LR35902::registers.PC = bus->memoryMap.getMemoryAt(mapping.pop16(bus->memoryMap));
+}
+
 uint16_t LR35902::tick() {
     //do its stuff
-    uint16_t val = LR35902::mapping.executeNext(bus->memoryMap);
+    uint16_t val = mapping.executeNext(bus->memoryMap);
     //Move to next opcode, if there was no operation that changed PC
     if(!changedPC){
         LR35902::registers.PC++;

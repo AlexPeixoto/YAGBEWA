@@ -8,7 +8,7 @@
 
 class Bus;
 namespace Memory{
-	// 0xFFFF + 1.... (interrupted segment)
+	// 0xFFFF + 1.... (interruptions segment)
 	using MemoryArray = std::array<uint8_t, 0x10000>;
 
 	struct Segment {
@@ -25,9 +25,21 @@ namespace Memory{
 	const Segment internalRam2{ 0xD000, 0x1999 };
 	//ECHO from 0xE000 until 0xFDFF
 	const Segment spriteAttrib{ 0xFE00, 0x009F };
+	/* From pandoc
+	FF00	FF02	DMG	Port/Mode
+	FF04	FF07	DMG	Port/Mode
+	FF10	FF26	DMG	Sound
+	FF30	FF3F	DMG	Waveform RAM
+	FF40	FF4B	DMG	LCD
+	FF4F		    CGB	VRAM Bank Select
+	FF50		    DMG	Set to non-zero to disable boot ROM
+	FF51	FF55	CGB	HDMA
+	FF68	FF69	CGB	BCP/OCP
+	FF70		    CGB	WRAM Bank Select
+	*/
 	const Segment ioReg{ 0xFF00, 0x007F };
 	const Segment hiRam{ 0xFF80, 0x007E };
-	const Segment interrupted{ 0xFFFF, 0xFFFF };
+	const Segment interruptions{ 0xFFFF, 0xFFFF };
 
 
     //Maps the memory, dont see this as a RAM module, but more as an orchestrator for memory access.
@@ -51,7 +63,7 @@ namespace Memory{
 				SPRITEATTRIB,
 				IOREG,
 				HIRAM,
-				INTERRUPTED,
+				INTERRUPTION,
 				CPU //This is like a master value, which can change "anything"
 			};
 			//Mainly used for UT
@@ -127,8 +139,8 @@ namespace Memory{
 						return size <= ioReg.size;
 					case MemArea::HIRAM:
 						return size <= hiRam.size;
-					case MemArea::INTERRUPTED:
-						return size <= interrupted.size;
+					case MemArea::INTERRUPTION:
+						return size <= interruptions.size;
 					default: //CPU
 						return true;
 				}
@@ -138,12 +150,20 @@ namespace Memory{
 				std::copy(data, data + size, memory.begin() + pos);
 			}
 			
+			//Write here does not allow (for now), to write on vram
 			inline void write(uint8_t val, uint16_t addr) {
-				if(addr < videoRam.position)
+				if(addr < switchableRam.position || 
+					//Prohibited areas
+					addr >= 0xE000 && addr <= 0xFDFF)
 					return;
-				//TODO REMOVE THIS
-				if(addr == 0xFF00)
-					return;
+				//Special write handling
+				switch(addr){
+					//Reset 0xFF04 on attempts to write to it (Timer).
+					case 0xFF04:
+						memory[0xFF04] = 0;
+						return;
+					
+				}
 				memory[addr] = val;
 			}
 

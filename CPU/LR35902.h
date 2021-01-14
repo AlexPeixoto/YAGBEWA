@@ -8,7 +8,8 @@ class Bus;
 
 namespace CPU{
 	class LR35902 {
-	private:		
+	private:
+		//Perhaps make it non-static and pass this as a parameter for OpCodeMapping
 		static Registers registers;
 		// Some instructions might have extra cycles depending on specific conditions
 		static uint8_t extraCycles;
@@ -20,10 +21,13 @@ namespace CPU{
 		static bool enableInterruptions;
 		// Check if moved the PC to another address, to prevent PC increment
 		static bool changedPC;
+
         Bus* bus;
 		OpCodeMapping mapping;
 		// Cycles contains the "used cycles by the instruction"
 		uint8_t cycles = 0;
+		// Interruption delay, needs to think about that or if that can even become a problem
+		//uint8_t instructionDelay = 0;
 
 		//OpCodeMapping needs access to the registers.
 		friend class OpCodeMapping;
@@ -35,6 +39,14 @@ namespace CPU{
 		void initPC();
 		uint16_t tick();
 
-		static bool stopped() { return LR35902::stop; }
+		//"Interface" so the BUS can perform interruptions and other operations
+		void pushPC();
+		void popPC();
+		void setPC(uint16_t target);
+
+		static bool stopped() { return stop; }
+		static bool interruptionsEnabled() { return enableInterruptions; }
+		static bool disableInterruptions() { return enableInterruptions = false; }
+		
 	};
 }

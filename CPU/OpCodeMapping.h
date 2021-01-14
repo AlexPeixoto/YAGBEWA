@@ -22,6 +22,10 @@ namespace CPU {
         void setCbMapping();
         uint16_t executeNext(Memory::Map& memMap);
 
+        //Used for 
+        void push16(Memory::Map& memMap, uint16_t val) { Call::_push16(memMap, val); }
+        uint16_t pop16(Memory::Map& memMap) { return Call::_pop16(memMap); }
+
         //Flags checked from 0x0 to 7xf
         class Call{
             public:
@@ -202,12 +206,14 @@ namespace CPU {
                 //Maps invalid instructions
                 static void ABORT(Memory::Map&, OpStructure&);
 
+                //Used for interruption handling
+                static void _push16(Memory::Map&, uint16_t);
+                static uint16_t _pop16(Memory::Map&);
+
             private:
                 //Internal push/pop instructions, those are not mapped to opcodes, but insteasd used
                 static void _push8(Memory::Map&, uint8_t);
-                static void _push16(Memory::Map&, uint16_t);
                 static uint8_t _pop8(Memory::Map&);
-                static uint16_t _pop16(Memory::Map&);
 
                 //Maps a more simple/generic ADC, SBC, ADD, SUB
                 static void _adc(uint8_t);
