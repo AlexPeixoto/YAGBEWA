@@ -81,8 +81,15 @@ OpCodeMapping::OpCodeMapping()
 
 uint16_t OpCodeMapping::executeNext(Memory::Map& memMap){
     LR35902::extraCycles = 0;
-    std::cout << std::hex << (int)(*LR35902::registers.PC) << std::endl;
     auto &op = instructions.at(*LR35902::registers.PC);
+    //Go back one instruction, this should not cause problems as no instruction
+    //Reads again the same byte.
+    //Its important to do here due to 2 byte instructions.
+    //The reason for that is that $3E $14 should be executed as $3E $3E $14
+    if(LR35902::haltType == HaltType::Revert){
+        LR35902::registers.PC--;
+        LR35902::haltType = HaltType::None;
+    }
     op.call(memMap, op);
     return op.cycleCount + LR35902::extraCycles;
 }
@@ -98,8 +105,17 @@ void OpCodeMapping::Call::CB_OPCODE(Memory::Map& memMap, OpStructure& info){
     cbInfo.call(memMap, cbInfo);
 }
 
-void OpCodeMapping::Call::HALT(Memory::Map&, OpStructure&){
-    LR35902::halt = true;
+void OpCodeMapping::Call::HALT(Memory::Map& memMap, OpStructure&){
+    if(!LR35902::enableInterruptions){
+        if((memMap[0xFFFF] & memMap[0xFF0F] & 0x1F) != 0){
+            LR35902::haltType = HaltType::Revert;
+        }
+        else if((memMap[0xFFFF] & memMap[0xFF0F] & 0x1F) != 0){
+            LR35902::haltType = HaltType::NoInterruption;
+        }
+    }
+
+    LR35902::haltType = HaltType::Normal;
 }
 
 void OpCodeMapping::Call::STOP(Memory::Map&, OpStructure&){

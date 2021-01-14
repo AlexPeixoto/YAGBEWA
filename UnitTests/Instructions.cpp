@@ -37,12 +37,12 @@ TEST_CASE( "Reinterpret Cast trick", "[PC]" ) {
 }
 
 
-TEST_CASE( "Check for STOP", "[INSTRUCTIONS]" ) {
+TEST_CASE( "Check for HALT", "[INSTRUCTIONS]" ) {
     resetRegisters();
-    REQUIRE(CPU::LR35902::halt == false);
+    REQUIRE(CPU::LR35902::haltType == CPU::HaltType::None);
     auto _instruction = mapping.instructions[0x76];
     _instruction.call(memMap, _instruction);
-    REQUIRE(CPU::LR35902::halt == true);
+    REQUIRE(CPU::LR35902::haltType == CPU::HaltType::Normal);
 }
 
 TEST_CASE( "Test ADC8", "[INSTRUCTIONS]" ) {

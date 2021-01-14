@@ -97,6 +97,12 @@ void Bus::clockUpdate() {
 void Bus::performInterruption() {
 	if(!CPU::LR35902::interruptionsEnabled())
 		return;
+	//RevertPC interruption bug is handled directly on executeNext;
+	if(CPU::LR35902::getHaltType() == CPU::HaltType::NoInterruption){
+		//Instead of jumping we just continue here.
+		CPU::LR35902::resetHalt();
+		return;
+	}
 	//If there is any interruption enabled, and if there was any interruption triggered
 	const uint8_t _IE = memoryMap[IE_ADDR];
 	const uint8_t _IF = memoryMap[IF_ADDR];

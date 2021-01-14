@@ -7,6 +7,12 @@
 class Bus;
 
 namespace CPU{
+	enum class HaltType{
+		Normal,
+		Revert,
+		NoInterruption,
+		None
+	};
 	class LR35902 {
 	private:
 		//Perhaps make it non-static and pass this as a parameter for OpCodeMapping
@@ -15,12 +21,12 @@ namespace CPU{
 		static uint8_t extraCycles;
 		// Maps to stop instruction (can be resumed by a button press).
 		static bool stop;
-		// Maps to halt instruction.
-		static bool halt;
 		// To re-enable interruptions on the next loop
 		static bool enableInterruptions;
 		// Check if moved the PC to another address, to prevent PC increment
 		static bool changedPC;
+		//Manages halt mode and halt bug
+		static HaltType haltType;
 
         Bus* bus;
 		OpCodeMapping mapping;
@@ -47,6 +53,8 @@ namespace CPU{
 		static bool stopped() { return stop; }
 		static bool interruptionsEnabled() { return enableInterruptions; }
 		static bool disableInterruptions() { return enableInterruptions = false; }
+		static HaltType getHaltType() { return haltType; }
+		static void resetHalt() { haltType = HaltType::None; }
 		
 	};
 }
