@@ -12,7 +12,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 set(SFML_WINDOWS_ROOT "D:/Developer/SFML-2.5/SFML")
 
 # Find source files
-file(GLOB_RECURSE SOURCES Gameboy.cpp Bus.cpp Memory/*.cpp CPU/*.cpp PPU/*.cpp APU/*.cpp IO/*.cpp)
+file(GLOB_RECURSE SOURCES Bus.cpp Gameboy.cpp  Memory/*.cpp CPU/*.cpp PPU/*.cpp APU/*.cpp IO/*.cpp)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	SET (CMAKE_OSX_ARCHITECTURES "x86_64") 

@@ -21,17 +21,17 @@ namespace CPU{
 	class LR35902 {
 	private:
 		//Perhaps make it non-static and pass this as a parameter for OpCodeMapping
-		static Registers registers;
+		Registers registers;
 		// Some instructions might have extra cycles depending on specific conditions
-		static uint8_t extraCycles;
+		uint8_t extraCycles = 0;
 		// Maps to stop instruction (can be resumed by a button press).
-		static bool stop;
+		bool stop = false;
 		// Check if moved the PC to another address, to prevent PC increment
-		static bool changedPC;
+		bool changedPC = false;
 		// To re-enable interruptions on the next loop
-		static IMEType imeType;
+		IMEType imeType = IMEType::None;
 		//Manages halt mode and halt bug
-		static HaltType haltType;
+		HaltType haltType = HaltType::None;
 
         Bus* bus;
 		OpCodeMapping mapping;
@@ -55,16 +55,16 @@ namespace CPU{
 		void popPC();
 		void setPC(uint16_t target);
 
-		static bool stopped() { return stop; }
-		static bool interruptionsEnabled() { return imeType == IMEType::Enabled; }
-		static void disableInterruptions() { imeType = IMEType::None; }
+		bool stopped() { return stop; }
+		bool interruptionsEnabled() { return imeType == IMEType::Enabled; }
+		void disableInterruptions() { imeType = IMEType::None; }
 		//Interruptions are enabled on next loop
-		static void enableInterruptionIfOnNext() { 
+		void enableInterruptionIfOnNext() { 
 			if(imeType == IMEType::OnNext)
 				imeType = IMEType::Enabled;
 		}
-		static HaltType getHaltType() { return haltType; }
-		static void resetHalt() { haltType = HaltType::None; }
+		HaltType getHaltType() { return haltType; }
+		void resetHalt() { haltType = HaltType::None; }
 		
 	};
 }

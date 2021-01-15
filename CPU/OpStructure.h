@@ -5,82 +5,7 @@
 
 //This file maps all instructions, parmeters, registers and jump conditions. It also defines the Operation struct that will store the instruction + parameters in a way that is easier to use in order to process.
 namespace CPU{
-    enum class INSTRUCTION{
-        NOP, LD, INC, DEC, RLCA, ADD, RRCA, STOP, RLA, JR, RRA, CPL, SCF, DAA, CCF, HALT, SUB, ADC, SBC, AND, XOR, OR, CP, RET, POP, JP, PUSH, RST, CB, CALL, RETI, LDH, DI, EI,
-        //CB
-        RLC,
-        RRC,
-        RL, RR,
-        SLA, SRA,
-        SWAP, SRL,
-        BIT,/* BIT,
-        BIT, BIT,
-        BIT, BIT,
-        BIT, BIT,*/
-        RES,/* RES,
-        RES, RES,
-        RES, RES,
-        RES, RES,*/
-        SET/*, SET,
-        SET, SET,
-        SET, SET, 
-        SET, SET*/
-    };
-
-    enum class PARAMETER_TYPE{
-        NONE,
-
-        D8,
-        A8,
-        R8,
-
-        D16,
-        A16,
-
-        REG,
-        REGV, //REG contains the address.
-        JMP,
-        RST,
-        BIT
-    };
-    enum class REG{
-        //Preserve this order from B to A as this is the order seen for several instructions
-        B, C,
-        D, E,
-        H, L,
-        HL,
-        A,
-
-        BC,
-        DE,
-        HLP,
-        HLM,
-        F, //F IS NOT ALWAYS USED, IT CONTAINS ALL THE FLAGS (ZNHC)
-        AF,
-        Z,
-        SP
-    };
-
-    //It is passed as a parameter (type JUMP)
-    enum class JMP{
-        NZ,
-        Z,
-        NC,
-        C
-    };
-
-    //Maps parameters for RST calls
-    enum class RST{
-        H00,
-        H10,
-        H20,
-        H30,
-        H08,
-        H18,
-        H28,
-        H38
-    };
-    
+    class LR35902;
     //This can, in theory, be initialized at compile time
     struct OpStructure{
         //Stores registers being used.
@@ -90,7 +15,7 @@ namespace CPU{
         bool invalid;
         uint8_t cycleCount;
 
-        using FunctionCallRef = std::function<void(Memory::Map&, OpStructure&)>;
+        using FunctionCallRef = std::function<void(LR35902&, Memory::Map&, OpStructure&)>;
         // Call the function, this contains the PC, the memory map and the a reference to itself (so parameters and type can be read)
         FunctionCallRef call;
         

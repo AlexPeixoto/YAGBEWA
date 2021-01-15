@@ -27,9 +27,9 @@ void Bus::runCycle() {
 	//Run 1 frame
 	//while(clock < CYCLES_PER_FRAME){
 		//Check for halt here
-		if(CPU::LR35902::getHaltType() != CPU::HaltType::None)
+		if(cpu.getHaltType() == CPU::HaltType::None)
 		{
-			CPU::LR35902::enableInterruptionIfOnNext();
+			cpu.enableInterruptionIfOnNext();
 			//This is to create a cycle acurrate emulation, where we "burn the cycles"
 			clock+=cpu.tick();
 			//Timer
@@ -86,7 +86,7 @@ void Bus::clockUpdate() {
 		else
 			memoryMap[0xFF05]++;
 	}
-	if(!CPU::LR35902::stopped() && clockTicks == 0xFF){
+	if(!cpu.stopped() && clockTicks == 0xFF){
 		clockTicks = 0;
 		memoryMap[0xFF04]++;
 		return;
@@ -99,12 +99,12 @@ void Bus::clockUpdate() {
 }
 
 void Bus::performInterruption() {
-	if(!CPU::LR35902::interruptionsEnabled())
+	if(!cpu.interruptionsEnabled())
 		return;
 	//RevertPC interruption bug is handled directly on executeNext;
-	if(CPU::LR35902::getHaltType() == CPU::HaltType::NoInterruption){
+	if(cpu.getHaltType() == CPU::HaltType::NoInterruption){
 		//Instead of jumping we just continue here.
-		CPU::LR35902::resetHalt();
+		cpu.resetHalt();
 		return;
 	}
 	//If there is any interruption enabled, and if there was any interruption triggered
@@ -112,7 +112,7 @@ void Bus::performInterruption() {
 	const uint8_t _IF = memoryMap[IF_ADDR];
 	if(_IE != 0 && _IF != 0){
 		//Disable interruption
-		CPU::LR35902::disableInterruptions();
+		cpu.disableInterruptions();
 		//Store PC on stack
 		cpu.pushPC();
 		uint16_t interruptionDestinationAddress=0;

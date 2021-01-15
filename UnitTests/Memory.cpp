@@ -6,26 +6,27 @@
 #include <CPU/OpCodeMapping.h>
 #include <CPU/OpStructure.h>
 #include <CPU/LR35902.h>
+#include <Bus.h>
 
 using namespace CPU;
 using namespace Memory;
 namespace {
-    OpCodeMapping mapping;
-    Map memMap;
+    LR35902 cpu(new Bus());
+    OpCodeMapping mapping(cpu);
 
     void resetRegisters(){
-        LR35902::registers.A = 0;
-        LR35902::registers.BC._pair = 0;
-        LR35902::registers.DE._pair = 0;
-        LR35902::registers.HL._pair = 0;
-        LR35902::registers.SP = 0;
-        LR35902::registers.PC = 0;
+        cpu.registers.A = 0;
+        cpu.registers.BC._pair = 0;
+        cpu.registers.DE._pair = 0;
+        cpu.registers.HL._pair = 0;
+        cpu.registers.SP = 0;
+        cpu.registers.PC = 0;
 
-        LR35902::registers.F.Z = 0;
-        LR35902::registers.F.N = 0;
-        LR35902::registers.F.H = 0;
-        LR35902::registers.F.C = 0;
-        LR35902::registers.F._C = 0;
+        cpu.registers.F.Z = 0;
+        cpu.registers.F.N = 0;
+        cpu.registers.F.H = 0;
+        cpu.registers.F.C = 0;
+        cpu.registers.F._C = 0;
     }
 }
 
