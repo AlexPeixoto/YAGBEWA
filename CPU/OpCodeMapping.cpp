@@ -805,7 +805,7 @@ void OpCodeMapping::Call::JP_NZ_a16(Memory::Map& memMap, OpStructure& info) {
 }
 
 void OpCodeMapping::Call::JP_Z_a16(Memory::Map& memMap, OpStructure& info){
-    if(LR35902::registers.F.Z ) {
+    if(LR35902::registers.F.Z) {
        JP_a16(memMap, info);
        LR35902::extraCycles=4;
     } else{
@@ -814,7 +814,7 @@ void OpCodeMapping::Call::JP_Z_a16(Memory::Map& memMap, OpStructure& info){
 }
 
 void OpCodeMapping::Call::JP_NC_a16(Memory::Map& memMap, OpStructure& info){
-    if(!LR35902::registers.F.C ) {
+    if(!LR35902::registers.F.C) {
        JP_a16(memMap, info);
        LR35902::extraCycles=4;
     } else{

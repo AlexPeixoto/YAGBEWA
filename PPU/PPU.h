@@ -1,0 +1,6 @@
+
+namespace PPU{
+    class PPU{
+
+    };
+}
