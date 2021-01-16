@@ -14,3 +14,4 @@ UnitTests/CMakeCache.txt
 UnitTests/CTest*.cmake
 UnitTests/*_test
 UnitTests/UnitTests/CTestTestfile.cmake
+output

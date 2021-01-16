@@ -110,11 +110,11 @@ void OpCodeMapping::Call::CB_OPCODE(LR35902& cpu, Memory::Map& memMap, OpStructu
 }
 
 void OpCodeMapping::Call::HALT(LR35902& cpu, Memory::Map& memMap, OpStructure&){
-    if(cpu.imeType == IMEType::Enabled){
+    if(cpu.imeType != IMEType::Enabled){
         if((memMap[0xFFFF] & memMap[0xFF0F] & 0x1F) != 0){
             cpu.haltType = HaltType::Revert;
         }
-        else if((memMap[0xFFFF] & memMap[0xFF0F] & 0x1F) != 0){
+        else if((memMap[0xFFFF] & memMap[0xFF0F] & 0x1F) == 0){
             cpu.haltType = HaltType::NoInterruption;
         }
     }

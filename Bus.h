@@ -1,5 +1,6 @@
 #pragma once
 
+#include <PPU/PPU.h>
 #include <CPU/LR35902.h>
 #include <Memory/Cartridge/RomManager.h>
 #include <Memory/MemoryMap.h>
@@ -18,7 +19,7 @@ private:
     CPU::LR35902 cpu;
     
 	void updateTimerValue();
-	void clockUpdate();
+	void clockUpdate(uint16_t ticks);
 	void performInterruption();
 
 public:

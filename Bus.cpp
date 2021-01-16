@@ -22,29 +22,42 @@ Bus::~Bus () {}
 
 //RunCycle happens on the Bus as here it is the coordinator of the whole thing.
 void Bus::runCycle() {	
-	uint32_t clock = 0;
+	uint16_t clock = 0;
+	//uint32_t pending = 0;
 	while(true){
 	//Run 1 frame
 	//while(clock < CYCLES_PER_FRAME){
 		//Check for halt here
-		if(cpu.getHaltType() == CPU::HaltType::None)
+
+		//Burn the cycles
+		if(clock > 0){
+			clock--;
+			continue;
+		}
+
+		//For revert we still continue execution, but PC will fail to increase
+		if(cpu.getHaltType() == CPU::HaltType::None || cpu.getHaltType() == CPU::HaltType::Revert)
 		{
 			cpu.enableInterruptionIfOnNext();
+
 			//This is to create a cycle acurrate emulation, where we "burn the cycles"
-			clock+=cpu.tick();
-			//Timer
-			updateTimerValue();
+			clock=cpu.tick();
+			
+			//Graphics here, IT IS DONE with the CPU, the renderFrame function is once per frame
+			//ppu.tick()
 		}
+		//Timer, we use pending here
+		updateTimerValue();
+		clockUpdate(clock);
 		//Interruptions
 		performInterruption();
+		//renderFrame()
 	//}
 	}
-	//Graphics here, as its not done per cycle
-	//ppu.tick()
+	
 
-	//Here I should sleep for the remaining frame time
-	//Another option is use an Update function via SDL or SFML and just call runCycle on it (as it will ensure proper pacing)
-	clock = 0;
+	//I use an Update function via SDL or SFML and just call runCycle on it (as it will ensure proper pacing)
+	//clock = 0;
 }
 
 /*void RomManager::checkInterruptions(){
@@ -74,14 +87,18 @@ void Bus::updateTimerValue() {
 }
 
 //This does *NOT* implement the obscure behaviour of the DIV
-void Bus::clockUpdate() {
+void Bus::clockUpdate(uint16_t ticks) {
 	//Isolated number of ticks for the timer
 	static uint32_t clockTicks=0;
+	clockTicks+=ticks;
 	
-	if(clockTicks > 0 && (clockTicks % inputClockSelect) == 0){
+	//Every time that the clock reaches the "selected update mode"
+	//We increase FF05.
+	if(clockTicks > inputClockSelect){
 		if(memoryMap[0xFF05] == 0xFF){
 			memoryMap[0xFF05]=memoryMap[0xFF06];
-			//TRIGGER INTERRUPT HERE
+			//TODO: TRIGGER INTERRUPT HERE
+			clockTicks-=inputClockSelect;
 		}
 		else
 			memoryMap[0xFF05]++;
@@ -91,31 +108,41 @@ void Bus::clockUpdate() {
 		memoryMap[0xFF04]++;
 		return;
 	}
-	if(clockTicks == 0xFF){
+
+	//Just reset the clock (for safekeeping),
+	//probably not necessary
+	if(clockTicks >= 0xFF){
 		clockTicks = 0;
 		return;
 	}
-	clockTicks++;
 }
 
 void Bus::performInterruption() {
 	if(!cpu.interruptionsEnabled())
 		return;
-	//RevertPC interruption bug is handled directly on executeNext;
+
+	//Reset halt so CPU can continue to execute instructions
+	cpu.resetHalt();
+
+	//RevertPC interruption bug is handled directly on executeNext.
+	//If an interruption happens, and the HALT was triggered with disabled interruptions
+	//We just disable halt.
 	if(cpu.getHaltType() == CPU::HaltType::NoInterruption){
 		//Instead of jumping we just continue here.
-		cpu.resetHalt();
 		return;
 	}
+
 	//If there is any interruption enabled, and if there was any interruption triggered
 	const uint8_t _IE = memoryMap[IE_ADDR];
 	const uint8_t _IF = memoryMap[IF_ADDR];
 	if(_IE != 0 && _IF != 0){
 		//Disable interruption
 		cpu.disableInterruptions();
+
 		//Store PC on stack
+		//Have in mind that here the PC is already incremented, so no need to increment before push
 		cpu.pushPC();
-		uint16_t interruptionDestinationAddress=0;
+
 		//Look at the 5 possible bits and check if any is both enabled and checked
 		//Interruptuion priority goes from the highest bit to the lowest
 		for(int x=4; x>=0; x--){
