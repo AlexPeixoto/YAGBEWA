@@ -17,12 +17,12 @@ namespace Memory{
 	};
 
 	//MemorySegments
-	const Segment romBank0{ 0x0000, 0x3999 };
-	const Segment romBank1{ 0x4000, 0x3999 };
-	const Segment videoRam{ 0x8000, 0x1999 };
-	const Segment switchableRam{ 0xA000, 0x1999 };
-	const Segment internalRam1{ 0xC000, 0x1999 };
-	const Segment internalRam2{ 0xD000, 0x1999 };
+	const Segment romBank0{ 0x0000, 0x3FFF };
+	const Segment romBank1{ 0x4000, 0x3FFF };
+	const Segment videoRam{ 0x8000, 0x1FFF };
+	const Segment switchableRam{ 0xA000, 0x1FFF };
+	const Segment internalRam1{ 0xC000, 0x1FFF };
+	const Segment internalRam2{ 0xD000, 0x1FFF };
 	//ECHO from 0xE000 until 0xFDFF
 	const Segment spriteAttrib{ 0xFE00, 0x009F };
 	/* From pandoc
@@ -146,8 +146,9 @@ namespace Memory{
 				}
 			};
 
-			void load(uint8_t* data, unsigned short pos, unsigned short size) {
-				std::copy(data, data + size, memory.begin() + pos);
+			void load(uint8_t* data, ptrdiff_t pos, ptrdiff_t size) {
+				//Add 1, this is because I need to stop on the next byte
+				std::copy(data, data + size + 1, memory.begin() + pos);
 			}
 			
 			//Write here does not allow (for now), to write on vram
@@ -179,6 +180,10 @@ namespace Memory{
 					case 0xFF04:
 						memory[0xFF04] = 0;
 						return;
+					//This is not IME, but the vector with list of enavled interrupts
+					//case 0xFFFF:
+					//	std::cout << "Updating interrupt value" << std::endl;
+					//	return;
 					case 0xFF46:
 						//PPU DMA TRANSFER
 						uint16_t startAddress = 0;
@@ -187,7 +192,6 @@ namespace Memory{
 						//Destination: FE00-FE9F
 						std::copy(memory.begin() + startAddress, memory.begin() + startAddress + 0x009F, memory.begin() + 0xFE00);
 						return;
-					
 				}
 				memory[addr] = val;
 			}

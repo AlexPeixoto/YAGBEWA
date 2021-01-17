@@ -57,5 +57,5 @@ void RomManager::initController(const MBC &controllerType) {
 
 void RomManager::loadBanks() {
 	bus->memoryMap.load(reinterpret_cast<uint8_t*>(cartridgeData), Memory::romBank0.position, Memory::romBank0.size);
-	bus->memoryMap.load(reinterpret_cast<unsigned char*>(cartridgeData + Memory::romBank1.position), Memory::romBank1.position, Memory::romBank1.size);
+	bus->memoryMap.load(reinterpret_cast<uint8_t*>(cartridgeData + Memory::romBank1.position), Memory::romBank1.position, Memory::romBank1.size);
 }

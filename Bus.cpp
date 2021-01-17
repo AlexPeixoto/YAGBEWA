@@ -13,7 +13,7 @@ namespace{
 	const uint16_t INTERRUPTION_TARGET[] = {0x40, 0x48, 0x50, 0x58, 0x60};
 }
 
-Bus::Bus() : cpu(this), cartridge(this), memoryMap(this) {
+Bus::Bus() : cpu(this), cartridge(this), memoryMap(this), ppu(this) {
 	cpu.initPC();
 	inputClockSelect = 1024;
 }
@@ -41,11 +41,10 @@ void Bus::runCycle() {
 			cpu.enableInterruptionIfOnNext();
 
 			//This is to create a cycle acurrate emulation, where we "burn the cycles"
-			clock=cpu.tick();
-			
-			//Graphics here, IT IS DONE with the CPU, the renderFrame function is once per frame
-			//ppu.tick()
+			clock=cpu.tick();	
 		}
+		//Graphics here, IT IS DONE with the CPU, the renderFrame function is once per frame
+		ppu.tick(clock);
 		//Timer, we use pending here
 		updateTimerValue();
 		clockUpdate(clock);
@@ -67,7 +66,7 @@ void Bus::runCycle() {
 void Bus::updateTimerValue() {
 	int8_t toDiv = memoryMap.read(0xFF07);
 	if(toDiv & 0b00000100) {
-		switch(toDiv) {
+		switch(toDiv & 0b00000011) {
 			case 0x00:
 				inputClockSelect = 1024;
 				break;
@@ -80,8 +79,6 @@ void Bus::updateTimerValue() {
 			case 0x11:
 				inputClockSelect = 256;
 				break;
-			default:
-				abort();
 		}
 	}
 }
@@ -124,6 +121,7 @@ void Bus::clockUpdate(uint16_t ticks) {
 void Bus::performInterruption() {
 	if(!cpu.interruptionsEnabled())
 		return;
+	//std::cout << "Yay?" << std::endl;
 
 	//Reset halt so CPU can continue to execute instructions
 	cpu.resetHalt();
@@ -142,6 +140,7 @@ void Bus::performInterruption() {
 	if(_IE != 0 && _IF != 0){
 		//Disable interruption
 		cpu.disableInterruptions();
+		std::cout << "Do we have interrupts" << std::endl;
 
 		//Store PC on stack
 		//Have in mind that here the PC is already incremented, so no need to increment before push
@@ -151,6 +150,7 @@ void Bus::performInterruption() {
 		//Interruptuion priority goes from the highest bit to the lowest
 		for(int x=4; x>=0; x--){
 			if((_IE >> x) & 0x1Ul && (_IF >> x) & 0x1Ul){
+				std::cout << "Interruption triggered" << std::endl;
 				cpu.setPC(INTERRUPTION_TARGET[x]);
 				//Reset IF flag
 				memoryMap[IF_ADDR] &= ~(1UL << x);

@@ -13,6 +13,24 @@ namespace PPU{
         struct pixel{
             uint8_t color:2;
         };
+
+        //10 sprites per line
+        struct Sprite{
+            //0 means that its inside the "screen" (as we want to be able to make in move inside)
+            //So 0x08 (as the sprite is 8 pixels width) means "0" on the screen
+            uint8_t posX;
+            //0 means that its inside the "screen" (as we want to be able to make in move inside)
+            //So 0x10 (as the sprite is 16 pixels height) means "0" on the screen
+            uint8_t posY;
+            uint8_t tileNumber; //index;
+            //DOUBLE CHECK
+            //1 - Above background pixels with value 0, below non-0 pixels
+            //0 - On top of everything (There is an weird behaviour depending on the position, not sure if that will be emulated)
+            uint8_t priority:1;
+            uint8_t flipX:1;
+            uint8_t flipY:1;
+            uint8_t pallete:1; //ff48 for 0 or FF49 for 1
+        }; 
         //Gameboy resolution is 160x144.
         //Even if this data is duplicated in memory, as of now the idea is to copy
         //it somewhere so whoever renders it uses a more "friendly" approach
@@ -27,7 +45,7 @@ namespace PPU{
         bool isLCDEnabled();
         bool isWindowTileMapDisplaySelectHigh();
         bool isWindowDisplayEnabled();
-        bool isBgWindowTtileHigh();
+        bool isBgWindowTileHigh();
         bool isBgTileMapHigh();
         bool isOBGSize();
         bool isOBGDisplayEnabled();

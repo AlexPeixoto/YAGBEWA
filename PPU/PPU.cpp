@@ -18,9 +18,12 @@ namespace{
     //Scrolls and position
     const uint16_t LCD_SCY_ADDR = 0xFF42;
     const uint16_t LCD_SCX_ADDR = 0xFF43;
+
+    //Used to trigger interruption when in specific Y position
     const uint16_t LCD_LY_ADDR = 0xFF44;
     const uint16_t LCD_LYC_ADDR = 0xFF45;
 
+    //Specified Window x and y position
     const uint16_t LCD_WY_ADDR = 0xFF4A;
     const uint16_t LCD_WX_ADDR = 0xFF4B;
 
@@ -68,6 +71,7 @@ void Core::processMode0(){
     if((bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0b00001000) == 0)
         return;
 
+    //std::cout << "processMode0" << std::endl;
     modeProcessed = 0;
 }
 void Core::processMode1(){
@@ -77,11 +81,12 @@ void Core::processMode1(){
     //Check if mode is also enabled
     if((bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0b00010000) == 0)
         return;
-
+    //std::cout << "processMode1" << std::endl;
     modeProcessed = 1;
 }
 
 void Core::processMode2(){
+    //Here I need to figure out which tiles will be used
     if(modeProcessed == 2 || getMode() != 2)
         return;
 
@@ -89,6 +94,7 @@ void Core::processMode2(){
     if((bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0b00100000) == 0)
         return;
 
+    //std::cout << "processMode2" << std::endl;
     modeProcessed = 2;
 }
 
@@ -97,6 +103,7 @@ void Core::processMode3(){
     if(modeProcessed == 3 || getMode() != 3)
         return;
 
+    //std::cout << "processMode3" << std::endl;
     modeProcessed = 3;
 }
 
@@ -109,6 +116,8 @@ void Core::processModes(){
 
 void Core::tick(uint16_t ticks) {
     static uint16_t dots = 0;
+    if(!isLCDEnabled())
+        return;
     //Each 4 "dots" per CPU cycle
     dots += ticks * 4;
     //Cycle through modes, 2, 3, 0, 1.
@@ -139,6 +148,7 @@ void Core::tick(uint16_t ticks) {
         }
         else if(line >=144 && line < 153){
             //if V-BLANK interrupt
+            setMode(1);
         }
         line++;
     }
@@ -154,7 +164,7 @@ void Core::tick(uint16_t ticks) {
 bool Core::isLCDEnabled() { return bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0b10000000; }
 bool Core::isWindowTileMapDisplaySelectHigh() { return bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0b01000000; }
 bool Core::isWindowDisplayEnabled() { return bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0b00100000; }
-bool Core::isBgWindowTtileHigh() { return bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0b00010000; }
+bool Core::isBgWindowTileHigh() { return bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0b00010000; }
 bool Core::isBgTileMapHigh() { return bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0b00001000; }
 bool Core::isOBGSize() { return bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0b00000100; }
 bool Core::isOBGDisplayEnabled() { return bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0b00000010; }
@@ -172,8 +182,16 @@ void Core::renderWindow() {
 
 void Core::checkLYC_LY(){
     //Checkk for VBLANK
-    if(bus->memoryMap[LCD_LY_ADDR] == 144 &&  bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0x00010000) {
+    //std::cout << static_cast<uint16_t>(bus->memoryMap[LCD_LY_ADDR]) << std::endl;
+    //std::cout << (bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0x00010000) << std::endl;
+    if(bus->memoryMap[LCD_LY_ADDR] == 144/* && bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0x00010000*/) {
+        //std::cout << "VBLANK HERE WE GO" << std::endl;
         bus->setInterruptFlag(CPU::INTERRUPTIONS_TYPE::VBLANK);
+
+        //If I also need to set LCDC during VBLANK
+        if(bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0x00010000)
+            bus->setInterruptFlag(CPU::INTERRUPTIONS_TYPE::LCDC);
+
     } else if(bus->memoryMap[LCD_LY_ADDR] == bus->memoryMap[LCD_LYC_ADDR]) {
         //If the coincidence interrupt is not enabled, we just skip this
         if((bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0b00100000) == 0)

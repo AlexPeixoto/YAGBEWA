@@ -23,7 +23,7 @@ namespace CPU{
 		LCDC,
 		TIMER,
 		SERIAL,
-		HILO
+		JOYP
 	};
 	class LR35902 {
 	private:

@@ -83,8 +83,9 @@ cbInstructions{
 }
 
 uint16_t OpCodeMapping::executeNext(LR35902& cpu, Memory::Map& memMap){
+    static uint64_t opcall = 0;
     cpu.extraCycles = 0;
-    //std::cout << std::hex << static_cast<uint32_t>(*(cpu.registers.PC)) << std::endl;
+    std::cout << std::hex << static_cast<uint32_t>(*(cpu.registers.PC)) << " at " << std::hex << (cpu.registers.PC - memMap.getRomStart()) << " Call:" << std::dec << opcall++ << std::endl;
     auto &op = instructions.at(*cpu.registers.PC);
     //Go back one instruction, this should not cause problems as no instruction
     //Reads again the same byte.
@@ -105,6 +106,7 @@ void OpCodeMapping::Call::ABORT(LR35902& cpu, Memory::Map& memMap, OpStructure& 
 void OpCodeMapping::Call::CB_OPCODE(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
     //Also known as STOP 0 instruction 10 00.
     cpu.registers.PC+=1;
+    std::cout << std::hex << static_cast<uint32_t>(*(cpu.registers.PC)) << std::endl;
     OpStructure& cbInfo = cpu.mapping.cbInstructions.at(*cpu.registers.PC);
     cbInfo.call(cpu, memMap, cbInfo);
 }
@@ -893,6 +895,7 @@ void OpCodeMapping::Call::CALL_C_a16(LR35902& cpu, Memory::Map& memMap, OpStruct
 }
 
 void OpCodeMapping::Call::EI(LR35902& cpu, Memory::Map&, OpStructure& ){
+    //std::cout << "EI" << std::endl;
     cpu.imeType = IMEType::OnNext;
 }
 

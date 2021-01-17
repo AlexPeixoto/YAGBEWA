@@ -17,6 +17,7 @@ private:
 	
 	uint16_t inputClockSelect;
     CPU::LR35902 cpu;
+	PPU::Core ppu;
     
 	void updateTimerValue();
 	void clockUpdate(uint16_t ticks);
