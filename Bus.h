@@ -29,4 +29,5 @@ public:
     ~Bus ();
 
 	void runCycle();
+	void setInterruptFlag(CPU::INTERRUPTIONS_TYPE type);
 };

@@ -156,11 +156,36 @@ namespace Memory{
 					//Prohibited areas
 					addr >= 0xE000 && addr <= 0xFDFF)
 					return;
+				//Block CPU writes on mode 2 or 3 to the VRAM memory
+				/*
+				 * When the LCD controller is reading a particular part of video memory, that memory is inaccessible to the CPU.
+
+				 * During modes 2 and 3, the CPU cannot access OAM (FE00h-FE9Fh).
+				 * During mode 3, the CPU cannot access VRAM or CGB Palette Data (FF69,FF6B).
+				 */
+				switch(memory[0xFF41] & 0b00000011){
+					case 0x10:
+						if(addr >= 0xF300 && addr <= 0xFE9F)
+							return;
+					case 0x11:
+						if(addr >= 0xF300 && addr <= 0xFE9F)
+							return;
+						if(addr == 0xFF69 || addr == 0xFF6B)
+							return;
+				}
 				//Special write handling
 				switch(addr){
 					//Reset 0xFF04 on attempts to write to it (Timer).
 					case 0xFF04:
 						memory[0xFF04] = 0;
+						return;
+					case 0xFF46:
+						//PPU DMA TRANSFER
+						uint16_t startAddress = 0;
+						startAddress |= val << 8;
+						//Source:      XX00-XX9F   ;XX in range from 00-F1h
+						//Destination: FE00-FE9F
+						std::copy(memory.begin() + startAddress, memory.begin() + startAddress + 0x009F, memory.begin() + 0xFE00);
 						return;
 					
 				}

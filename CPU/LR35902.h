@@ -18,6 +18,13 @@ namespace CPU{
 		Enabled,
 		None
 	};
+	enum class INTERRUPTIONS_TYPE{
+		VBLANK = 0,
+		LCDC,
+		TIMER,
+		SERIAL,
+		HILO
+	};
 	class LR35902 {
 	private:
 		//Perhaps make it non-static and pass this as a parameter for OpCodeMapping

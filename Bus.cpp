@@ -86,6 +86,10 @@ void Bus::updateTimerValue() {
 	}
 }
 
+void Bus::setInterruptFlag(CPU::INTERRUPTIONS_TYPE type){
+	memoryMap[IF_ADDR] |= (1UL << static_cast<int>(type));
+}
+
 //This does *NOT* implement the obscure behaviour of the DIV
 void Bus::clockUpdate(uint16_t ticks) {
 	//Isolated number of ticks for the timer
@@ -97,7 +101,7 @@ void Bus::clockUpdate(uint16_t ticks) {
 	if(clockTicks > inputClockSelect){
 		if(memoryMap[0xFF05] == 0xFF){
 			memoryMap[0xFF05]=memoryMap[0xFF06];
-			//TODO: TRIGGER INTERRUPT HERE
+			setInterruptFlag(CPU::INTERRUPTIONS_TYPE::TIMER);
 			clockTicks-=inputClockSelect;
 		}
 		else
