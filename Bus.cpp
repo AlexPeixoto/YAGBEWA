@@ -140,7 +140,6 @@ void Bus::performInterruption() {
 	if(_IE != 0 && _IF != 0){
 		//Disable interruption
 		cpu.disableInterruptions();
-		std::cout << "Do we have interrupts" << std::endl;
 
 		//Store PC on stack
 		//Have in mind that here the PC is already incremented, so no need to increment before push
@@ -154,6 +153,10 @@ void Bus::performInterruption() {
 				cpu.setPC(INTERRUPTION_TARGET[x]);
 				//Reset IF flag
 				memoryMap[IF_ADDR] &= ~(1UL << x);
+				//Stop here, we serve this interruption, once it finishes we serve
+				//the next one (id we just set the PC twice we will only serve the one)
+				//with the lowest priority
+				return;
 			}
 		}
 	}
