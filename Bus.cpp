@@ -22,18 +22,20 @@ Bus::~Bus () {}
 
 //RunCycle happens on the Bus as here it is the coordinator of the whole thing.
 void Bus::runCycle() {	
+	//"Global" clock
 	uint16_t clock = 0;
+	uint16_t numberCyclesCurrrent = 0;
 	//uint32_t pending = 0;
 	while(true){
 	//Run 1 frame
 	//while(clock < CYCLES_PER_FRAME){
 		//Check for halt here
 
-		//Burn the cycles
-		if(clock > 0){
-			clock--;
-			continue;
-		}
+		//Burn the cycles (OR NOT, AS PER WHILE ABOVE)
+		//if(clock > 0){
+		//	clock--;
+		//	continue;
+		//}
 
 		//For revert we still continue execution, but PC will fail to increase
 		if(cpu.getHaltType() == CPU::HaltType::None || cpu.getHaltType() == CPU::HaltType::Revert)
@@ -41,13 +43,14 @@ void Bus::runCycle() {
 			cpu.enableInterruptionIfOnNext();
 
 			//This is to create a cycle acurrate emulation, where we "burn the cycles"
-			clock=cpu.tick();	
+			numberCyclesCurrrent=cpu.tick();	
+			clock+=numberCyclesCurrrent;
 		}
 		//Graphics here, IT IS DONE with the CPU, the renderFrame function is once per frame
-		ppu.tick(clock);
+		ppu.tick(numberCyclesCurrrent);
 		//Timer, we use pending here
 		updateTimerValue();
-		clockUpdate(clock);
+		clockUpdate(numberCyclesCurrrent);
 		//Interruptions
 		performInterruption();
 		//renderFrame()

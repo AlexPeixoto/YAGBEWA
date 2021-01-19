@@ -147,7 +147,7 @@ void Core::tick(uint16_t ticks) {
             //regular rendering
         }
         else if(line >=144 && line < 153){
-            //if V-BLANK interrupt
+            //if V-BLANK interrupt.. as its done only on line 144, its done only once (we will increment the line after that.)
             setMode(1);
         }
         line++;
