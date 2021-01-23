@@ -15,3 +15,4 @@ UnitTests/CTest*.cmake
 UnitTests/*_test
 UnitTests/UnitTests/CTestTestfile.cmake
 output
+log.out
