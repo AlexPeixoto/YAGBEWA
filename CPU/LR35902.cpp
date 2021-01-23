@@ -5,9 +5,12 @@ using namespace CPU;
 
 LR35902::LR35902(Bus* bus) : bus(bus), mapping(*this) {
     registers.A = 0x01;
-    registers.BC._pair = 0x0013;
-    registers.DE._pair = 0x00D8;
-    registers.HL._pair = 0x014D;
+    registers.BC[0] = 0x0013;
+    registers.BC[1] = 0x13;
+    registers.DE[0] = 0x00;
+    registers.DE[1] = 0xD8;
+    registers.HL[0] = 0x01;
+    registers.HL[1] = 0x4D;
     registers.F.Z = 1;
     registers.F.N = 0;
     registers.F.H = 1;

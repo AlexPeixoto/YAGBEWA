@@ -121,6 +121,7 @@ void Bus::clockUpdate(uint16_t ticks) {
 	}
 }
 
+//This should be moved to the CPU
 void Bus::performInterruption() {
 	if(!cpu.interruptionsEnabled())
 		return;

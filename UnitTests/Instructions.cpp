@@ -18,9 +18,12 @@ namespace {
 
     void resetRegisters(){
         cpu.registers.A = 0;
-        cpu.registers.BC._pair = 0;
-        cpu.registers.DE._pair = 0;
-        cpu.registers.HL._pair = 0;
+        cpu.registers.BC[0] = 0;
+        cpu.registers.BC[1] = 0;
+        cpu.registers.DE[0] = 0;
+        cpu.registers.DE[1] = 0;
+        cpu.registers.HL[0] = 0;
+        cpu.registers.HL[1] = 0;
         cpu.registers.SP = 0;
         cpu.registers.PC = 0;
 
@@ -113,7 +116,7 @@ TEST_CASE( "Test SET", "[INSTRUCTIONS]" ) {
     resetRegisters();
     auto _instruction = mapping.instructions[0xcb];
     cpu.registers.PC = new uint8_t[2]{0xF0, 0xF0};
-    cpu.registers.BC._reg[0] = 0;
+    cpu.registers.BC[0] = 0;
     _instruction.call(cpu, memMap, _instruction);
-    REQUIRE(static_cast<uint32_t>(cpu.registers.BC._reg[0]) == 0b01000000);
+    REQUIRE(static_cast<uint32_t>(cpu.registers.BC[0]) == 0b01000000);
 }

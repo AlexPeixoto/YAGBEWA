@@ -5,18 +5,9 @@
 namespace CPU {
 	struct Registers {
 		uint8_t A;
-		union BC {
-			uint16_t _pair;
-			uint8_t _reg[2];
-		} BC;
-		union DE {
-			uint16_t _pair;
-			uint8_t _reg[2];
-		} DE;
-		union HL {
-			uint16_t _pair;
-			uint8_t _reg[2];
-		} HL;
+		uint8_t BC[2];
+		uint8_t DE[2];
+		uint8_t HL[2];
 		//Stack pointer
 		uint16_t SP;
 		//Program counter

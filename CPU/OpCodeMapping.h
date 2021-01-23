@@ -42,13 +42,25 @@ namespace CPU {
                 static void LD_REG8_REG8(LR35902&, Memory::Map&, OpStructure&);
 
                 /* REGV, instead of taking the value itself this is treated as a pointer */
-                static void LD_REG16V_REG8(LR35902&, Memory::Map&, OpStructure&);
-                static void LD_REG8_REG16V(LR35902&, Memory::Map&, OpStructure&);
+                
+                static void LD_REG8_BC_V(LR35902&, Memory::Map&, OpStructure&);
+                static void LD_REG8_DE_V(LR35902&, Memory::Map&, OpStructure&);
+                static void LD_REG8_HL_V(LR35902&, Memory::Map&, OpStructure&);
 
-                static void LD_REG16_d16(LR35902&, Memory::Map&, OpStructure&);
+                static void LD_BC_REG8(LR35902&, Memory::Map&, OpStructure&);
+                static void LD_DE_REG8(LR35902&, Memory::Map&, OpStructure&);
+                static void LD_HL_REG8(LR35902&, Memory::Map&, OpStructure&);
+
+                static void LD_BC_d16(LR35902&, Memory::Map&, OpStructure&);
+                static void LD_DE_d16(LR35902&, Memory::Map&, OpStructure&);
+                static void LD_HL_d16(LR35902&, Memory::Map&, OpStructure&);
+                static void LD_SP_d16(LR35902&, Memory::Map&, OpStructure&);
+                static void _LD_REG16_d16(uint8_t reg[2], LR35902& cpu);
+                
+                
                 static void LD_REG8_d8(LR35902&, Memory::Map&, OpStructure&);
                 static void LD_REGV_d16(LR35902&, Memory::Map&, OpStructure&);
-                static void LD_REG16V_d8(LR35902&, Memory::Map&, OpStructure&);
+                static void LD_HLV_d8(LR35902&, Memory::Map&, OpStructure&);
 
                 // Maps LD (HL+) A/LD (HL-) A
                 static void LD_HLI_REG(LR35902&, Memory::Map&, OpStructure&);
@@ -101,41 +113,57 @@ namespace CPU {
                 static void RETI(LR35902&, Memory::Map&, OpStructure&);
 
                 //INC/DEC
-                static void INC16(LR35902&, Memory::Map&, OpStructure&);
+                static void INC_BC(LR35902&, Memory::Map&, OpStructure&);
+                static void INC_DE(LR35902&, Memory::Map&, OpStructure&);
+                static void INC_HL(LR35902&, Memory::Map&, OpStructure&);
+                static void INC_SP(LR35902&, Memory::Map&, OpStructure&);
+
+                static void DEC_BC(LR35902&, Memory::Map&, OpStructure&);
+                static void DEC_DE(LR35902&, Memory::Map&, OpStructure&);
+                static void DEC_HL(LR35902&, Memory::Map&, OpStructure&);
+                static void DEC_SP(LR35902&, Memory::Map&, OpStructure&);
+
                 static void INC8(LR35902&, Memory::Map&, OpStructure&);
-                static void DEC16(LR35902&, Memory::Map&, OpStructure&);
+                
                 static void DEC8(LR35902&, Memory::Map&, OpStructure&);
-                static void INC_REG16V(LR35902&, Memory::Map&, OpStructure&);
-                static void DEC_REG16V(LR35902&, Memory::Map&, OpStructure&);
+                static void INC_HL_V(LR35902&, Memory::Map&, OpStructure&);
+                static void DEC_HL_V(LR35902&, Memory::Map&, OpStructure&);
 
                 //ADD, ADC, SUB, SBC
+                static void ADD_HL_BC(LR35902&, Memory::Map&, OpStructure&);
+                static void ADD_HL_DE(LR35902&, Memory::Map&, OpStructure&);
+                static void ADD_HL_HL(LR35902&, Memory::Map&, OpStructure&);
+                static void ADD_HL_SP(LR35902&, Memory::Map&, OpStructure&);
+                
+
+
                 static void ADD8(LR35902&, Memory::Map&, OpStructure&);
-                static void ADD8_REG16V(LR35902&, Memory::Map&, OpStructure&);
+                static void ADD8_HL_V(LR35902&, Memory::Map&, OpStructure&);
                 static void ADD8_d8(LR35902&, Memory::Map&, OpStructure&);
-                static void ADD16(LR35902&, Memory::Map&, OpStructure&);
+                
                 static void ADD_SP_r8(LR35902&, Memory::Map&, OpStructure&);
                 static void SUB8(LR35902&, Memory::Map&, OpStructure&);
-                static void SUB8_REG16V(LR35902&, Memory::Map&, OpStructure&);
+                static void SUB8_HL_V(LR35902&, Memory::Map&, OpStructure&);
                 static void SUB8_d8(LR35902&, Memory::Map&, OpStructure&);
                 static void ADC8(LR35902&, Memory::Map&, OpStructure&);
-                static void ADC8_REG16V(LR35902&, Memory::Map&, OpStructure&);
+                static void ADC8_HL_V(LR35902&, Memory::Map&, OpStructure&);
                 static void ADC8_d8(LR35902&, Memory::Map&, OpStructure&);
                 static void SBC8(LR35902&, Memory::Map&, OpStructure&);
-                static void SBC8_REG16V(LR35902&, Memory::Map&, OpStructure&);
+                static void SBC8_HL_V(LR35902&, Memory::Map&, OpStructure&);
                 static void SBC8_d8(LR35902&, Memory::Map&, OpStructure&);
 
                 //AND, XOR, OR, CP
                 static void AND8(LR35902&, Memory::Map&, OpStructure&);
-                static void AND8_REG16V(LR35902&, Memory::Map&, OpStructure&);
+                static void AND8_HL_V(LR35902&, Memory::Map&, OpStructure&);
                 static void AND8_d8(LR35902&, Memory::Map&, OpStructure&);
                 static void XOR8(LR35902&, Memory::Map&, OpStructure&);
-                static void XOR8_REG16V(LR35902&, Memory::Map&, OpStructure&);
+                static void XOR8_HL_V(LR35902&, Memory::Map&, OpStructure&);
                 static void XOR8_d8(LR35902&, Memory::Map&, OpStructure&);
                 static void OR8(LR35902&, Memory::Map&, OpStructure&);
-                static void OR8_REG16V(LR35902&, Memory::Map&, OpStructure&);
+                static void OR8_HL_V(LR35902&, Memory::Map&, OpStructure&);
                 static void OR8_d8(LR35902&, Memory::Map&, OpStructure&);
                 static void CP8(LR35902&, Memory::Map&, OpStructure&);
-                static void CP8_REG16V(LR35902&, Memory::Map&, OpStructure&);
+                static void CP8_HL_V(LR35902&, Memory::Map&, OpStructure&);
                 static void CP8_d8(LR35902&, Memory::Map&, OpStructure&);
 
                 //RR and RL
@@ -172,9 +200,13 @@ namespace CPU {
                 static void SCF(LR35902&, Memory::Map&, OpStructure&);
                 static void CCF(LR35902&, Memory::Map&, OpStructure&);
 
-                static void PUSH(LR35902&, Memory::Map&, OpStructure&);
+                static void PUSH_BC(LR35902&, Memory::Map&, OpStructure&);
+                static void PUSH_DE(LR35902&, Memory::Map&, OpStructure&);
+                static void PUSH_HL(LR35902&, Memory::Map&, OpStructure&);
                 static void PUSH_AF(LR35902&, Memory::Map&, OpStructure&);
-                static void POP(LR35902&, Memory::Map&, OpStructure&);
+                static void POP_BC(LR35902&, Memory::Map&, OpStructure&);
+                static void POP_DE(LR35902&, Memory::Map&, OpStructure&);
+                static void POP_HL(LR35902&, Memory::Map&, OpStructure&);
                 static void POP_AF(LR35902&, Memory::Map&, OpStructure&);
                 static void NOP(LR35902&, Memory::Map&, OpStructure&);
                 static void STOP(LR35902&, Memory::Map&, OpStructure&);
@@ -219,6 +251,7 @@ namespace CPU {
                 static void _adc(LR35902&, uint8_t);
                 static void _sbc(LR35902&, uint8_t);
                 static void _add(LR35902&, uint8_t);
+                static void _addhl(LR35902&, uint16_t);
                 static void _sub(LR35902&, uint8_t);
 
                 //Maps a more simple/generic AND, OR, XOR, CP
