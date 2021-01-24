@@ -85,7 +85,7 @@ cbInstructions{
 uint16_t OpCodeMapping::executeNext(LR35902& cpu, Memory::Map& memMap){
     static uint64_t opcall = 0;
     cpu.extraCycles = 0;
-    std::cout << std::hex << static_cast<uint32_t>(*(cpu.registers.PC)) << " at " << std::hex << (cpu.registers.PC - memMap.getRomStart()) << " Call:" << std::dec << opcall++ << std::endl;
+    //std::cout << std::hex << static_cast<uint32_t>(*(cpu.registers.PC)) << " at " << std::hex << (cpu.registers.PC - memMap.getRomStart()) << " Call:" << std::dec << opcall++ << std::endl;
     auto &op = instructions.at(*cpu.registers.PC);
     //Go back one instruction, this should not cause problems as no instruction
     //Reads again the same byte.
@@ -106,7 +106,7 @@ void OpCodeMapping::Call::ABORT(LR35902& cpu, Memory::Map& memMap, OpStructure& 
 void OpCodeMapping::Call::CB_OPCODE(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
     //Also known as STOP 0 instruction 10 00.
     cpu.registers.PC+=1;
-    std::cout << std::hex << static_cast<uint32_t>(*(cpu.registers.PC)) << std::endl;
+    //std::cout << "CB called" << std::hex << static_cast<uint32_t>(*(cpu.registers.PC)) << std::endl;
     OpStructure& cbInfo = cpu.mapping.cbInstructions.at(*cpu.registers.PC);
     cbInfo.call(cpu, memMap, cbInfo);
 }
@@ -620,12 +620,15 @@ void OpCodeMapping::Call::DEC_HL_V(LR35902& cpu, Memory::Map& memMap, OpStructur
 }
 
 void OpCodeMapping::Call::RET(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
+    std::cout << "Ret called" << std::endl;
     cpu.registers.PC = memMap.getMemoryAt(_pop16(cpu, memMap));
+    cpu.changedPC = true;
 }
 
 void OpCodeMapping::Call::RETI(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
     EI(cpu, memMap, info);
     cpu.registers.PC = memMap.getMemoryAt(_pop16(cpu, memMap));
+    cpu.changedPC = true;
 }
 
 void OpCodeMapping::Call::RET_NZ(LR35902& cpu, Memory::Map& memMap, OpStructure&){
@@ -633,6 +636,7 @@ void OpCodeMapping::Call::RET_NZ(LR35902& cpu, Memory::Map& memMap, OpStructure&
         //The address is not 16 bits, so when I push/pop the current PC I will actually store the 
         //memory index
         cpu.registers.PC = memMap.getMemoryAt(_pop16(cpu, memMap));
+        cpu.changedPC = true;
         cpu.extraCycles=12;
     }
 }
@@ -642,6 +646,7 @@ void OpCodeMapping::Call::RET_Z(LR35902& cpu, Memory::Map& memMap, OpStructure&)
         //The address is not 16 bits, so when I push/pop the current PC I will actually store the 
         //memory index
         cpu.registers.PC = memMap.getMemoryAt(_pop16(cpu, memMap));
+        cpu.changedPC = true;
         cpu.extraCycles=12;
     }
 }
@@ -651,6 +656,7 @@ void OpCodeMapping::Call::RET_NC(LR35902& cpu, Memory::Map& memMap, OpStructure&
         //The address is not 16 bits, so when I push/pop the current PC I will actually store the 
         //memory index
         cpu.registers.PC = memMap.getMemoryAt(_pop16(cpu, memMap));
+        cpu.changedPC = true;
         cpu.extraCycles=12;
     }
 }
@@ -660,6 +666,7 @@ void OpCodeMapping::Call::RET_C(LR35902& cpu, Memory::Map& memMap, OpStructure&)
         //The address is not 16 bits, so when I push/pop the current PC I will actually store the 
         //memory index
         cpu.registers.PC = memMap.getMemoryAt(_pop16(cpu, memMap));
+        cpu.changedPC = true;
         cpu.extraCycles=12;
     }
 }
@@ -815,6 +822,7 @@ void OpCodeMapping::Call::RR_HL(LR35902& cpu, Memory::Map& memMap, OpStructure& 
 
 void OpCodeMapping::Call::SLA(LR35902& cpu, Memory::Map&, OpStructure& info){
     //Check if after the shift it will "overflow"
+    std::cout << "SLA called" << std::endl;
     cpu.registers.F.C = *(info.registers_8[0]) & 0b10000000;
     *(info.registers_8[0]) <<= 1;
     cpu.registers.F.Z = (*(info.registers_8[0]) == 0);
@@ -1097,6 +1105,7 @@ void OpCodeMapping::Call::_rst(LR35902& cpu, Memory::Map& memMap, OpStructure&){
 
 template<int N>
 void OpCodeMapping::Call::_bit(LR35902& cpu, Memory::Map&, OpStructure& info){
+    std::cout << "bit called" << std::endl;
     cpu.registers.F.Z = ((*(info.registers_8[0]) & (1UL << N)) == 0);
     cpu.registers.F.N = 0;
     cpu.registers.F.H = 1;
