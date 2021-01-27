@@ -31,4 +31,5 @@ public:
 
 	void runCycle();
 	void setInterruptFlag(CPU::INTERRUPTIONS_TYPE type);
+	auto getPPUFrameBuffer() { return ppu.returnScreen(); }
 };

@@ -40,19 +40,6 @@ if(SFML_FOUND)
           target_link_libraries(${PROJECT_NAME} ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
 endif()
 
-add_custom_target(WindowsCopyDLL	
-	COMMAND ${CMAKE_COMMAND} -E copy ${SFML_WINDOWS_ROOT}/bin/openal32.dll ${CMAKE_BINARY_DIR}
-	COMMAND ${CMAKE_COMMAND} -E copy ${SFML_WINDOWS_ROOT}/bin/sfml-audio-2.dll ${CMAKE_BINARY_DIR}
-	COMMAND ${CMAKE_COMMAND} -E copy ${SFML_WINDOWS_ROOT}/bin/sfml-audio-d-2.dll ${CMAKE_BINARY_DIR}
-	COMMAND ${CMAKE_COMMAND} -E copy ${SFML_WINDOWS_ROOT}/bin/sfml-graphics-2.dll ${CMAKE_BINARY_DIR}
-	COMMAND ${CMAKE_COMMAND} -E copy ${SFML_WINDOWS_ROOT}/bin/sfml-graphics-d-2.dll ${CMAKE_BINARY_DIR}
-	COMMAND ${CMAKE_COMMAND} -E copy ${SFML_WINDOWS_ROOT}/bin/sfml-network-2.dll ${CMAKE_BINARY_DIR}
-	COMMAND ${CMAKE_COMMAND} -E copy ${SFML_WINDOWS_ROOT}/bin/sfml-network-d-2.dll ${CMAKE_BINARY_DIR}
-	COMMAND ${CMAKE_COMMAND} -E copy ${SFML_WINDOWS_ROOT}/bin/sfml-system-2.dll ${CMAKE_BINARY_DIR}
-	COMMAND ${CMAKE_COMMAND} -E copy ${SFML_WINDOWS_ROOT}/bin/sfml-system-d-2.dll ${CMAKE_BINARY_DIR}
-	COMMAND ${CMAKE_COMMAND} -E copy ${SFML_WINDOWS_ROOT}/bin/sfml-window-2.dll ${CMAKE_BINARY_DIR}
-	COMMAND ${CMAKE_COMMAND} -E copy ${SFML_WINDOWS_ROOT}/bin/sfml-window-d-2.dll ${CMAKE_BINARY_DIR}
-)
 
 add_custom_target(WindowsCopyRom
 	COMMAND ${CMAKE_COMMAND} -E copy "D:/Tetris.gb" ${CMAKE_BINARY_DIR}

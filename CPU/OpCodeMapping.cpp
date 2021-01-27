@@ -620,7 +620,7 @@ void OpCodeMapping::Call::DEC_HL_V(LR35902& cpu, Memory::Map& memMap, OpStructur
 }
 
 void OpCodeMapping::Call::RET(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
-    std::cout << "Ret called" << std::endl;
+    //std::cout << "Ret called" << std::endl;
     cpu.registers.PC = memMap.getMemoryAt(_pop16(cpu, memMap));
     cpu.changedPC = true;
 }
@@ -822,7 +822,7 @@ void OpCodeMapping::Call::RR_HL(LR35902& cpu, Memory::Map& memMap, OpStructure& 
 
 void OpCodeMapping::Call::SLA(LR35902& cpu, Memory::Map&, OpStructure& info){
     //Check if after the shift it will "overflow"
-    std::cout << "SLA called" << std::endl;
+    //std::cout << "SLA called" << std::endl;
     cpu.registers.F.C = *(info.registers_8[0]) & 0b10000000;
     *(info.registers_8[0]) <<= 1;
     cpu.registers.F.Z = (*(info.registers_8[0]) == 0);
@@ -1105,7 +1105,7 @@ void OpCodeMapping::Call::_rst(LR35902& cpu, Memory::Map& memMap, OpStructure&){
 
 template<int N>
 void OpCodeMapping::Call::_bit(LR35902& cpu, Memory::Map&, OpStructure& info){
-    std::cout << "bit called" << std::endl;
+    //std::cout << "bit called" << std::endl;
     cpu.registers.F.Z = ((*(info.registers_8[0]) & (1UL << N)) == 0);
     cpu.registers.F.N = 0;
     cpu.registers.F.H = 1;

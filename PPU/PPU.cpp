@@ -2,6 +2,9 @@
 #include <Bus.h>
 
 namespace{
+
+    constexpr uint16_t LCD_CONTROL_REGISTER_ADDR = 0xFF40;
+
     /*Bit 6 - LYC=LY Coincidence Interrupt (1=Enable) (Read/Write)
      Bit 5 - Mode 2 OAM Interrupt         (1=Enable) (Read/Write)
      Bit 4 - Mode 1 V-Blank Interrupt     (1=Enable) (Read/Write)
@@ -13,37 +16,38 @@ namespace{
              2: During Searching OAM
              3: During Transferring Data to LCD Driver
     */
-    const uint16_t LCD_STATUS_REGISTER_ADDR = 0xFF41;
+    constexpr uint16_t LCD_STATUS_REGISTER_ADDR = 0xFF41;
 
-    //Scrolls and position
-    const uint16_t LCD_SCY_ADDR = 0xFF42;
-    const uint16_t LCD_SCX_ADDR = 0xFF43;
+    //Scrolls and position (viewport)
+    constexpr uint16_t LCD_SCY_ADDR = 0xFF42;
+    constexpr uint16_t LCD_SCX_ADDR = 0xFF43;
 
     //Used to trigger interruption when in specific Y position
-    const uint16_t LCD_LY_ADDR = 0xFF44;
-    const uint16_t LCD_LYC_ADDR = 0xFF45;
+    constexpr uint16_t LCD_LY_ADDR = 0xFF44;
+    constexpr uint16_t LCD_LYC_ADDR = 0xFF45;
 
-    //Specified Window x and y position
-    const uint16_t LCD_WY_ADDR = 0xFF4A;
-    const uint16_t LCD_WX_ADDR = 0xFF4B;
+    //Specified Window x and y position (for example, like a dialog box)
+    constexpr uint16_t LCD_WY_ADDR = 0xFF4A;
+    constexpr uint16_t LCD_WX_ADDR = 0xFF4B;
 
     //Pallete
     //Background Pallete
-    const uint16_t BGP_ADDR =  0xFF47;
+    constexpr uint16_t BGP_ADDR =  0xFF47;
     //Object Palette
-    const uint16_t OBP0_ADDR =  0xFF48;
-    const uint16_t OBP1_ADDR =  0xFF49;
+    constexpr uint16_t OBP0_ADDR =  0xFF48;
+    constexpr uint16_t OBP1_ADDR =  0xFF49;
 
     //OAM DMA Transfers
-    const uint16_t DMA_ADDR = 0xFF46;
+    constexpr uint16_t OAM_TABLE_ADDR = 0xFE00;
+    constexpr uint16_t DMA_ADDR = 0xFF46;
 
     //Tile data start
     //each block is a 128 tile with 16 bytes each
     //each 2 bytes is a line (so each line is 16 bits)
-    const uint16_t TILE_ADDR = 0x8000;
-    const uint16_t TILE_SIZE = 0x17FF;
+    constexpr uint16_t TILE_ADDR = 0x8000;
+    constexpr uint16_t TILE_SIZE = 0x17FF;
 
-    const uint16_t CLOCKS_PER_LINE = 456;
+    constexpr uint16_t CLOCKS_PER_LINE = 456;
 
 }
 using namespace PPU;
@@ -64,12 +68,111 @@ uint8_t Core::getMode(){
     return bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0x3;
 }
 
+void Core::initPalleteTable(std::array<Color, 4>& palette, uint16_t memPosition){
+    const uint8_t paletteMem = bus->memoryMap[memPosition];
+    for(int x=0; x<=3; x++){
+        switch((paletteMem >> x) & 0x11){
+            case 0x00:
+                palette[x] = {0, 0, 0};
+                return;
+            case 0x01:
+                palette[x] = {0x66, 0x66, 0x66};
+                return;
+            case 0x03:
+                palette[x] = {0xCC, 0xCC, 0xCC};
+                return;
+            case 0x04:
+                palette[x] = {0xFF, 0xFF, 0xFF};
+                return;
+        }
+    }
+}
+
+void Core::initSprites(){
+    for(int x=0; x<40; x++){
+        //4 bytes per entry
+        const uint8_t spacing = 4;
+        const uint8_t flags = bus->memoryMap[OAM_TABLE_ADDR + spacing + 3];
+        sprites.at(x) = {
+            bus->memoryMap[OAM_TABLE_ADDR + spacing], //pos x
+            bus->memoryMap[OAM_TABLE_ADDR + spacing + 1], //pos y
+            bus->memoryMap[OAM_TABLE_ADDR + spacing + 2], //tile number
+            static_cast<uint8_t>(flags & 0b1000000), //Priority
+            static_cast<uint8_t>(flags & 0b0100000), //Y-Flip
+            static_cast<uint8_t>(flags & 0b0010000), //X-Flip
+            static_cast<uint8_t>(flags & 0b0001000) //Palette
+        };
+    }
+}
+
+void Core::renderLine(){
+    //Lets check the tile mode first (tile = background)
+    const uint16_t baseTileAddr = isBgTileMapHigh() ? 0x8000 : 0x8800;
+    const uint16_t baseSpriteAddr = 0x8000;
+    const bool isTallSprite = isOBGSize();
+
+    //Background map information, this is just the index to be used
+    //To access the baseTileAddr above
+    const uint16_t baseBackgroundMapAddr = isWindowTileMapDisplaySelectHigh() ? 0x9C00 : 0x9800;
+
+    //This is the line that I will render
+    const uint8_t line = bus->memoryMap[LCD_LY_ADDR];
+
+    //I need 2 things here, my real Y position on the screen, this is calculated with line being rendered + SCY
+    //which is the "adjustment"
+    const int yAdjusted = line + bus->memoryMap[LCD_SCY_ADDR];
+    const int yTileAdjusted = (yAdjusted / 8);
+    //Now I calculate the difference between the tile index and the adjustment
+    //For example, I know that each tile is 8 pixels, so if SCY is 14 I skip the first Tile, then 6 pixels of the picked tile
+    const int ySkipPixels = (yAdjusted % 8);
+
+    //Here I will be rendering a single line of the screen
+    //Render all the pixels (160) of the line
+
+    for(int x=0; x<160; x++){
+
+        //Render background, have in mind that I could possibly do the opposite (render 32 tiles)
+        //would probably be WAY cheaper
+        const int xAdjusted = x + bus->memoryMap[LCD_SCX_ADDR];
+        const int xTileAdjusted = (xAdjusted / 8);
+        
+        bool backgroundRendered = false;
+        //Each tile is a byte, so we retrieve the byte that corresponds to this position
+        //Missing signed vs unsigned here (depending on the )
+        const int tileIndex = bus->memoryMap[baseBackgroundMapAddr + 
+                                                 (yTileAdjusted * 32 /*tiles per line*/) + 
+                                                xTileAdjusted];
+
+        //THE TIME HAS COME PPL, BEHOLD, LETS PICK A... pixel
+        //We multiply by 16, because each tile is 16 bytes
+        const uint8_t colorByte = tileIndex * 16 + 
+                                  (ySkipPixels * 2); //2 bytes per line
+        const uint8_t colorIndex_0 = bus->memoryMap[baseTileAddr + colorByte];
+        const uint8_t colorIndex_1 = bus->memoryMap[baseTileAddr + colorByte];
+        const int bit = (xAdjusted % 8);
+        const uint8_t index = (colorIndex_0 >> bit) & 0x1 | (((colorIndex_1 >> bit) & 0x1) << 1);
+
+        //Set this pixel at this position to what is on the pixel table
+        screen[x][line] = backgroundColorMap.at(index);
+        //backgroundColorMap.at(index);
+
+
+
+        //Time to render sprite.
+        
+        //if(sprite.priority == 0 && backgroundRendered)
+
+        //Remember here that x for the tile == 0 means inside the screen, same for Y (or 0x10... 16px if twice as tall)
+
+    }
+}
+
 void Core::processMode0(){
     if(modeProcessed == 0 || getMode() != 0)
         return;
     //Check if mode is also enabled
     if((bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0b00001000) == 0)
-        return;
+        bus->setInterruptFlag(CPU::INTERRUPTIONS_TYPE::LCDC);
 
     //std::cout << "processMode0" << std::endl;
     modeProcessed = 0;
@@ -80,7 +183,7 @@ void Core::processMode1(){
     
     //Check if mode is also enabled
     if((bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0b00010000) == 0)
-        return;
+        bus->setInterruptFlag(CPU::INTERRUPTIONS_TYPE::LCDC);
     //std::cout << "processMode1" << std::endl;
     modeProcessed = 1;
 }
@@ -92,7 +195,13 @@ void Core::processMode2(){
 
     //Check if mode is also enabled
     if((bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0b00100000) == 0)
-        return;
+        bus->setInterruptFlag(CPU::INTERRUPTIONS_TYPE::LCDC);
+
+    //Load backgroundColorMap palette from BGP_ADDR
+    initPalleteTable(backgroundColorMap, BGP_ADDR);
+    //Init both object palletes
+    initPalleteTable(objectPallete1, OBP0_ADDR);
+    initPalleteTable(objectPallate2, OBP1_ADDR);
 
     //std::cout << "processMode2" << std::endl;
     modeProcessed = 2;
@@ -103,6 +212,7 @@ void Core::processMode3(){
     if(modeProcessed == 3 || getMode() != 3)
         return;
 
+    renderLine();
     //std::cout << "processMode3" << std::endl;
     modeProcessed = 3;
 }
@@ -116,6 +226,7 @@ void Core::processModes(){
 
 void Core::tick(uint16_t ticks) {
     static uint16_t dots = 0;
+    static bool lineRendered = false;
     if(!isLCDEnabled())
         return;
     //Each 4 "dots" per CPU cycle
@@ -137,6 +248,7 @@ void Core::tick(uint16_t ticks) {
         setMode(3);
     } else if(dots <= 456){
         //Mode 0 does nothing, 
+        lineRendered = false;
         setMode(0);
     } else {
         dots -= CLOCKS_PER_LINE;
@@ -144,11 +256,18 @@ void Core::tick(uint16_t ticks) {
         //< 144 Normal render
         //renderline
         if(line < 144){
-            //regular rendering
         }
         else if(line >=144 && line < 153){
             //if V-BLANK interrupt.. as its done only on line 144, its done only once (we will increment the line after that.)
             setMode(1);
+            //reset line
+            line=0;
+
+            //Do normal processing, then return
+            processModes();
+
+            checkLYC_LY();
+            return;
         }
         line++;
     }
@@ -170,10 +289,6 @@ bool Core::isOBGSize() { return bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0b00
 bool Core::isOBGDisplayEnabled() { return bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0b00000010; }
 bool Core::isBGWindowDisplayPriority() { return bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0x1; }
 
-void Core::renderLine(){
-    const uint8_t Y = bus->memoryMap [LCD_LY_ADDR];
-
-}
 
 //Have in mind that the window is not THE WINDOW, it is a subsection that the PPU can render
 void Core::renderWindow() { 

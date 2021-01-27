@@ -8,10 +8,10 @@ class Bus;
 namespace PPU{
     class Core{
         private:
-        const uint16_t LCD_CONTROL_REGISTER_ADDR = 0xFF40;
+        
 
-        struct pixel{
-            uint8_t color:2;
+        struct Color{
+            uint8_t r, g, b;
         };
 
         //10 sprites per line
@@ -34,7 +34,12 @@ namespace PPU{
         //Gameboy resolution is 160x144.
         //Even if this data is duplicated in memory, as of now the idea is to copy
         //it somewhere so whoever renders it uses a more "friendly" approach
-        std::array<std::array<uint8_t, 160>, 144> screen;
+        std::array<std::array<Color, 144>, 160> screen;
+        
+        //Set pixel value for 00, 01, 10, 11.
+        std::array<Color, 4> backgroundColorMap, objectPallete1, objectPallate2;
+        //Store sprites
+        std::array<Sprite, 40> sprites;
         //Mark an invalid mode
         uint8_t modeProcessed=5;
 
@@ -57,6 +62,9 @@ namespace PPU{
         void setMode(uint8_t mode);
         uint8_t getMode();
 
+        void initPalleteTable(std::array<Color, 4>& palette, uint16_t memPosition);
+        void initSprites();
+
         void processModes();
         void processMode0();
         void processMode1();
@@ -66,5 +74,6 @@ namespace PPU{
         public:
         Core(Bus* bus);
         void tick(uint16_t ticks);
+        auto returnScreen() { return screen; }
     };
 }

@@ -23,12 +23,12 @@ Bus::~Bus () {}
 //RunCycle happens on the Bus as here it is the coordinator of the whole thing.
 void Bus::runCycle() {	
 	//"Global" clock
-	uint16_t clock = 0;
-	uint16_t numberCyclesCurrrent = 0;
+	uint32_t clock = 0;
+	uint32_t numberCyclesCurrrent = 0;
 	//uint32_t pending = 0;
-	while(true){
+	//while(true){
 	//Run 1 frame
-	//while(clock < CYCLES_PER_FRAME){
+	while(clock < CYCLES_PER_FRAME){
 		//Check for halt here
 
 		//Burn the cycles (OR NOT, AS PER WHILE ABOVE)

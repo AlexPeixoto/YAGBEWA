@@ -6,6 +6,9 @@
 #include <APU/audiocontroller.h>
 #include <Bus.h>
 
+#include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
+
 
 int main(int argc, char** argv){
     /*if(argc != 2)
@@ -16,7 +19,40 @@ int main(int argc, char** argv){
 	Bus bus;
 
 	bus.cartridge.loadRom("Tetris.gb");
-    bus.runCycle();
+
+    sf::RenderWindow window(sf::VideoMode(160, 144), "My window");
+    window.setVerticalSyncEnabled(true); // call it once, after creating the window
+    window.setFramerateLimit(60); // call it once, after creating the window
+    // run the program as long as the window is open
+    sf::Texture texture;
+    texture.create(160, 144);
+    sf::Sprite background;
+    while (window.isOpen())
+    {
+        
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            // "close requested" event: we close the window
+            if (event.type == sf::Event::Closed)
+                window.close();
+        }
+        window.clear();
+        bus.runCycle();
+        auto buffer = bus.getPPUFrameBuffer();
+        sf::Image image = texture.copyToImage();
+        for(int x=0; x<160; x++){
+            for(int y=0; y<144; y++){
+                const auto pixel = buffer[x][y];
+                sf::Color color(pixel.r, pixel.g, pixel.b);
+                image.setPixel(x, y, color);
+            }
+        }
+        texture.loadFromImage(image);
+        background.setTexture(texture);
+        window.draw(background);
+        window.display();
+    }
 
 	//Load cartridge header
     //Memory::Cartridge::RomLoader loader(begin);
