@@ -54,7 +54,7 @@ namespace CPU{
 		LR35902(Bus* bus);
 		~LR35902();
 
-		void initPC();
+		void initPC(bool headless);
 		uint16_t tick();
 
 		//"Interface" so the BUS can perform interruptions and other operations

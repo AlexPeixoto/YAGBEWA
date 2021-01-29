@@ -9,8 +9,9 @@ RomManager::RomManager(Bus* bus)
     : bus(bus) {}
 RomManager::~RomManager() {}
 
-void RomManager::loadRom(std::string fileName) {
+void RomManager::loadRom(std::string fileName, bool headless) {
 	this->fileName = fileName;
+	this->headless = headless;
 	loadCartridge();
 }
 
@@ -36,7 +37,8 @@ void RomManager::loadCartridge() {
 	//Then uses that to load the header.
 	cartridgeBeginPtr = reinterpret_cast<unsigned char*>(cartridgeData);
 	header.loadData(cartridgeBeginPtr);
-	initController(header.getCartridgeType().mbc);
+	if(!headless)
+		initController(header.getCartridgeType().mbc);
 
 	loadBanks();
 

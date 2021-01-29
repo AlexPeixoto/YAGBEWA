@@ -18,6 +18,7 @@ namespace Memory::Cartridge{
 		char* cartridgeData;
 		size_t cartridgeSize;
         Bus* bus;
+		bool headless = false;
 
 		//To make everything easier, we store the whole cartrige in memory and close the file.
 		unsigned char* cartridgeBeginPtr;
@@ -33,6 +34,8 @@ namespace Memory::Cartridge{
         RomManager(Bus* bus);
 		~RomManager();
 
-		void loadRom(std::string filename);
+		bool isHeadless() { return headless; }
+
+		void loadRom(std::string filename, bool headless = false);
 	};
 }

@@ -49,6 +49,9 @@ namespace Memory{
         private:
 			MemoryArray memory;
 			Bus* bus;
+
+			//Some very rare occasions (like DMA) creates a cycle cost
+			uint16_t memoryOpCost = 0;
         public:
 			//This contains a list of each memory area that an be accesse.
 			//This is used on fillWith to prevent OOB memory from being accessed.
@@ -69,9 +72,15 @@ namespace Memory{
 			//Mainly used for UT
 			Map(){}
 
+			uint16_t getAndResetCost(){
+				uint16_t tmp = memoryOpCost;
+				memoryOpCost = 0;
+				return tmp;
+			}
+
 			Map(Bus* bus) : bus(bus) {
 				for(int x=0; x< 0xffff; x++)
-					memory.at(x) = static_cast<uint8_t>(00);
+					memory.at(x) = static_cast<uint8_t>(0);
 				// Power up sequence
 				memory.at(0xFF05) = 0x00; //TIMA
 				memory.at(0xFF06) = 0x00; //TMA
@@ -153,10 +162,18 @@ namespace Memory{
 			
 			//Write here does not allow (for now), to write on vram
 			inline void write(uint8_t val, uint16_t addr) {
-				if(addr < switchableRam.position || 
-					//Prohibited areas
-					addr >= 0xE000 && addr <= 0xFDFF)
+				//if(addr == 0xFF47){
+				//	std::cout << "Attempt to write to palette memory" << std::endl;
+				//}
+				//Tetris testing JOYP hack
+				if(addr == 0xFF00)
 					return;
+				if(addr < videoRam.position)
+					return;
+				// || 
+				//	//Prohibited areas
+				//	addr >= 0xE000 && addr <= 0xFDFF)
+				//	return;
 				//Block CPU writes on mode 2 or 3 to the VRAM memory
 				/*
 				 * When the LCD controller is reading a particular part of video memory, that memory is inaccessible to the CPU.
@@ -164,7 +181,7 @@ namespace Memory{
 				 * During modes 2 and 3, the CPU cannot access OAM (FE00h-FE9Fh).
 				 * During mode 3, the CPU cannot access VRAM or CGB Palette Data (FF69,FF6B).
 				 */
-				switch(memory[0xFF41] & 0b00000011){
+				switch(memory[0xFF41] & 0x3){
 					case 0x10:
 						if(addr >= 0xF300 && addr <= 0xFE9F)
 							return;
@@ -173,26 +190,50 @@ namespace Memory{
 							return;
 						if(addr == 0xFF69 || addr == 0xFF6B)
 							return;
+						//No VRAM access for you
+						if(addr >= 0x8000 || addr <= 0x9FF)
+							return;
+				}
+				if(addr >= 0xc000 && addr <= 0xc09f){
+					std::cout << "Aborting write to: " << std::hex << addr << std::endl;
+					abort();
 				}
 				//Special write handling
 				switch(addr){
 					//Reset 0xFF04 on attempts to write to it (Timer).
 					case 0xFF04:
-						memory[0xFF04] = 0;
+						memory[addr] = 0;
 						return;
 					//This is not IME, but the vector with list of enavled interrupts
 					//case 0xFFFF:
 					//	std::cout << "Updating interrupt value" << std::endl;
 					//	return;
 					case 0xFF46:
+						std::cout << "DMA THIS SHIT" << std::endl;
+						std::cout << std::hex << static_cast<uint32_t>(val) << std::endl;
+						
 						//PPU DMA TRANSFER
 						uint16_t startAddress = 0;
 						startAddress |= val << 8;
+						std::cout << "With real start at: " << std::hex << static_cast<uint32_t>(startAddress) << std::endl;
+						std::cout << "With real end at: " << std::hex << static_cast<uint32_t>(startAddress + 0x009F) << std::endl;
+						for(uint16_t addrStart = startAddress; addrStart < (startAddress + 0x009F); addrStart++)
+							std::cout << "OG - Addr: " << std::hex << static_cast<uint32_t>(addrStart) << " value is: " << std::hex << static_cast<uint32_t>(*getMemoryAt(addrStart)) << std::endl;
+						std::cout << "Now for the copy" << std::endl;
 						//Source:      XX00-XX9F   ;XX in range from 00-F1h
 						//Destination: FE00-FE9F
+						//costs 160 cycles (but not mapped yet).
 						std::copy(memory.begin() + startAddress, memory.begin() + startAddress + 0x009F, memory.begin() + 0xFE00);
+						for(uint16_t addrStart = 0xFE00; addrStart < (0xFE00 + 0x009F); addrStart++)
+							std::cout << "Addr: " << std::hex << static_cast<uint32_t>(addrStart) << " value is: " << std::hex << static_cast<uint32_t>(*getMemoryAt(addrStart)) << std::endl;
+						//DMA costs 160 CPU cycles
+						memoryOpCost = 160;
+						abort();
 						return;
 				}
+				//if(addr == 0xFF47){
+				//	std::cout << "Written to palette memory" << std::endl;
+				//}
 				memory[addr] = val;
 			}
 

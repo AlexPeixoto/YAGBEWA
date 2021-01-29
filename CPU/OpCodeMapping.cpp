@@ -85,7 +85,7 @@ cbInstructions{
 uint16_t OpCodeMapping::executeNext(LR35902& cpu, Memory::Map& memMap){
     static uint64_t opcall = 0;
     cpu.extraCycles = 0;
-    //std::cout << std::hex << static_cast<uint32_t>(*(cpu.registers.PC)) << " at " << std::hex << (cpu.registers.PC - memMap.getRomStart()) << " Call:" << std::dec << opcall++ << std::endl;
+    std::cout << std::hex << static_cast<uint32_t>(*(cpu.registers.PC)) << " at " << std::hex << (cpu.registers.PC - memMap.getRomStart()) << " Call:" << std::dec << opcall++ << std::endl;
     auto &op = instructions.at(*cpu.registers.PC);
     //Go back one instruction, this should not cause problems as no instruction
     //Reads again the same byte.
@@ -245,12 +245,16 @@ void OpCodeMapping::Call::LD_REG_HLD(LR35902& cpu, Memory::Map& memMap, OpStruct
 
 void OpCodeMapping::Call::LDH_a8_A(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
     cpu.registers.PC+=1;
-    memMap.write(cpu.registers.A, 0xFF00 + *cpu.registers.PC);
+    memMap.write(cpu.registers.A, 0xFF00 + static_cast<uint32_t>(*cpu.registers.PC));
 }
 
 void OpCodeMapping::Call::LDH_A_a8(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
     cpu.registers.PC+=1;
-    cpu.registers.A = memMap.read(0xFF00 + *cpu.registers.PC);
+    cpu.registers.A = memMap.read(0xFF00 + static_cast<uint32_t>(*cpu.registers.PC));
+    //std::cout << "Reading from: " << std::hex << (0xFF00 + static_cast<uint32_t>(*cpu.registers.PC)) << std::endl;
+    //std::cout << "A value is: " << std::hex << static_cast<uint32_t>(cpu.registers.A)  << std::endl;
+    //if(static_cast<uint32_t>(cpu.registers.A) == 0x94 || static_cast<uint32_t>(cpu.registers.A) == 94)
+    //    std::cout << "Yay maybe" << std::endl;
 }
 
 void OpCodeMapping::Call::LD_a16_A(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
@@ -586,6 +590,9 @@ void OpCodeMapping::Call::OR8_d8(LR35902& cpu, Memory::Map&, OpStructure&){
 
 void OpCodeMapping::Call::_cp(LR35902& cpu, uint8_t val){
     uint8_t result = cpu.registers.A - val;
+    //std::cout << "Subtract" << std::hex << static_cast<uint32_t>(cpu.registers.A) << std::endl;
+    //std::cout << "From" << std::hex << static_cast<uint32_t>(val) << std::endl;
+    //std::cout << "Result value is: " << std::hex << static_cast<uint32_t>(result) << std::endl;
     cpu.registers.F.Z = (result == 0);
     cpu.registers.F.N = 1;
     cpu.registers.F.H = ((static_cast<int8_t>(cpu.registers.A & 0xF) - (val & 0xF)) < 0);
@@ -606,6 +613,7 @@ void OpCodeMapping::Call::CP8_HL_V(LR35902& cpu, Memory::Map& memMap, OpStructur
 void OpCodeMapping::Call::CP8_d8(LR35902& cpu, Memory::Map&, OpStructure&){
     cpu.registers.PC+=1;
     const uint8_t val = *cpu.registers.PC;
+    //std::cout << "CP VAL IS: " << std::hex << static_cast<uint32_t>(val) << std::endl;
     _cp(cpu, val);
 }
 
@@ -1019,6 +1027,8 @@ void OpCodeMapping::Call::CALL_a16(LR35902& cpu, Memory::Map& memMap, OpStructur
     uint16_t target = *reinterpret_cast<uint8_t*>(++cpu.registers.PC);
     target |=(*reinterpret_cast<uint8_t*>(++cpu.registers.PC)) << 8;
 
+    //Increment again to point to proper PC
+    cpu.registers.PC++;
     const ptrdiff_t index = (cpu.registers.PC - memMap.getRomStart());
     _push16(cpu, memMap, static_cast<uint16_t>(index));
     cpu.registers.PC=memMap.getMemoryAt(target);
@@ -1066,7 +1076,6 @@ void OpCodeMapping::Call::CALL_C_a16(LR35902& cpu, Memory::Map& memMap, OpStruct
 }
 
 void OpCodeMapping::Call::EI(LR35902& cpu, Memory::Map&, OpStructure& ){
-    //std::cout << "EI" << std::endl;
     cpu.imeType = IMEType::OnNext;
 }
 

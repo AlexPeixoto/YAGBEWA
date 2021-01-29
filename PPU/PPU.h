@@ -34,7 +34,7 @@ namespace PPU{
         //Gameboy resolution is 160x144.
         //Even if this data is duplicated in memory, as of now the idea is to copy
         //it somewhere so whoever renders it uses a more "friendly" approach
-        std::array<std::array<Color, 144>, 160> screen;
+        std::array<std::array<Color, 144>, 160> screen, internalBuffer;
         
         //Set pixel value for 00, 01, 10, 11.
         std::array<Color, 4> backgroundColorMap, objectPallete1, objectPallate2;
@@ -50,10 +50,10 @@ namespace PPU{
         bool isLCDEnabled();
         bool isWindowTileMapDisplaySelectHigh();
         bool isWindowDisplayEnabled();
-        bool isBgWindowTileHigh();
+        bool isTileDataSelectHigh();
         bool isBgTileMapHigh();
-        bool isOBGSize();
-        bool isOBGDisplayEnabled();
+        bool isSpriteDoubleHeight();
+        bool isSpriteEnabled();
         bool isBGWindowDisplayPriority();
 
         void renderLine();

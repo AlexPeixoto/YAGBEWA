@@ -19,15 +19,24 @@ int main(int argc, char** argv){
 	Bus bus;
 
 	bus.cartridge.loadRom("Tetris.gb");
+    //bus.cartridge.loadRom("cpu_instrs.gb", true);
+    bus.initCPU();
 
-    sf::RenderWindow window(sf::VideoMode(160, 144), "My window");
+    sf::RenderWindow window(sf::VideoMode(160, 144), "Gameboy");
     window.setVerticalSyncEnabled(true); // call it once, after creating the window
     window.setFramerateLimit(60); // call it once, after creating the window
+    window.setSize({800, 700});
+
+    //sf::RenderWindow windowDebug(sf::VideoMode(1024, 768), "Debug Window");
+    //window.setVerticalSyncEnabled(true); // call it once, after creating the window
+    //window.setFramerateLimit(60); // call it once, after creating the window
+
+
     // run the program as long as the window is open
     sf::Texture texture;
     texture.create(160, 144);
     sf::Sprite background;
-    while (window.isOpen())
+    while (window.isOpen()/* || windowDebug.isOpen()*/)
     {
         
         sf::Event event;
@@ -38,6 +47,7 @@ int main(int argc, char** argv){
                 window.close();
         }
         window.clear();
+        //windowDebug.clear();
         bus.runCycle();
         auto buffer = bus.getPPUFrameBuffer();
         sf::Image image = texture.copyToImage();
@@ -52,6 +62,7 @@ int main(int argc, char** argv){
         background.setTexture(texture);
         window.draw(background);
         window.display();
+        //windowDebug.display();
     }
 
 	//Load cartridge header

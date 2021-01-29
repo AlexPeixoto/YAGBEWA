@@ -29,6 +29,8 @@ public:
     Bus ();
     ~Bus ();
 
+	void initCPU(){ cpu.initPC(cartridge.isHeadless());}
+
 	void runCycle();
 	void setInterruptFlag(CPU::INTERRUPTIONS_TYPE type);
 	auto getPPUFrameBuffer() { return ppu.returnScreen(); }

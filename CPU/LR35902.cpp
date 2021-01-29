@@ -20,8 +20,10 @@ LR35902::LR35902(Bus* bus) : bus(bus), mapping(*this) {
 
 LR35902::~LR35902() {}
 
-void LR35902::initPC() {
-    registers.PC = bus->memoryMap.getMemoryAt(0x100);
+void LR35902::initPC(bool headless = false) {
+    registers.PC = bus->memoryMap.getMemoryAt(headless ? 0x000 : 0x100);
+    //std::cout << std::hex << (headless ? 0x000 : 0x100) << std::endl;
+    //abort();
 }
 
 void LR35902::setPC(uint16_t target) { 
@@ -30,7 +32,7 @@ void LR35902::setPC(uint16_t target) {
 
 void LR35902::pushPC() {
     const ptrdiff_t index = (registers.PC - bus->memoryMap.getRomStart());
-    std::cout << "Push pc index as: " << std::hex << static_cast<uint16_t>(index) << std::endl;
+    //std::cout << "Push pc index as: " << std::hex << static_cast<uint16_t>(index) << std::endl;
     mapping.push16(*this, bus->memoryMap, index);
 }
 

@@ -14,7 +14,6 @@ namespace{
 }
 
 Bus::Bus() : cpu(this), cartridge(this), memoryMap(this), ppu(this) {
-	cpu.initPC();
 	inputClockSelect = 1024;
 }
 Bus::~Bus () {}
@@ -22,20 +21,13 @@ Bus::~Bus () {}
 
 //RunCycle happens on the Bus as here it is the coordinator of the whole thing.
 void Bus::runCycle() {	
+	//Debug
+	static uint64_t totalCycles = 0;
+
 	//"Global" clock
 	uint32_t clock = 0;
-	uint32_t numberCyclesCurrrent = 0;
-	//uint32_t pending = 0;
-	//while(true){
-	//Run 1 frame
+	uint32_t numberCyclesCurrent = 0;
 	while(clock < CYCLES_PER_FRAME){
-		//Check for halt here
-
-		//Burn the cycles (OR NOT, AS PER WHILE ABOVE)
-		//if(clock > 0){
-		//	clock--;
-		//	continue;
-		//}
 
 		//For revert we still continue execution, but PC will fail to increase
 		if(cpu.getHaltType() == CPU::HaltType::None || cpu.getHaltType() == CPU::HaltType::Revert)
@@ -43,28 +35,22 @@ void Bus::runCycle() {
 			cpu.enableInterruptionIfOnNext();
 
 			//This is to create a cycle acurrate emulation, where we "burn the cycles"
-			numberCyclesCurrrent=cpu.tick();	
-			clock+=numberCyclesCurrrent;
+			numberCyclesCurrent=cpu.tick();
+			//Did any memory OP added a cost?
+			numberCyclesCurrent+=memoryMap.getAndResetCost();	
+			clock+=numberCyclesCurrent;
+			totalCycles+=numberCyclesCurrent;
 		}
-		//Graphics here, IT IS DONE with the CPU, the renderFrame function is once per frame
-		ppu.tick(numberCyclesCurrrent);
+		//Graphics here, IT IS DONE with the CPU
+		ppu.tick(numberCyclesCurrent);
 		//Timer, we use pending here
 		updateTimerValue();
-		clockUpdate(numberCyclesCurrrent);
+		clockUpdate(numberCyclesCurrent);
 		//Interruptions
 		performInterruption();
-		//renderFrame()
-	//}
+		std::cout << "Cycle count: " << totalCycles << std::endl;
 	}
-	
-
-	//I use an Update function via SDL or SFML and just call runCycle on it (as it will ensure proper pacing)
-	//clock = 0;
 }
-
-/*void RomManager::checkInterruptions(){
-
-}*/
 
 void Bus::updateTimerValue() {
 	int8_t toDiv = memoryMap.read(0xFF07);
@@ -134,6 +120,7 @@ void Bus::performInterruption() {
 	//If an interruption happens, and the HALT was triggered with disabled interruptions
 	//We just disable halt.
 	if(cpu.getHaltType() == CPU::HaltType::NoInterruption){
+		//std::cout << "HALT" << std::endl;
 		//Instead of jumping we just continue here.
 		return;
 	}
@@ -142,18 +129,19 @@ void Bus::performInterruption() {
 	const uint8_t _IE = memoryMap[IE_ADDR];
 	const uint8_t _IF = memoryMap[IF_ADDR];
 	if(_IE != 0 && _IF != 0){
-		//Disable interruption
-		cpu.disableInterruptions();
-
-		//Store PC on stack
-		//Have in mind that here the PC is already incremented, so no need to increment before push
-		cpu.pushPC();
-
+		//std::cout << "Interruption perhaps" << std::endl;
 		//Look at the 5 possible bits and check if any is both enabled and checked
 		//Interruptuion priority goes from the highest bit to the lowest
 		for(int x=4; x>=0; x--){
 			if((_IE >> x) & 0x1Ul && (_IF >> x) & 0x1Ul){
-				std::cout << "Interruption triggered" << std::endl;
+				//Disable interruption
+				cpu.disableInterruptions();
+
+				//Store PC on stack
+				//Have in mind that here the PC is already incremented, so no need to increment before push
+				cpu.pushPC();
+
+				//std::cout << "Interruption triggered" << std::endl;
 				cpu.setPC(INTERRUPTION_TARGET[x]);
 				//Reset IF flag
 				memoryMap[IF_ADDR] &= ~(1UL << x);
