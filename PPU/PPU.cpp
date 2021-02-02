@@ -73,20 +73,16 @@ void Core::initPalleteTable(std::array<Color, 4>& palette, uint16_t memPosition)
     for(int x=0; x<=3; x++){
         switch((paletteMem >> (x * 2)) & 0x3){
             case 0x00:
-            //std::cout << "0" << std::endl;
-                palette[x] = {0, 0, 0};
+                palette[x] = {0xFF, 0xFF, 0xFF};
                 continue;
             case 0x01:
-            //std::cout << "1" << std::endl;
-                palette[x] = {0x66, 0x66, 0x66};
-                continue;
-            case 0x02:
-            //std::cout << "2" << std::endl;
                 palette[x] = {0xCC, 0xCC, 0xCC};
                 continue;
+            case 0x02:
+                palette[x] = {0x66, 0x66, 0x66};
+                continue;
             case 0x03:
-            //std::cout << "3" << std::endl;
-                palette[x] = {0xFF, 0xFF, 0xFF};
+                palette[x] = {0x00, 0x00, 0x00};
                 continue;
         }
     }
@@ -112,11 +108,7 @@ void Core::initSprites(){
 void Core::renderLine(){
     //Lets check the tile mode first (tile = background)
     const uint16_t baseTileAddr = isTileDataSelectHigh() ? 0x8000 : 0x8800;
-    //std::cout << "BGTILEMAPHIGH: " << (isTileDataSelectHigh() ? "1" : "0") << std::endl;
-    //for(uint16_t pos = baseTileAddr; pos <=baseTileAddr+1000; pos++) {
-    //    std::cout << "Addr: " << std::hex << static_cast<uint32_t>(pos) << " Value: " << std::hex << static_cast<uint32_t>(bus->memoryMap[pos]) << std::endl;
-    //}
-    //abort();
+    static uint16_t count=0;
     const uint16_t baseSpriteAddr = 0x8000;
     const bool isTallSprite = isSpriteDoubleHeight();
 
@@ -124,63 +116,46 @@ void Core::renderLine(){
     //To access the baseTileAddr above
     const uint16_t baseBackgroundMapAddr = isBgTileMapHigh() ? 0x9C00 : 0x9800;
     
-    
-
     //This is the line that I will render
     const uint8_t line = bus->memoryMap[LCD_LY_ADDR];
 
     //I need 2 things here, my real Y position on the screen, this is calculated with line being rendered + SCY
     //which is the "adjustment"
+    //0xFF42 + 0xFF44
     const int yAdjusted = line + bus->memoryMap[LCD_SCY_ADDR];
     const int yTileAdjusted = (yAdjusted / 8);
+    
     //Now I calculate the difference between the tile index and the adjustment
     //For example, I know that each tile is 8 pixels, so if SCY is 14 I skip the first Tile, then 6 pixels of the picked tile
     const int ySkipPixels = (yAdjusted % 8);
 
-    //Here I will be rendering a single line of the screen
-    //Render all the pixels (160) of the line
-
+    //This should ALL be white
     for(int x=0; x<160; x++){
-
         //Render background, have in mind that I could possibly do the opposite (render 32 tiles)
         //would probably be WAY cheaper
+        //Should be pixel + scroll X
         const int xAdjusted = x + bus->memoryMap[LCD_SCX_ADDR];
         const int xTileAdjusted = (xAdjusted / 8);
         
         bool backgroundRendered = false;
         //Each tile is a byte, so we retrieve the byte that corresponds to this position
         //Missing signed vs unsigned here (depending on the )
-        const int tileIndex = bus->memoryMap[baseBackgroundMapAddr + 
-                                                 (yTileAdjusted * 32 /*tiles per line*/) + 
-                                                xTileAdjusted];
-        //std::cout << "Addr pos is: " << std::hex << (baseBackgroundMapAddr + (yTileAdjusted * 32 /*tiles per line*/) + xTileAdjusted) << std::endl;
-
-        //THE TIME HAS COME PPL, BEHOLD, LETS PICK A... pixel
-        //We multiply by 16, because each tile is 16 bytes
-        const uint8_t colorByte = tileIndex * 16 + 
+        //Here we are looking at the tilemap to extract the tile index
+        const uint32_t tileMemPos = baseBackgroundMapAddr + (yTileAdjusted * 32 /*tiles per line*/) + xTileAdjusted;
+        const int tileIndex = bus->memoryMap[tileMemPos];   
+         
+        const uint16_t colorByte = baseTileAddr +
+                                  (tileIndex * 16) +
                                   (ySkipPixels * 2); //2 bytes per line
-        //std::cout << "Reading byte at: " << std::hex << static_cast<uint32_t>(baseTileAddr + colorByte) << std::endl;
-        const uint8_t colorIndex_0 = bus->memoryMap[static_cast<uint32_t>(baseTileAddr + colorByte)];
-        const uint8_t colorIndex_1 = bus->memoryMap[static_cast<uint32_t>(baseTileAddr + colorByte + 1)];
-        const int bit = (xAdjusted % 8);
+         
+        const uint8_t colorIndex_0 = bus->memoryMap[colorByte];
+        const uint8_t colorIndex_1 = bus->memoryMap[colorByte + 1];
+        int bit = (xAdjusted % 8);
+        bit -= 7;
+        bit *= -1;
         const uint8_t index = (colorIndex_0 >> bit) & 0x1 | (((colorIndex_1 >> bit) & 0x1) << 1);
-        //std::cout << "Color value 1:" << std::hex << (uint32_t)colorIndex_0 << std::endl;
-        //std::cout << "Color value 2:" << std::hex << (uint32_t)colorIndex_1 << std::endl;
-        //Set this pixel at this position to what is on the pixel table
-        
-        //std::cout  << "tileIndex is: " << std::hex << (uint32_t)tileIndex << std::endl;
-        //std::cout  << "Index is: " << std::hex << (uint32_t)index << std::endl;
+
         internalBuffer[x][line] = backgroundColorMap.at(index);
-        //backgroundColorMap.at(index);
-
-
-
-        //Time to render sprite.
-        
-        //if(sprite.priority == 0 && backgroundRendered)
-
-        //Remember here that x for the tile == 0 means inside the screen, same for Y (or 0x10... 16px if twice as tall)
-
     }
 }
 
@@ -191,7 +166,7 @@ void Core::processMode0(){
     if((bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0b00001000) == 0)
         bus->setInterruptFlag(CPU::INTERRUPTIONS_TYPE::LCDC);
 
-    //std::cout << "processMode0" << std::endl;
+    
     modeProcessed = 0;
 }
 void Core::processMode1(){
@@ -206,7 +181,7 @@ void Core::processMode1(){
     for(int x=0; x<160; x++)
         for(int y=0; y<144; y++)
             screen[x][y]=internalBuffer[x][y];
-    //std::cout << "processMode1" << std::endl;
+    
     modeProcessed = 1;
 }
 
@@ -225,7 +200,7 @@ void Core::processMode2(){
     //initPalleteTable(objectPallete1, OBP0_ADDR);
     //initPalleteTable(objectPallate2, OBP1_ADDR);
 
-    //std::cout << "processMode2" << std::endl;
+    
     modeProcessed = 2;
 }
 
@@ -235,7 +210,7 @@ void Core::processMode3(){
         return;
 
     renderLine();
-    //std::cout << "processMode3" << std::endl;
+    
     modeProcessed = 3;
 }
 
@@ -252,6 +227,7 @@ void Core::tick(uint16_t ticks) {
     if(!isLCDEnabled())
         return;
     //Each 4 "dots" per CPU cycle
+    //Each scanline is 456 dots (114 CPU cycles) 
     dots += ticks * 4;
     //Cycle through modes, 2, 3, 0, 1.
     //OAM, DRAWING, H-BLANK, V-BLANK
@@ -286,11 +262,14 @@ void Core::tick(uint16_t ticks) {
         //Is 153, we reset the line
         else{
             line = 0;
+            
+            
 
             checkLYC_LY();
             return;
         }
         line++;
+        
     }
     
     //Those will only be triggered once, each one will validate itself
@@ -318,10 +297,7 @@ void Core::renderWindow() {
 
 void Core::checkLYC_LY(){
     //Checkk for VBLANK
-    //std::cout << static_cast<uint16_t>(bus->memoryMap[LCD_LY_ADDR]) << std::endl;
-    //std::cout << (bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0x00010000) << std::endl;
     if(bus->memoryMap[LCD_LY_ADDR] == 144/* && bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0x00010000*/) {
-        //std::cout << "VBLANK HERE WE GO" << std::endl;
         bus->setInterruptFlag(CPU::INTERRUPTIONS_TYPE::VBLANK);
 
         //If I also need to set LCDC during VBLANK

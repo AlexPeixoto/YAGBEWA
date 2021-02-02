@@ -23,9 +23,15 @@ Bus::~Bus () {}
 void Bus::runCycle() {	
 	//Debug
 	static uint64_t totalCycles = 0;
+	//Cycles that have to be burned down from last iteration
+	static uint64_t pendingCycles = 0;
 
 	//"Global" clock
-	uint32_t clock = 0;
+	uint32_t clock = pendingCycles;
+	//Reset pending cycles
+	pendingCycles = 0;
+
+	//Current number of cycles
 	uint32_t numberCyclesCurrent = 0;
 	while(clock < CYCLES_PER_FRAME){
 
@@ -48,8 +54,13 @@ void Bus::runCycle() {
 		clockUpdate(numberCyclesCurrent);
 		//Interruptions
 		performInterruption();
-		std::cout << "Cycle count: " << totalCycles << std::endl;
+		
+
+		//Extra thing that can be done here is to get "remaining cycles (like if the limit is 10 and we ran 12, we have to discount from next frame)"
+		//That should not be a huge ISSUE, but still
 	}
+	//Store remaining cycles to burn on next execution.
+	pendingCycles = clock - CYCLES_PER_FRAME;
 }
 
 void Bus::updateTimerValue() {
@@ -111,7 +122,7 @@ void Bus::clockUpdate(uint16_t ticks) {
 void Bus::performInterruption() {
 	if(!cpu.interruptionsEnabled())
 		return;
-	//std::cout << "Yay?" << std::endl;
+	
 
 	//Reset halt so CPU can continue to execute instructions
 	cpu.resetHalt();
@@ -120,7 +131,7 @@ void Bus::performInterruption() {
 	//If an interruption happens, and the HALT was triggered with disabled interruptions
 	//We just disable halt.
 	if(cpu.getHaltType() == CPU::HaltType::NoInterruption){
-		//std::cout << "HALT" << std::endl;
+		
 		//Instead of jumping we just continue here.
 		return;
 	}
@@ -129,11 +140,11 @@ void Bus::performInterruption() {
 	const uint8_t _IE = memoryMap[IE_ADDR];
 	const uint8_t _IF = memoryMap[IF_ADDR];
 	if(_IE != 0 && _IF != 0){
-		//std::cout << "Interruption perhaps" << std::endl;
+		
 		//Look at the 5 possible bits and check if any is both enabled and checked
 		//Interruptuion priority goes from the highest bit to the lowest
 		for(int x=4; x>=0; x--){
-			if((_IE >> x) & 0x1Ul && (_IF >> x) & 0x1Ul){
+			if((_IE >> x) & 0x1 && (_IF >> x) & 0x1){
 				//Disable interruption
 				cpu.disableInterruptions();
 
@@ -141,7 +152,7 @@ void Bus::performInterruption() {
 				//Have in mind that here the PC is already incremented, so no need to increment before push
 				cpu.pushPC();
 
-				//std::cout << "Interruption triggered" << std::endl;
+				
 				cpu.setPC(INTERRUPTION_TARGET[x]);
 				//Reset IF flag
 				memoryMap[IF_ADDR] &= ~(1UL << x);

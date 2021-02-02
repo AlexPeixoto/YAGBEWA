@@ -18,8 +18,9 @@ int main(int argc, char** argv){
 	*/
 	Bus bus;
 
-	bus.cartridge.loadRom("Tetris.gb");
+	//bus.cartridge.loadRom("Tetris.gb");
     //bus.cartridge.loadRom("cpu_instrs.gb", true);
+    bus.cartridge.loadRom("dmg_boot.gb", true);
     bus.initCPU();
 
     sf::RenderWindow window(sf::VideoMode(160, 144), "Gameboy");
@@ -58,6 +59,7 @@ int main(int argc, char** argv){
                 image.setPixel(x, y, color);
             }
         }
+        
         texture.loadFromImage(image);
         background.setTexture(texture);
         window.draw(background);

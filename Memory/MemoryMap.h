@@ -118,6 +118,77 @@ namespace Memory{
 				//Set FF00 as F and prevent any further writes to it until IO is done 
 			};
 
+			void loadNintendoLogo(){
+				#if 1
+				memory.at(0x100) = 0x00; 
+				memory.at(0x101) = 0xc3;
+				memory.at(0x102) = 0x50;
+				memory.at(0x103) = 0x01;
+				memory.at(0x104) = 0xce;
+				memory.at(0x105) = 0xed;
+				memory.at(0x106) = 0x66;
+				memory.at(0x107) = 0x66;
+				memory.at(0x108) = 0xcc;
+				memory.at(0x109) = 0x0d;
+				memory.at(0x10A) = 0x00;
+				memory.at(0x10B) = 0x0b;
+				memory.at(0x10C) = 0x03;
+				memory.at(0x10D) = 0x73;
+				memory.at(0x10E) = 0x00;
+				memory.at(0x10F) = 0x83;
+
+				memory.at(0x110) = 0x00; 
+				memory.at(0x111) = 0x0c;
+				memory.at(0x112) = 0x00;
+				memory.at(0x113) = 0x0d;
+				memory.at(0x114) = 0x00;
+				memory.at(0x115) = 0x08;
+				memory.at(0x116) = 0x11;
+				memory.at(0x117) = 0x1f;
+				memory.at(0x118) = 0x88;
+				memory.at(0x119) = 0x89;
+				memory.at(0x11A) = 0x00;
+				memory.at(0x11B) = 0x0e;
+				memory.at(0x11C) = 0xdc;
+				memory.at(0x11D) = 0xcc;
+				memory.at(0x11E) = 0x6e;
+				memory.at(0x11F) = 0xe6;
+
+				memory.at(0x120) = 0xdd; 
+				memory.at(0x121) = 0xdd;
+				memory.at(0x122) = 0xd9;
+				memory.at(0x123) = 0x99;
+				memory.at(0x124) = 0xbb;
+				memory.at(0x125) = 0xbb;
+				memory.at(0x126) = 0x67;
+				memory.at(0x127) = 0x63;
+				memory.at(0x128) = 0x6e;
+				memory.at(0x129) = 0x0e;
+				memory.at(0x12A) = 0xec;
+				memory.at(0x12B) = 0xcc;
+				memory.at(0x12C) = 0xdd;
+				memory.at(0x12D) = 0xdc;
+				memory.at(0x12E) = 0x99;
+				memory.at(0x12F) = 0xef;
+
+				memory.at(0x130) = 0xbb; 
+				memory.at(0x131) = 0xb9;
+				memory.at(0x132) = 0x33;
+				memory.at(0x133) = 0x3e;
+				memory.at(0x134) = 0x54;
+				memory.at(0x135) = 0x45;
+				memory.at(0x136) = 0x54;
+				memory.at(0x137) = 0x52;
+				memory.at(0x138) = 0x49;
+				memory.at(0x139) = 0x53;
+
+				memory.at(0x14B) = 0x01; 
+				memory.at(0x14C) = 0x01;
+				memory.at(0x14D) = 0x0a;
+				memory.at(0x14E) = 0x16;
+				memory.at(0x14F) = 0xbf;
+				#endif
+			}
 			uint8_t& operator[](std::size_t index) { return memory.at(index); }
 
 			uint8_t* getRomStart() {
@@ -161,10 +232,7 @@ namespace Memory{
 			}
 			
 			//Write here does not allow (for now), to write on vram
-			inline void write(uint8_t val, uint16_t addr) {
-				//if(addr == 0xFF47){
-				//	std::cout << "Attempt to write to palette memory" << std::endl;
-				//}
+			inline void write(uint8_t val, uint16_t addr) { 
 				//Tetris testing JOYP hack
 				if(addr == 0xFF00)
 					return;
@@ -194,46 +262,30 @@ namespace Memory{
 						if(addr >= 0x8000 || addr <= 0x9FF)
 							return;
 				}
-				if(addr >= 0xc000 && addr <= 0xc09f){
-					std::cout << "Aborting write to: " << std::hex << addr << std::endl;
-					abort();
-				}
+				//if(addr >= 0xc000 && addr <= 0xc09f){
+					
+					//abort();
+				//}
 				//Special write handling
 				switch(addr){
 					//Reset 0xFF04 on attempts to write to it (Timer).
 					case 0xFF04:
 						memory[addr] = 0;
 						return;
-					//This is not IME, but the vector with list of enavled interrupts
-					//case 0xFFFF:
-					//	std::cout << "Updating interrupt value" << std::endl;
-					//	return;
+
 					case 0xFF46:
-						std::cout << "DMA THIS SHIT" << std::endl;
-						std::cout << std::hex << static_cast<uint32_t>(val) << std::endl;
-						
 						//PPU DMA TRANSFER
 						uint16_t startAddress = 0;
 						startAddress |= val << 8;
-						std::cout << "With real start at: " << std::hex << static_cast<uint32_t>(startAddress) << std::endl;
-						std::cout << "With real end at: " << std::hex << static_cast<uint32_t>(startAddress + 0x009F) << std::endl;
-						for(uint16_t addrStart = startAddress; addrStart < (startAddress + 0x009F); addrStart++)
-							std::cout << "OG - Addr: " << std::hex << static_cast<uint32_t>(addrStart) << " value is: " << std::hex << static_cast<uint32_t>(*getMemoryAt(addrStart)) << std::endl;
-						std::cout << "Now for the copy" << std::endl;
 						//Source:      XX00-XX9F   ;XX in range from 00-F1h
 						//Destination: FE00-FE9F
 						//costs 160 cycles (but not mapped yet).
 						std::copy(memory.begin() + startAddress, memory.begin() + startAddress + 0x009F, memory.begin() + 0xFE00);
-						for(uint16_t addrStart = 0xFE00; addrStart < (0xFE00 + 0x009F); addrStart++)
-							std::cout << "Addr: " << std::hex << static_cast<uint32_t>(addrStart) << " value is: " << std::hex << static_cast<uint32_t>(*getMemoryAt(addrStart)) << std::endl;
 						//DMA costs 160 CPU cycles
 						memoryOpCost = 160;
-						abort();
 						return;
 				}
-				//if(addr == 0xFF47){
-				//	std::cout << "Written to palette memory" << std::endl;
-				//}
+				
 				memory[addr] = val;
 			}
 

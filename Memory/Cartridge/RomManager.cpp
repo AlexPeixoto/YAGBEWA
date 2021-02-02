@@ -17,7 +17,7 @@ void RomManager::loadRom(std::string fileName, bool headless) {
 
 void RomManager::loadCartridge() {
 	//Assumes that the first parameter is the name of the file
-	//std::cout << "File opened:" << filename << std::endl;
+	
 	std::ifstream file(this->fileName, std::ios::in | std::ios::binary | std::ios::ate);
 	if (!file.good()) {
 		throw std::runtime_error("Failed to open the file: " + fileName);
@@ -41,6 +41,9 @@ void RomManager::loadCartridge() {
 		initController(header.getCartridgeType().mbc);
 
 	loadBanks();
+	//For headless (as of now) we load the nintendo logo information
+	if(headless)
+		bus->memoryMap.loadNintendoLogo();
 
 }
 

@@ -28,19 +28,19 @@ OpCodeMapping::OpCodeMapping(LR35902& cpu) : instructions{
     //8x[0..F]
     {/* 8x0 */ 4,  OP::ADD8, &cpu.registers.A, &cpu.registers.BC[0]},  {/* 8x1 */ 4, OP::ADD8, &cpu.registers.A, &cpu.registers.BC[1]}, {/* 8x2 */ 4, OP::ADD8, &cpu.registers.A, &cpu.registers.DE[0]}, {/* 8x3 */ 4, OP::ADD8, &cpu.registers.A, &cpu.registers.DE[1]}, {/* 8x4 */ 4, OP::ADD8, &cpu.registers.A, &cpu.registers.HL[0]}, {/* 8x5 */ 4, OP::ADD8, &cpu.registers.A, &cpu.registers.HL[1]}, {/* 8x6 */ 8, OP::ADD8_HL_V}, {/* 8x7 */ 4, OP::ADD8, &cpu.registers.A, &cpu.registers.A}, {/* 8x8 */ 4, OP::ADC8, &cpu.registers.A, &cpu.registers.BC[0]}, {/* 8x9 */ 4, OP::ADC8, &cpu.registers.A, &cpu.registers.BC[1]}, {/* 8xA */ 4, OP::ADC8, &cpu.registers.A, &cpu.registers.DE[0]}, {/* 8xB */ 4, OP::ADC8, &cpu.registers.A, &cpu.registers.DE[1]}, {/* 8xC */ 4, OP::ADC8, &cpu.registers.A, &cpu.registers.HL[0]}, {/* 8xD */ 4, OP::ADC8, &cpu.registers.A, &cpu.registers.HL[1]}, {/* 8xE */ 8, OP::ADC8_HL_V, &cpu.registers.A}, {/* 8xF */ 4, OP::ADC8, &cpu.registers.A, &cpu.registers.A},
     //9x[0..F]
-    {/* 9x0 */ 4,  OP::SUB8, &cpu.registers.A, &cpu.registers.BC[0]},  {/* 9x1 */ 4, OP::SUB8, &cpu.registers.A, &cpu.registers.BC[1]}, {/* 9x2 */ 4, OP::SUB8, &cpu.registers.A, &cpu.registers.DE[0]}, {/* 9x3 */ 4, OP::SUB8, &cpu.registers.A, &cpu.registers.DE[1]}, {/* 9x4 */ 4, OP::SUB8, &cpu.registers.A, &cpu.registers.HL[0]}, {/* 9x5 */ 4, OP::SUB8, &cpu.registers.A, &cpu.registers.HL[1]}, {/* 9x6 */ 8, OP::SUB8_HL_V, &cpu.registers.A}, {/* 9x7 */ 4, OP::SUB8, &cpu.registers.A, &cpu.registers.A}, {/* 9x8 */ 4, OP::SBC8, &cpu.registers.A, &cpu.registers.BC[0]}, {/* 9x9 */ 4, OP::SBC8, &cpu.registers.A, &cpu.registers.BC[1]}, {/* 9xA */ 4, OP::SBC8, &cpu.registers.A, &cpu.registers.DE[0]}, {/* 9xB */ 4, OP::SBC8, &cpu.registers.A, &cpu.registers.DE[1]}, {/* 9xC */ 4, OP::SBC8, &cpu.registers.A, &cpu.registers.HL[0]}, {/* 9xD */ 4, OP::SBC8, &cpu.registers.A, &cpu.registers.HL[1]}, {/* 9xE */ 8, OP::SBC8_HL_V, &cpu.registers.A}, {/* 9xF */ 4, OP::SBC8, &cpu.registers.A, &cpu.registers.A},
+    {/* 9x0 */ 4,  OP::SUB8, &cpu.registers.A, &cpu.registers.BC[0]},  {/* 9x1 */ 4, OP::SUB8, &cpu.registers.A, &cpu.registers.BC[1]}, {/* 9x2 */ 4, OP::SUB8, &cpu.registers.A, &cpu.registers.DE[0]}, {/* 9x3 */ 4, OP::SUB8, &cpu.registers.A, &cpu.registers.DE[1]}, {/* 9x4 */ 4, OP::SUB8, &cpu.registers.A, &cpu.registers.HL[0]}, {/* 9x5 */ 4, OP::SUB8, &cpu.registers.A, &cpu.registers.HL[1]}, {/* 9x6 */ 8, OP::SUB8_HL_V}, {/* 9x7 */ 4, OP::SUB8, &cpu.registers.A, &cpu.registers.A}, {/* 9x8 */ 4, OP::SBC8, &cpu.registers.A, &cpu.registers.BC[0]}, {/* 9x9 */ 4, OP::SBC8, &cpu.registers.A, &cpu.registers.BC[1]}, {/* 9xA */ 4, OP::SBC8, &cpu.registers.A, &cpu.registers.DE[0]}, {/* 9xB */ 4, OP::SBC8, &cpu.registers.A, &cpu.registers.DE[1]}, {/* 9xC */ 4, OP::SBC8, &cpu.registers.A, &cpu.registers.HL[0]}, {/* 9xD */ 4, OP::SBC8, &cpu.registers.A, &cpu.registers.HL[1]}, {/* 9xE */ 8, OP::SBC8_HL_V, &cpu.registers.A}, {/* 9xF */ 4, OP::SBC8, &cpu.registers.A, &cpu.registers.A},
     //Ax[0..F]
-    {/* Ax0 */ 4,  OP::AND8, &cpu.registers.A, &cpu.registers.BC[0]},  {/* Ax1 */ 4, OP::AND8, &cpu.registers.A, &cpu.registers.BC[1]}, {/* Ax2 */ 4, OP::AND8, &cpu.registers.A, &cpu.registers.DE[0]}, {/* Ax3 */ 4, OP::AND8, &cpu.registers.A, &cpu.registers.DE[1]}, {/* Ax4 */ 4, OP::AND8, &cpu.registers.A, &cpu.registers.HL[0]}, {/* Ax5 */ 4, OP::AND8, &cpu.registers.A, &cpu.registers.HL[1]}, {/* Ax6 */ 8, OP::AND8_HL_V, &cpu.registers.A}, {/* Ax7 */ 4, OP::AND8, &cpu.registers.A, &cpu.registers.A}, {/* Ax8 */ 4, OP::XOR8, &cpu.registers.A, &cpu.registers.BC[0]}, {/* Ax9 */ 4, OP::XOR8, &cpu.registers.A, &cpu.registers.BC[1]}, {/* AxA */ 4, OP::XOR8, &cpu.registers.A, &cpu.registers.DE[0]}, {/* AxB */ 4, OP::XOR8, &cpu.registers.A, &cpu.registers.DE[1]}, {/* AxC */ 4, OP::XOR8, &cpu.registers.A, &cpu.registers.HL[0]}, {/* AxD */ 4, OP::XOR8, &cpu.registers.A, &cpu.registers.HL[1]}, {/* AxE */ 8, OP::XOR8_HL_V, &cpu.registers.A}, {/* AxF */ 4, OP::XOR8, &cpu.registers.A, &cpu.registers.A},
+    {/* Ax0 */ 4,  OP::AND8, &cpu.registers.A, &cpu.registers.BC[0]},  {/* Ax1 */ 4, OP::AND8, &cpu.registers.A, &cpu.registers.BC[1]}, {/* Ax2 */ 4, OP::AND8, &cpu.registers.A, &cpu.registers.DE[0]}, {/* Ax3 */ 4, OP::AND8, &cpu.registers.A, &cpu.registers.DE[1]}, {/* Ax4 */ 4, OP::AND8, &cpu.registers.A, &cpu.registers.HL[0]}, {/* Ax5 */ 4, OP::AND8, &cpu.registers.A, &cpu.registers.HL[1]}, {/* Ax6 */ 8, OP::AND8_HL_V}, {/* Ax7 */ 4, OP::AND8, &cpu.registers.A, &cpu.registers.A}, {/* Ax8 */ 4, OP::XOR8, &cpu.registers.A, &cpu.registers.BC[0]}, {/* Ax9 */ 4, OP::XOR8, &cpu.registers.A, &cpu.registers.BC[1]}, {/* AxA */ 4, OP::XOR8, &cpu.registers.A, &cpu.registers.DE[0]}, {/* AxB */ 4, OP::XOR8, &cpu.registers.A, &cpu.registers.DE[1]}, {/* AxC */ 4, OP::XOR8, &cpu.registers.A, &cpu.registers.HL[0]}, {/* AxD */ 4, OP::XOR8, &cpu.registers.A, &cpu.registers.HL[1]}, {/* AxE */ 8, OP::XOR8_HL_V, &cpu.registers.A}, {/* AxF */ 4, OP::XOR8, &cpu.registers.A, &cpu.registers.A},
     //Bx[0..F]
-    {/* Bx0 */ 4,  OP::OR8, &cpu.registers.A, &cpu.registers.BC[0]},  {/* Bx1 */ 4,  OP::OR8, &cpu.registers.A, &cpu.registers.BC[1]}, {/* Bx2 */ 4,  OP::OR8, &cpu.registers.A, &cpu.registers.DE[0]}, {/* Bx3 */ 4,  OP::OR8, &cpu.registers.A, &cpu.registers.DE[1]}, {/* Bx4 */ 4,  OP::OR8, &cpu.registers.A, &cpu.registers.HL[0]}, {/* Bx5 */ 4,  OP::OR8, &cpu.registers.A, &cpu.registers.HL[1]}, {/* Bx6 */ 8,  OP::OR8_HL_V, &cpu.registers.A}, {/* Bx7 */ 4,  OP::OR8, &cpu.registers.A, &cpu.registers.A}, {/* Bx8 */ 4,  OP::CP8, &cpu.registers.A, &cpu.registers.BC[0]}, {/* Bx9 */ 4,  OP::CP8, &cpu.registers.A, &cpu.registers.BC[1]}, {/* BxA */ 4,  OP::CP8, &cpu.registers.A, &cpu.registers.DE[0]}, {/* BxB */ 4,  OP::CP8, &cpu.registers.A, &cpu.registers.DE[1]}, {/* BxC */ 4,  OP::CP8, &cpu.registers.A, &cpu.registers.HL[0]}, {/* BxD */ 4,  OP::CP8, &cpu.registers.A, &cpu.registers.HL[1]}, {/* BxE */ 8,  OP::CP8_HL_V, &cpu.registers.A}, {/* BxF */ 4,  OP::CP8, &cpu.registers.A, &cpu.registers.A},
+    {/* Bx0 */ 4,  OP::OR8, &cpu.registers.A, &cpu.registers.BC[0]},  {/* Bx1 */ 4,  OP::OR8, &cpu.registers.A, &cpu.registers.BC[1]}, {/* Bx2 */ 4,  OP::OR8, &cpu.registers.A, &cpu.registers.DE[0]}, {/* Bx3 */ 4,  OP::OR8, &cpu.registers.A, &cpu.registers.DE[1]}, {/* Bx4 */ 4,  OP::OR8, &cpu.registers.A, &cpu.registers.HL[0]}, {/* Bx5 */ 4,  OP::OR8, &cpu.registers.A, &cpu.registers.HL[1]}, {/* Bx6 */ 8,  OP::OR8_HL_V}, {/* Bx7 */ 4,  OP::OR8, &cpu.registers.A, &cpu.registers.A}, {/* Bx8 */ 4,  OP::CP8, &cpu.registers.A, &cpu.registers.BC[0]}, {/* Bx9 */ 4,  OP::CP8, &cpu.registers.A, &cpu.registers.BC[1]}, {/* BxA */ 4,  OP::CP8, &cpu.registers.A, &cpu.registers.DE[0]}, {/* BxB */ 4,  OP::CP8, &cpu.registers.A, &cpu.registers.DE[1]}, {/* BxC */ 4,  OP::CP8, &cpu.registers.A, &cpu.registers.HL[0]}, {/* BxD */ 4,  OP::CP8, &cpu.registers.A, &cpu.registers.HL[1]}, {/* BxE */ 8,  OP::CP8_HL_V, &cpu.registers.A}, {/* BxF */ 4,  OP::CP8, &cpu.registers.A, &cpu.registers.A},
     //Cx[0..F]
-    {/* Cx0 */ 8,  OP::RET_NZ}, {/* Cx1 */ 12,  OP::POP_BC}, {/* Cx2 */ 12,  OP::JP_NZ_a16}, {/* Cx3 */ 16,  OP::JP_a16}, {/* Cx4 */ 12,  OP::CALL_NZ_a16}, {/* Cx5 */ 16,  OP::PUSH_BC},  {/* Cx6 */ 8,  OP::ADD8_d8, &cpu.registers.A}, {/* Cx7 */ 16, OP::_rst<0x0>}, {/* Cx8 */ 8, OP::RET_Z}, {/* Cx9 */ 16, OP::RET}, {/* CxA */ 12, OP::JP_Z_a16}, {/* CxB */ 4, OP::CB_OPCODE}, {/* CxC */ 12, OP::CALL_Z_a16}, {/* CxD */ 12, OP::CALL_a16}, {/* CxE */ 12, OP::ADC8_d8, &cpu.registers.A}, {/* CxF */ 16, OP::_rst<0x8>},
+    {/* Cx0 */ 8,  OP::RET_NZ}, {/* Cx1 */ 12,  OP::POP_BC}, {/* Cx2 */ 12,  OP::JP_NZ_a16}, {/* Cx3 */ 16,  OP::JP_a16}, {/* Cx4 */ 12,  OP::CALL_NZ_a16}, {/* Cx5 */ 16,  OP::PUSH_BC},  {/* Cx6 */ 8,  OP::ADD8_d8}, {/* Cx7 */ 16, OP::_rst<0x0>}, {/* Cx8 */ 8, OP::RET_Z}, {/* Cx9 */ 16, OP::RET}, {/* CxA */ 12, OP::JP_Z_a16}, {/* CxB */ 4, OP::CB_OPCODE}, {/* CxC */ 12, OP::CALL_Z_a16}, {/* CxD */ 12, OP::CALL_a16}, {/* CxE */ 12, OP::ADC8_d8}, {/* CxF */ 16, OP::_rst<0x8>},
     //Dx[0..F]
-    {/* Dx0 */ 8,  OP::RET_NC}, {/* Dx1 */ 12,  OP::POP_DE}, {/* Dx2 */ 12,  OP::JP_NC_a16}, {/* Dx3 */ 1,  OP::ABORT}, {/* Dx4 */ 12,  OP::CALL_NC_a16}, {/* Dx5 */ 16,  OP::PUSH_DE},  {/* Dx6 */ 8,  OP::SUB8_d8}, {/* Dx7 */ 16, OP::_rst<0x10>}, {/* Dx8 */ 8, OP::RET_C}, {/* Dx9 */ 16, OP::RETI}, {/* DxA */ 12, OP::JP_C_a16}, {/* DxB */ 1, OP::ABORT}, {/* DxC */ 12, OP::CALL_C_a16}, {/* DxD */ 12, OP::ABORT}, {/* DxE */ 12, OP::SBC8_d8, &cpu.registers.A}, {/* DxF */ 16, OP::_rst<0x18>},
+    {/* Dx0 */ 8,  OP::RET_NC}, {/* Dx1 */ 12,  OP::POP_DE}, {/* Dx2 */ 12,  OP::JP_NC_a16}, {/* Dx3 */ 1,  OP::ABORT}, {/* Dx4 */ 12,  OP::CALL_NC_a16}, {/* Dx5 */ 16,  OP::PUSH_DE},  {/* Dx6 */ 8,  OP::SUB8_d8}, {/* Dx7 */ 16, OP::_rst<0x10>}, {/* Dx8 */ 8, OP::RET_C}, {/* Dx9 */ 16, OP::RETI}, {/* DxA */ 12, OP::JP_C_a16}, {/* DxB */ 1, OP::ABORT}, {/* DxC */ 12, OP::CALL_C_a16}, {/* DxD */ 12, OP::ABORT}, {/* DxE */ 12, OP::SBC8_d8}, {/* DxF */ 16, OP::_rst<0x18>},
     //Ex[0..F]
-    {/* Ex0 */ 12,  OP::LDH_a8_A}, {/* Ex1 */ 12,  OP::POP_HL}, {/* Ex2 */ 8,  OP::LD_C_A}, {/* Ex3 */ 1,  OP::ABORT}, {/* Ex4 */ 1,  OP::ABORT}, {/* Ex5 */ 16,  OP::PUSH_HL},  {/* Ex6 */ 8,  OP::AND8_d8}, {/* Ex7 */ 16, OP::_rst<0x20>}, {/* Ex8 */ 16, OP::ADD_SP_r8}, {/* Ex9 */ 4, OP::JP_HL}, {/* ExA */ 16, OP::LD_a16_A}, {/* ExB */ 1, OP::ABORT}, {/* ExC */ 1, OP::ABORT}, {/* ExD */ 12, OP::ABORT}, {/* ExE */ 12, OP::XOR8_d8, &cpu.registers.A}, {/* CxF */ 16, OP::_rst<0x28>},
+    {/* Ex0 */ 12,  OP::LDH_a8_A}, {/* Ex1 */ 12,  OP::POP_HL}, {/* Ex2 */ 8,  OP::LD_C_A}, {/* Ex3 */ 1,  OP::ABORT}, {/* Ex4 */ 1,  OP::ABORT}, {/* Ex5 */ 16,  OP::PUSH_HL},  {/* Ex6 */ 8,  OP::AND8_d8}, {/* Ex7 */ 16, OP::_rst<0x20>}, {/* Ex8 */ 16, OP::ADD_SP_r8}, {/* Ex9 */ 4, OP::JP_HL}, {/* ExA */ 16, OP::LD_a16_A}, {/* ExB */ 1, OP::ABORT}, {/* ExC */ 1, OP::ABORT}, {/* ExD */ 12, OP::ABORT}, {/* ExE */ 12, OP::XOR8_d8}, {/* CxF */ 16, OP::_rst<0x28>},
     //Fx[0..F]
-    {/* Fx0 */ 12,  OP::LDH_A_a8}, {/* Fx1 */ 12,  OP::POP_AF}, {/* Fx2 */ 8,  OP::LD_A_C}, {/* Fx3 */ 4,  OP::DI}, {/* Fx4 */ 1,  OP::ABORT}, {/* Fx5 */ 16,  OP::PUSH_AF},  {/* Fx6 */ 8,  OP::OR8_d8}, {/* Fx7 */ 16, OP::_rst<0x30>}, {/* Fx8 */ 12, OP::LD_HL_SP_r8}, {/* Fx9 */ 8, OP::LD_SP_HL}, {/* FxA */ 4, OP::LD_A_a16}, {/* FxB */ 1, OP::EI}, {/* FxC */ 1, OP::ABORT}, {/* FxD */ 12, OP::ABORT}, {/* FxE */ 12, OP::CP8_d8, &cpu.registers.A}, {/* FxF */ 16, OP::_rst<0x38>},
+    {/* Fx0 */ 12,  OP::LDH_A_a8}, {/* Fx1 */ 12,  OP::POP_AF}, {/* Fx2 */ 8,  OP::LD_A_C}, {/* Fx3 */ 4,  OP::DI}, {/* Fx4 */ 1,  OP::ABORT}, {/* Fx5 */ 16,  OP::PUSH_AF},  {/* Fx6 */ 8,  OP::OR8_d8}, {/* Fx7 */ 16, OP::_rst<0x30>}, {/* Fx8 */ 12, OP::LD_HL_SP_r8}, {/* Fx9 */ 8, OP::LD_SP_HL}, {/* FxA */ 4, OP::LD_A_a16}, {/* FxB */ 1, OP::EI}, {/* FxC */ 1, OP::ABORT}, {/* FxD */ 12, OP::ABORT}, {/* FxE */ 12, OP::CP8_d8}, {/* FxF */ 16, OP::_rst<0x38>},
 
 },
 cbInstructions{
@@ -59,7 +59,7 @@ cbInstructions{
     //6x[0..F]
     {/* 6x0 */ 4, OP::_bit<4>, &cpu.registers.BC[0]}, {/* 6x1 */ 4, OP::_bit<4>, &cpu.registers.BC[1]}, {/* 6x2 */ 4, OP::_bit<4>, &cpu.registers.DE[0]}, {/* 6x3 */ 4, OP::_bit<4>, &cpu.registers.DE[1]}, {/* 6x4 */ 4, OP::_bit<4>, &cpu.registers.HL[0]}, {/* 6x5 */ 4, OP::_bit<4>, &cpu.registers.HL[1]}, {/* 6x6 */ 12, OP::_bit_hl<4>}, {/* 6x7 */ 4, OP::_bit<4>, &cpu.registers.A},{/* 6x8 */ 4, OP::_bit<5>, &cpu.registers.BC[0]}, {/* 6x9 */ 4, OP::_bit<5>, &cpu.registers.BC[1]}, {/* 6xA */ 4, OP::_bit<5>, &cpu.registers.DE[0]}, {/* 6xB */ 4, OP::_bit<5>, &cpu.registers.DE[1]}, {/* 6xC */ 4, OP::_bit<5>, &cpu.registers.HL[0]}, {/* 6xD */ 4, OP::_bit<5>, &cpu.registers.HL[1]}, {/* §E */ 12, OP::_bit_hl<5>}, {/* 6xF */ 4, OP::_bit<5>, &cpu.registers.A},
     //7x[0..F]
-    {/* 7x0 */ 4, OP::_bit<6>, &cpu.registers.BC[0]}, {/* 7x1 */ 4, OP::_bit<6>, &cpu.registers.BC[1]}, {/* 7x2 */ 4, OP::_bit<6>, &cpu.registers.DE[0]}, {/* 7x3 */ 4, OP::_bit<6>, &cpu.registers.DE[1]}, {/* 7x4 */ 4, OP::_bit<6>, &cpu.registers.HL[0]}, {/* 7x5 */ 4, OP::_bit<6>, &cpu.registers.HL[1]}, {/* 7x6 */ 12, OP::_bit_hl<6>}, {/* 7x7 */ 4, OP::_bit<6>, &cpu.registers.A},{/* 7x8 */ 4, OP::_bit<6>, &cpu.registers.BC[0]}, {/* 7x9 */ 4, OP::_bit<6>, &cpu.registers.BC[1]}, {/* 7xA */ 4, OP::_bit<6>, &cpu.registers.DE[0]}, {/* 7xB */ 4, OP::_bit<6>, &cpu.registers.DE[1]}, {/* 7xC */ 4, OP::_bit<6>, &cpu.registers.HL[0]}, {/* 7xD */ 4, OP::_bit<6>, &cpu.registers.HL[1]}, {/* §E */ 12, OP::_bit_hl<6>}, {/* 7xF */ 4, OP::_bit<6>, &cpu.registers.A},
+    {/* 7x0 */ 4, OP::_bit<6>, &cpu.registers.BC[0]}, {/* 7x1 */ 4, OP::_bit<6>, &cpu.registers.BC[1]}, {/* 7x2 */ 4, OP::_bit<6>, &cpu.registers.DE[0]}, {/* 7x3 */ 4, OP::_bit<6>, &cpu.registers.DE[1]}, {/* 7x4 */ 4, OP::_bit<6>, &cpu.registers.HL[0]}, {/* 7x5 */ 4, OP::_bit<6>, &cpu.registers.HL[1]}, {/* 7x6 */ 12, OP::_bit_hl<6>}, {/* 7x7 */ 4, OP::_bit<6>, &cpu.registers.A},{/* 7x8 */ 4, OP::_bit<7>, &cpu.registers.BC[0]}, {/* 7x9 */ 4, OP::_bit<7>, &cpu.registers.BC[1]}, {/* 7xA */ 4, OP::_bit<7>, &cpu.registers.DE[0]}, {/* 7xB */ 4, OP::_bit<7>, &cpu.registers.DE[1]}, {/* 7xC */ 4, OP::_bit<7>, &cpu.registers.HL[0]}, {/* 7xD */ 4, OP::_bit<7>, &cpu.registers.HL[1]}, {/* §E */ 12, OP::_bit_hl<6>}, {/* 7xF */ 4, OP::_bit<6>, &cpu.registers.A},
     //8x[0..F]
     {/* 8x0 */ 4, OP::_res<0>, &cpu.registers.BC[0]}, {/* 8x1 */ 4, OP::_res<0>, &cpu.registers.BC[1]}, {/* 8x2 */ 4, OP::_res<0>, &cpu.registers.DE[0]}, {/* 8x3 */ 4, OP::_res<0>, &cpu.registers.DE[1]}, {/* 8x4 */ 4, OP::_res<0>, &cpu.registers.HL[0]}, {/* 8x5 */ 4, OP::_res<0>, &cpu.registers.HL[1]}, {/* 8x6 */ 12, OP::_res_hl<0>}, {/* 8x7 */ 4, OP::_res<0>, &cpu.registers.A},{/* 8x8 */ 4, OP::_res<1>, &cpu.registers.BC[0]}, {/* 8x9 */ 4, OP::_res<1>, &cpu.registers.BC[1]}, {/* 8xA */ 4, OP::_res<1>, &cpu.registers.DE[0]}, {/* 8xB */ 4, OP::_res<1>, &cpu.registers.DE[1]}, {/* 8xC */ 4, OP::_res<1>, &cpu.registers.HL[0]}, {/* 8xD */ 4, OP::_res<1>, &cpu.registers.HL[1]}, {/* 8xE */ 12, OP::_res_hl<1>}, {/* 8xF */ 4, OP::_res<1>, &cpu.registers.A},
     //9x[0..F]
@@ -67,15 +67,15 @@ cbInstructions{
     //Ax[0..F]
     {/* Ax0 */ 4, OP::_res<4>, &cpu.registers.BC[0]}, {/* Ax1 */ 4, OP::_res<4>, &cpu.registers.BC[1]}, {/* Ax2 */ 4, OP::_res<4>, &cpu.registers.DE[0]}, {/* Ax3 */ 4, OP::_res<4>, &cpu.registers.DE[1]}, {/* Ax4 */ 4, OP::_res<4>, &cpu.registers.HL[0]}, {/* Ax5 */ 4, OP::_res<4>, &cpu.registers.HL[1]}, {/* Ax6 */ 12, OP::_res_hl<4>}, {/* Ax7 */ 4, OP::_res<4>, &cpu.registers.A},{/* Ax8 */ 4, OP::_res<5>, &cpu.registers.BC[0]}, {/* Ax9 */ 4, OP::_res<5>, &cpu.registers.BC[1]}, {/* AxA */ 4, OP::_res<5>, &cpu.registers.DE[0]}, {/* AxB */ 4, OP::_res<5>, &cpu.registers.DE[1]}, {/* AxC */ 4, OP::_res<5>, &cpu.registers.HL[0]}, {/* AxD */ 4, OP::_res<5>, &cpu.registers.HL[1]}, {/* §E */ 12, OP::_res_hl<5>}, {/* AxF */ 4, OP::_res<5>, &cpu.registers.A},
     //Bx[0..F]
-    {/* Bx0 */ 4, OP::_res<6>, &cpu.registers.BC[0]}, {/* Bx1 */ 4, OP::_res<6>, &cpu.registers.BC[1]}, {/* Bx2 */ 4, OP::_res<6>, &cpu.registers.DE[0]}, {/* Bx3 */ 4, OP::_res<6>, &cpu.registers.DE[1]}, {/* Bx4 */ 4, OP::_res<6>, &cpu.registers.HL[0]}, {/* Bx5 */ 4, OP::_res<6>, &cpu.registers.HL[1]}, {/* Bx6 */ 12, OP::_res_hl<6>}, {/* Bx7 */ 4, OP::_res<6>, &cpu.registers.A},{/* Bx8 */ 4, OP::_res<6>, &cpu.registers.BC[0]}, {/* Bx9 */ 4, OP::_res<6>, &cpu.registers.BC[1]}, {/* BxA */ 4, OP::_res<6>, &cpu.registers.DE[0]}, {/* BxB */ 4, OP::_res<6>, &cpu.registers.DE[1]}, {/* BxC */ 4, OP::_res<6>, &cpu.registers.HL[0]}, {/* BxD */ 4, OP::_res<6>, &cpu.registers.HL[1]}, {/* §E */ 12, OP::_res_hl<6>}, {/* BxF */ 4, OP::_res<6>, &cpu.registers.A},
+    {/* Bx0 */ 4, OP::_res<6>, &cpu.registers.BC[0]}, {/* Bx1 */ 4, OP::_res<6>, &cpu.registers.BC[1]}, {/* Bx2 */ 4, OP::_res<6>, &cpu.registers.DE[0]}, {/* Bx3 */ 4, OP::_res<6>, &cpu.registers.DE[1]}, {/* Bx4 */ 4, OP::_res<6>, &cpu.registers.HL[0]}, {/* Bx5 */ 4, OP::_res<6>, &cpu.registers.HL[1]}, {/* Bx6 */ 12, OP::_res_hl<6>}, {/* Bx7 */ 4, OP::_res<6>, &cpu.registers.A},{/* Bx8 */ 4, OP::_res<7>, &cpu.registers.BC[0]}, {/* Bx9 */ 4, OP::_res<7>, &cpu.registers.BC[1]}, {/* BxA */ 4, OP::_res<7>, &cpu.registers.DE[0]}, {/* BxB */ 4, OP::_res<7>, &cpu.registers.DE[1]}, {/* BxC */ 4, OP::_res<7>, &cpu.registers.HL[0]}, {/* BxD */ 4, OP::_res<7>, &cpu.registers.HL[1]}, {/* §E */ 12, OP::_res_hl<7>}, {/* BxF */ 4, OP::_res<7>, &cpu.registers.A},
     //Cx[0..F]
     {/* Cx0 */ 4, OP::_set<0>, &cpu.registers.BC[0]}, {/* Cx1 */ 4, OP::_set<0>, &cpu.registers.BC[1]}, {/* Cx2 */ 4, OP::_set<0>, &cpu.registers.DE[0]}, {/* Cx3 */ 4, OP::_set<0>, &cpu.registers.DE[1]}, {/* Cx4 */ 4, OP::_set<0>, &cpu.registers.HL[0]}, {/* Cx5 */ 4, OP::_set<0>, &cpu.registers.HL[1]}, {/* Cx6 */ 12, OP::_set_hl<0>}, {/* Cx7 */ 4, OP::_set<0>, &cpu.registers.A},{/* Cx8 */ 4, OP::_set<1>, &cpu.registers.BC[0]}, {/* Cx9 */ 4, OP::_set<1>, &cpu.registers.BC[1]}, {/* CxA */ 4, OP::_set<1>, &cpu.registers.DE[0]}, {/* CxB */ 4, OP::_set<1>, &cpu.registers.DE[1]}, {/* CxC */ 4, OP::_set<1>, &cpu.registers.HL[0]}, {/* CxD */ 4, OP::_set<1>, &cpu.registers.HL[1]}, {/* CxE */ 12, OP::_set_hl<1>}, {/* CxF */ 4, OP::_set<1>, &cpu.registers.A},
     //Dx[0..F]
     {/* Dx0 */ 4, OP::_set<2>, &cpu.registers.BC[0]}, {/* Dx1 */ 4, OP::_set<2>, &cpu.registers.BC[1]}, {/* Dx2 */ 4, OP::_set<2>, &cpu.registers.DE[0]}, {/* Dx3 */ 4, OP::_set<2>, &cpu.registers.DE[1]}, {/* Dx4 */ 4, OP::_set<2>, &cpu.registers.HL[0]}, {/* Dx5 */ 4, OP::_set<2>, &cpu.registers.HL[1]}, {/* Dx6 */ 12, OP::_set_hl<2>}, {/* Dx7 */ 4, OP::_set<2>, &cpu.registers.A},{/* Dx8 */ 4, OP::_set<3>, &cpu.registers.BC[0]}, {/* Dx9 */ 4, OP::_set<3>, &cpu.registers.BC[1]}, {/* DxA */ 4, OP::_set<3>, &cpu.registers.DE[0]}, {/* DxB */ 4, OP::_set<3>, &cpu.registers.DE[1]}, {/* DxC */ 4, OP::_set<3>, &cpu.registers.HL[0]}, {/* DxD */ 4, OP::_set<3>, &cpu.registers.HL[1]}, {/* DxE */ 12, OP::_set_hl<3>}, {/* DxF */ 4, OP::_set<3>, &cpu.registers.A},
     //Ex[0..F]
-    {/* Ex0 */ 4, OP::_set<4>, &cpu.registers.BC[0]}, {/* Ex1 */ 4, OP::_set<4>, &cpu.registers.BC[1]}, {/* Ex2 */ 4, OP::_set<4>, &cpu.registers.DE[0]}, {/* Ex3 */ 4, OP::_set<4>, &cpu.registers.DE[1]}, {/* Ex4 */ 4, OP::_set<4>, &cpu.registers.HL[0]}, {/* Ex5 */ 4, OP::_set<4>, &cpu.registers.HL[1]}, {/* Ex6 */ 12, OP::_set_hl<4>}, {/* Ex7 */ 4, OP::_set<4>, &cpu.registers.A},{/* Ex8 */ 4, OP::_set<5>, &cpu.registers.BC[0]}, {/* Ex9 */ 4, OP::_set<5>, &cpu.registers.BC[1]}, {/* ExA */ 4, OP::_set<5>, &cpu.registers.DE[0]}, {/* ExB */ 4, OP::_set<5>, &cpu.registers.DE[1]}, {/* ExC */ 4, OP::_set<5>, &cpu.registers.HL[0]}, {/* ExD */ 4, OP::_set<5>, &cpu.registers.HL[1]}, {/* §E */ 12, OP::_set_hl<5>}, {/* ExF */ 4, OP::_set<5>, &cpu.registers.A},
+    {/* Ex0 */ 4, OP::_set<4>, &cpu.registers.BC[0]}, {/* Ex1 */ 4, OP::_set<4>, &cpu.registers.BC[1]}, {/* Ex2 */ 4, OP::_set<4>, &cpu.registers.DE[0]}, {/* Ex3 */ 4, OP::_set<4>, &cpu.registers.DE[1]}, {/* Ex4 */ 4, OP::_set<4>, &cpu.registers.HL[0]}, {/* Ex5 */ 4, OP::_set<4>, &cpu.registers.HL[1]}, {/* Ex6 */ 12, OP::_set_hl<4>}, {/* Ex7 */ 4, OP::_set<4>, &cpu.registers.A},{/* Ex8 */ 4, OP::_set<5>, &cpu.registers.BC[0]}, {/* Ex9 */ 4, OP::_set<5>, &cpu.registers.BC[1]}, {/* ExA */ 4, OP::_set<5>, &cpu.registers.DE[0]}, {/* ExB */ 4, OP::_set<5>, &cpu.registers.DE[1]}, {/* ExC */ 4, OP::_set<5>, &cpu.registers.HL[0]}, {/* ExD */ 4, OP::_set<5>, &cpu.registers.HL[1]}, {/* ExE */ 12, OP::_set_hl<5>}, {/* ExF */ 4, OP::_set<5>, &cpu.registers.A},
     //Fx[0..F]
-    {/* Fx0 */ 4, OP::_set<6>, &cpu.registers.BC[0]}, {/* Fx1 */ 4, OP::_set<6>, &cpu.registers.BC[1]}, {/* Fx2 */ 4, OP::_set<6>, &cpu.registers.DE[0]}, {/* Fx3 */ 4, OP::_set<6>, &cpu.registers.DE[1]}, {/* Fx4 */ 4, OP::_set<6>, &cpu.registers.HL[0]}, {/* Fx5 */ 4, OP::_set<6>, &cpu.registers.HL[1]}, {/* Fx6 */ 12, OP::_set_hl<6>}, {/* Fx7 */ 4, OP::_set<6>, &cpu.registers.A},{/* Fx8 */ 4, OP::_set<6>, &cpu.registers.BC[0]}, {/* Fx9 */ 4, OP::_set<6>, &cpu.registers.BC[1]}, {/* FxA */ 4, OP::_set<6>, &cpu.registers.DE[0]}, {/* FxB */ 4, OP::_set<6>, &cpu.registers.DE[1]}, {/* FxC */ 4, OP::_set<6>, &cpu.registers.HL[0]}, {/* FxD */ 4, OP::_set<6>, &cpu.registers.HL[1]}, {/* §E */ 12, OP::_set_hl<6>}, {/* FxF */ 4, OP::_set<6>, &cpu.registers.A}
+    {/* Fx0 */ 4, OP::_set<6>, &cpu.registers.BC[0]}, {/* Fx1 */ 4, OP::_set<6>, &cpu.registers.BC[1]}, {/* Fx2 */ 4, OP::_set<6>, &cpu.registers.DE[0]}, {/* Fx3 */ 4, OP::_set<6>, &cpu.registers.DE[1]}, {/* Fx4 */ 4, OP::_set<6>, &cpu.registers.HL[0]}, {/* Fx5 */ 4, OP::_set<6>, &cpu.registers.HL[1]}, {/* Fx6 */ 12, OP::_set_hl<6>}, {/* Fx7 */ 4, OP::_set<6>, &cpu.registers.A},{/* Fx8 */ 4, OP::_set<7>, &cpu.registers.BC[0]}, {/* Fx9 */ 4, OP::_set<7>, &cpu.registers.BC[1]}, {/* FxA */ 4, OP::_set<7>, &cpu.registers.DE[0]}, {/* FxB */ 4, OP::_set<7>, &cpu.registers.DE[1]}, {/* FxC */ 4, OP::_set<7>, &cpu.registers.HL[0]}, {/* FxD */ 4, OP::_set<7>, &cpu.registers.HL[1]}, {/* FxE */ 12, OP::_set_hl<7>}, {/* FxF */ 4, OP::_set<7>, &cpu.registers.A}
 }
 {
     
@@ -85,8 +85,8 @@ cbInstructions{
 uint16_t OpCodeMapping::executeNext(LR35902& cpu, Memory::Map& memMap){
     static uint64_t opcall = 0;
     cpu.extraCycles = 0;
-    std::cout << std::hex << static_cast<uint32_t>(*(cpu.registers.PC)) << " at " << std::hex << (cpu.registers.PC - memMap.getRomStart()) << " Call:" << std::dec << opcall++ << std::endl;
     auto &op = instructions.at(*cpu.registers.PC);
+
     //Go back one instruction, this should not cause problems as no instruction
     //Reads again the same byte.
     //Its important to do here due to 2 byte instructions.
@@ -106,7 +106,7 @@ void OpCodeMapping::Call::ABORT(LR35902& cpu, Memory::Map& memMap, OpStructure& 
 void OpCodeMapping::Call::CB_OPCODE(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
     //Also known as STOP 0 instruction 10 00.
     cpu.registers.PC+=1;
-    //std::cout << "CB called" << std::hex << static_cast<uint32_t>(*(cpu.registers.PC)) << std::endl;
+    
     OpStructure& cbInfo = cpu.mapping.cbInstructions.at(*cpu.registers.PC);
     cbInfo.call(cpu, memMap, cbInfo);
 }
@@ -212,19 +212,19 @@ void OpCodeMapping::Call::LD_a16_SP(LR35902& cpu, Memory::Map& memMap, OpStructu
 }
 
 void OpCodeMapping::Call::LD_HLI_REG(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
-    uint16_t val16 = cpu.registers.HL[0] << 8 | cpu.registers.HL[1];
-    memMap.write(*info.registers_8[0], val16);
-    val16++;
-    cpu.registers.HL[0] = val16 >> 8;
-    cpu.registers.HL[1] = val16 & 0xFF;
+    uint16_t addr = cpu.registers.HL[0] << 8 | cpu.registers.HL[1];
+    memMap.write(*info.registers_8[0], addr);
+    addr++;
+    cpu.registers.HL[0] = addr >> 8;
+    cpu.registers.HL[1] = addr & 0xFF;
 }
 
 void OpCodeMapping::Call::LD_HLD_REG(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
-    uint16_t val16 = cpu.registers.HL[0] << 8 | cpu.registers.HL[1];
-    memMap.write(*info.registers_8[0], val16);
-    val16--;
-    cpu.registers.HL[0] = val16 >> 8;
-    cpu.registers.HL[1] = val16 & 0xFF;
+    uint16_t addr = cpu.registers.HL[0] << 8 | cpu.registers.HL[1];
+    memMap.write(*info.registers_8[0], addr);
+    addr--;
+    cpu.registers.HL[0] = addr >> 8;
+    cpu.registers.HL[1] = addr & 0xFF;
 }
 
 void OpCodeMapping::Call::LD_REG_HLI(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
@@ -245,16 +245,15 @@ void OpCodeMapping::Call::LD_REG_HLD(LR35902& cpu, Memory::Map& memMap, OpStruct
 
 void OpCodeMapping::Call::LDH_a8_A(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
     cpu.registers.PC+=1;
+    
     memMap.write(cpu.registers.A, 0xFF00 + static_cast<uint32_t>(*cpu.registers.PC));
+    
+    
 }
 
 void OpCodeMapping::Call::LDH_A_a8(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
     cpu.registers.PC+=1;
     cpu.registers.A = memMap.read(0xFF00 + static_cast<uint32_t>(*cpu.registers.PC));
-    //std::cout << "Reading from: " << std::hex << (0xFF00 + static_cast<uint32_t>(*cpu.registers.PC)) << std::endl;
-    //std::cout << "A value is: " << std::hex << static_cast<uint32_t>(cpu.registers.A)  << std::endl;
-    //if(static_cast<uint32_t>(cpu.registers.A) == 0x94 || static_cast<uint32_t>(cpu.registers.A) == 94)
-    //    std::cout << "Yay maybe" << std::endl;
 }
 
 void OpCodeMapping::Call::LD_a16_A(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
@@ -359,6 +358,7 @@ void OpCodeMapping::Call::_add(LR35902& cpu,  uint8_t val){
 }
 
 void OpCodeMapping::Call::ADD_SP_r8(LR35902& cpu, Memory::Map&, OpStructure& info){
+    
     cpu.registers.PC+=1;
     const int8_t val = *reinterpret_cast<int8_t*>(cpu.registers.PC);
     cpu.registers.F.H = ((((cpu.registers.SP & 0xF) + (val & 0xF)) & 0x10) == 0x10);
@@ -538,7 +538,7 @@ void OpCodeMapping::Call::AND8_d8(LR35902& cpu, Memory::Map&, OpStructure&){
     _and(cpu, val);
 }
 void OpCodeMapping::Call::_xor(LR35902& cpu,uint8_t val){
-    cpu.registers.A |= val;
+    cpu.registers.A ^= val;
     cpu.registers.F.Z = (cpu.registers.A == 0);
     cpu.registers.F.N = 0;
     cpu.registers.F.H = 0;
@@ -590,9 +590,6 @@ void OpCodeMapping::Call::OR8_d8(LR35902& cpu, Memory::Map&, OpStructure&){
 
 void OpCodeMapping::Call::_cp(LR35902& cpu, uint8_t val){
     uint8_t result = cpu.registers.A - val;
-    //std::cout << "Subtract" << std::hex << static_cast<uint32_t>(cpu.registers.A) << std::endl;
-    //std::cout << "From" << std::hex << static_cast<uint32_t>(val) << std::endl;
-    //std::cout << "Result value is: " << std::hex << static_cast<uint32_t>(result) << std::endl;
     cpu.registers.F.Z = (result == 0);
     cpu.registers.F.N = 1;
     cpu.registers.F.H = ((static_cast<int8_t>(cpu.registers.A & 0xF) - (val & 0xF)) < 0);
@@ -613,7 +610,6 @@ void OpCodeMapping::Call::CP8_HL_V(LR35902& cpu, Memory::Map& memMap, OpStructur
 void OpCodeMapping::Call::CP8_d8(LR35902& cpu, Memory::Map&, OpStructure&){
     cpu.registers.PC+=1;
     const uint8_t val = *cpu.registers.PC;
-    //std::cout << "CP VAL IS: " << std::hex << static_cast<uint32_t>(val) << std::endl;
     _cp(cpu, val);
 }
 
@@ -628,7 +624,6 @@ void OpCodeMapping::Call::DEC_HL_V(LR35902& cpu, Memory::Map& memMap, OpStructur
 }
 
 void OpCodeMapping::Call::RET(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
-    //std::cout << "Ret called" << std::endl;
     cpu.registers.PC = memMap.getMemoryAt(_pop16(cpu, memMap));
     cpu.changedPC = true;
 }
@@ -724,18 +719,20 @@ void OpCodeMapping::Call::POP_HL(LR35902& cpu, Memory::Map& memMap, OpStructure&
 void OpCodeMapping::Call::POP_AF(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
     const uint8_t f = _pop8(cpu, memMap);
     cpu.registers.A = _pop8(cpu, memMap);
-    cpu.registers.F.Z = f & 0b10000000;
-    cpu.registers.F.N = f & 0b01000000;
-    cpu.registers.F.H = f & 0b00100000;
-    cpu.registers.F.C = f & 0b00010000;
+    cpu.registers.F.Z = (f >> 7);
+    cpu.registers.F.N = (f >> 6);
+    cpu.registers.F.H = (f >> 5);
+    cpu.registers.F.C = (f >> 4);
 }
 
 // In some instances here the 0x1 is redundant, but its left to make the intentions clear.
 // Also, for *RLCA and other ***A variants the check is not performed (as it is a faster variant).
 void OpCodeMapping::Call::_rl(LR35902& cpu, OpStructure& info, uint8_t reg, bool check = true){
-    *(info.registers_8[0]) = *(info.registers_8[0]) << 1 | reg & 0x1;
+    *(info.registers_8[0]) = (*(info.registers_8[0]) << 1 & 0xFF) | reg & 0x1;
     if(check)
         cpu.registers.F.Z = (*(info.registers_8[0]) == 0);
+    else
+        cpu.registers.F.Z = false;
     cpu.registers.F.H = cpu.registers.F.N = 0;
 }
 
@@ -747,19 +744,19 @@ void OpCodeMapping::Call::RLCA(LR35902& cpu, Memory::Map&, OpStructure& info){
 //RL operations use the previous carry value, while RL do not
 void OpCodeMapping::Call::RLA(LR35902& cpu, Memory::Map&, OpStructure& info){
     cpu.registers.F._C = cpu.registers.F.C;
-    cpu.registers.F.C = *(info.registers_8[0]) & 0b10000000;
+    cpu.registers.F.C = (*(info.registers_8[0]) >> 7);
     _rl(cpu, info, cpu.registers.F._C, false);
 }
 
 void OpCodeMapping::Call::RLC(LR35902& cpu, Memory::Map&, OpStructure& info){
-    cpu.registers.F.C = *(info.registers_8[0]) & 0b10000000;
+    cpu.registers.F.C = (*(info.registers_8[0]) >> 7);
     _rl(cpu, info, cpu.registers.F.C);
 }
 
 void OpCodeMapping::Call::RLC_HL(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
     const uint16_t addr = cpu.registers.HL[0] << 8 | cpu.registers.HL[1];
     uint8_t& val = memMap.read(addr);
-    cpu.registers.F.C = val & 0b10000000;
+    cpu.registers.F.C = val >> 7;
     val = val << 1 | cpu.registers.F.C & 0x1;
     cpu.registers.F.Z = (val == 0);
     cpu.registers.F.H = cpu.registers.F.N = 0;
@@ -767,14 +764,14 @@ void OpCodeMapping::Call::RLC_HL(LR35902& cpu, Memory::Map& memMap, OpStructure&
 
 void OpCodeMapping::Call::RL(LR35902& cpu, Memory::Map&, OpStructure& info){
     cpu.registers.F._C = cpu.registers.F.C;
-    cpu.registers.F.C = *(info.registers_8[0]) & 0b10000000;
+    cpu.registers.F.C = *(info.registers_8[0]) >> 7;
     _rl(cpu, info, cpu.registers.F._C);
 }
 void OpCodeMapping::Call::RL_HL(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
     const uint16_t addr = cpu.registers.HL[0] << 8 | cpu.registers.HL[1];
     uint8_t& val = memMap.read(addr);
     cpu.registers.F._C = cpu.registers.F.C;
-    cpu.registers.F.C = val & 0b10000000;
+    cpu.registers.F.C = val >> 7;
     val = val << 1 | cpu.registers.F.C;
     cpu.registers.F.Z = (val == 0);
     cpu.registers.F.H = cpu.registers.F.N = 0;
@@ -830,8 +827,8 @@ void OpCodeMapping::Call::RR_HL(LR35902& cpu, Memory::Map& memMap, OpStructure& 
 
 void OpCodeMapping::Call::SLA(LR35902& cpu, Memory::Map&, OpStructure& info){
     //Check if after the shift it will "overflow"
-    //std::cout << "SLA called" << std::endl;
-    cpu.registers.F.C = *(info.registers_8[0]) & 0b10000000;
+    
+    cpu.registers.F.C = *(info.registers_8[0]) >> 7;
     *(info.registers_8[0]) <<= 1;
     cpu.registers.F.Z = (*(info.registers_8[0]) == 0);
     cpu.registers.F.N = cpu.registers.F.H = 0;
@@ -840,16 +837,16 @@ void OpCodeMapping::Call::SLA(LR35902& cpu, Memory::Map&, OpStructure& info){
 void OpCodeMapping::Call::SLA_HL(LR35902& cpu, Memory::Map& memMap, OpStructure&){
     const uint16_t addr = cpu.registers.HL[0] << 8 | cpu.registers.HL[1];
     uint8_t& val = memMap.read(addr);
-    cpu.registers.F.C = val & 0b10000000;
+    cpu.registers.F.C = val >> 7;
     val <<= 1;
     cpu.registers.F.Z = (val == 0);
     cpu.registers.F.N = cpu.registers.F.H = 0;
 }
 
 void OpCodeMapping::Call::SRA(LR35902& cpu, Memory::Map&, OpStructure& info){
-    cpu.registers.F.C = *(info.registers_8[0]) & 0b00000001;
+    cpu.registers.F.C = *(info.registers_8[0]) & 0x1;
     //shift right arithmetic (b7=b7)
-    *(info.registers_8[0]) = *(info.registers_8[0]) >> 1 | *(info.registers_8[0]) & 0b10000000;
+    *(info.registers_8[0]) = *(info.registers_8[0]) >> 1 | *(info.registers_8[0]) & 0x80;
     cpu.registers.F.Z = (*(info.registers_8[0]) == 0);
     cpu.registers.F.N = cpu.registers.F.H = 0;
 }
@@ -857,7 +854,7 @@ void OpCodeMapping::Call::SRA(LR35902& cpu, Memory::Map&, OpStructure& info){
 void OpCodeMapping::Call::SRA_HL(LR35902& cpu, Memory::Map& memMap, OpStructure&){
     const uint16_t addr = cpu.registers.HL[0] << 8 | cpu.registers.HL[1];
     uint8_t& val = memMap.read(addr);
-    cpu.registers.F.C = val & 0b00000001;
+    cpu.registers.F.C = val >> 7;
     //shift right arithmetic (b7=b7)
     val = val >> 1 | val & 0b10000000;
     cpu.registers.F.Z = (val == 0);
@@ -866,7 +863,7 @@ void OpCodeMapping::Call::SRA_HL(LR35902& cpu, Memory::Map& memMap, OpStructure&
 
 void OpCodeMapping::Call::SRL(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
     //Check if after the shift it will "overflow"
-    cpu.registers.F.C = *(info.registers_8[0]) & 0b10000000;
+    cpu.registers.F.C = *(info.registers_8[0]) & 0x01;
     *(info.registers_8[0]) >>= 1;
     cpu.registers.F.Z = (*(info.registers_8[0]) == 0);
     cpu.registers.F.N = cpu.registers.F.H = 0;
@@ -875,7 +872,7 @@ void OpCodeMapping::Call::SRL(LR35902& cpu, Memory::Map& memMap, OpStructure& in
 void OpCodeMapping::Call::SRL_HL(LR35902& cpu, Memory::Map& memMap, OpStructure&){
     const uint16_t addr = cpu.registers.HL[0] << 8 | cpu.registers.HL[1];
     uint8_t& val = memMap.read(addr);
-    cpu.registers.F.C = val & 0b00000001;
+    cpu.registers.F.C = val & 0x01;
     //shift right arithmetic (b7=b7)
     val >>=1;
     cpu.registers.F.Z = (val == 0);
@@ -1084,12 +1081,12 @@ void OpCodeMapping::Call::DI(LR35902& cpu, Memory::Map&, OpStructure& ){
 }
 
 void OpCodeMapping::Call::_push8(LR35902& cpu, Memory::Map& memMap, uint8_t val){
-    memMap.write(val, --cpu.registers.SP);
+    memMap.write(static_cast<uint8_t>(val & 0xFF), --cpu.registers.SP);
 }
 
 void OpCodeMapping::Call::_push16(LR35902& cpu, Memory::Map& memMap, uint16_t val){
-    memMap.write(val & 0xFF, --cpu.registers.SP);
-    memMap.write(val >> 8, --cpu.registers.SP);
+    memMap.write(static_cast<uint8_t>(val & 0xFF), --cpu.registers.SP);
+    memMap.write(static_cast<uint8_t>(val >> 8), --cpu.registers.SP);
 }
 
 uint8_t OpCodeMapping::Call::_pop8(LR35902& cpu, Memory::Map& memMap){
@@ -1114,7 +1111,6 @@ void OpCodeMapping::Call::_rst(LR35902& cpu, Memory::Map& memMap, OpStructure&){
 
 template<int N>
 void OpCodeMapping::Call::_bit(LR35902& cpu, Memory::Map&, OpStructure& info){
-    //std::cout << "bit called" << std::endl;
     cpu.registers.F.Z = ((*(info.registers_8[0]) & (1UL << N)) == 0);
     cpu.registers.F.N = 0;
     cpu.registers.F.H = 1;
