@@ -87,6 +87,14 @@ uint16_t OpCodeMapping::executeNext(LR35902& cpu, Memory::Map& memMap){
     cpu.extraCycles = 0;
     auto &op = instructions.at(*cpu.registers.PC);
 
+    
+    /*if(((cpu.registers.PC - memMap.getRomStart())) == 0x27){
+        std::cout << "Break here" << std::endl;
+    }
+    if(((cpu.registers.PC - memMap.getRomStart())) == 0xa3){
+        std::cout << "Break here" << std::endl;
+    }*/
+
     //Go back one instruction, this should not cause problems as no instruction
     //Reads again the same byte.
     //Its important to do here due to 2 byte instructions.
@@ -95,7 +103,20 @@ uint16_t OpCodeMapping::executeNext(LR35902& cpu, Memory::Map& memMap){
         cpu.registers.PC--;
         cpu.haltType = HaltType::None;
     }
+    uint8_t* oldPC = cpu.registers.PC;
     op.call(cpu, memMap, op);
+    /*std::cout << std::hex << static_cast<uint32_t>(*oldPC) << " at " << std::hex << (oldPC - memMap.getRomStart()) << " Call:" << std::dec << opcall++ << std::endl;
+    std::cout << "A: " << std::hex << static_cast<uint32_t>(cpu.registers.A) << std::endl;
+    std::cout << "B: " << std::hex << static_cast<uint32_t>(cpu.registers.BC[0]) << std::endl;
+    std::cout << "C: " << std::hex << static_cast<uint32_t>(cpu.registers.BC[1]) << std::endl;
+    std::cout << "D: " << std::hex << static_cast<uint32_t>(cpu.registers.DE[0]) << std::endl;
+    std::cout << "E: " << std::hex << static_cast<uint32_t>(cpu.registers.DE[1]) << std::endl;
+    std::cout << "H: " << std::hex << static_cast<uint32_t>(cpu.registers.HL[0]) << std::endl;
+    std::cout << "L: " << std::hex << static_cast<uint32_t>(cpu.registers.HL[1]) << std::endl;
+    std::cout << "F.Z: " << std::hex << static_cast<uint32_t>(cpu.registers.F.Z) << std::endl;
+    std::cout << "F.N: " << std::hex << static_cast<uint32_t>(cpu.registers.F.N) << std::endl;
+    std::cout << "F.H: " << std::hex << static_cast<uint32_t>(cpu.registers.F.H) << std::endl;
+    std::cout << "F.C: " << std::hex << static_cast<uint32_t>(cpu.registers.F.C) << std::endl;*/
     return op.cycleCount + cpu.extraCycles;
 }
 
@@ -104,9 +125,8 @@ void OpCodeMapping::Call::ABORT(LR35902& cpu, Memory::Map& memMap, OpStructure& 
 }
 
 void OpCodeMapping::Call::CB_OPCODE(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
-    //Also known as STOP 0 instruction 10 00.
     cpu.registers.PC+=1;
-    
+    std::cout << "[CB] - " << std::hex << static_cast<uint32_t>(*(cpu.registers.PC)) << " at " << std::hex << (cpu.registers.PC - memMap.getRomStart()) << std::endl;
     OpStructure& cbInfo = cpu.mapping.cbInstructions.at(*cpu.registers.PC);
     cbInfo.call(cpu, memMap, cbInfo);
 }
@@ -245,10 +265,7 @@ void OpCodeMapping::Call::LD_REG_HLD(LR35902& cpu, Memory::Map& memMap, OpStruct
 
 void OpCodeMapping::Call::LDH_a8_A(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
     cpu.registers.PC+=1;
-    
     memMap.write(cpu.registers.A, 0xFF00 + static_cast<uint32_t>(*cpu.registers.PC));
-    
-    
 }
 
 void OpCodeMapping::Call::LDH_A_a8(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
@@ -564,7 +581,7 @@ void OpCodeMapping::Call::XOR8_d8(LR35902& cpu, Memory::Map&, OpStructure&){
 }
 
 void OpCodeMapping::Call::_or(LR35902& cpu,uint8_t val){
-    cpu.registers.A = (cpu.registers.A ||  val);
+    cpu.registers.A |= val;
     cpu.registers.F.Z = (cpu.registers.A == 0);
     cpu.registers.F.N = 0;
     cpu.registers.F.H = 0;
@@ -778,14 +795,14 @@ void OpCodeMapping::Call::RL_HL(LR35902& cpu, Memory::Map& memMap, OpStructure& 
 }
 
 void OpCodeMapping::Call::_rr(LR35902& cpu, OpStructure& info, uint8_t reg, bool check = true){
-    *(info.registers_8[0]) = *(info.registers_8[0]) >> 1 | reg << 7;
+    *(info.registers_8[0]) = *(info.registers_8[0]) >> 1 | (reg & 1) << 7;
     if(check)
         cpu.registers.F.Z = (*(info.registers_8[0]) == 0);
     cpu.registers.F.H = cpu.registers.F.N = 0;
 }
 
 void OpCodeMapping::Call::RRCA(LR35902& cpu, Memory::Map&, OpStructure& info){
-    cpu.registers.F.C = *(info.registers_8[0]) & 0x1;
+    cpu.registers.F.C = *(info.registers_8[0]) >> 7;
     _rr(cpu, info, cpu.registers.F.C, false);
 }
 
@@ -1034,7 +1051,7 @@ void OpCodeMapping::Call::CALL_a16(LR35902& cpu, Memory::Map& memMap, OpStructur
 
 void OpCodeMapping::Call::CALL_NZ_a16(LR35902& cpu, Memory::Map& memMap, OpStructure& info) {
     // jump if Z is not set
-    if(!cpu.registers.F.Z ) {
+    if(!cpu.registers.F.Z) {
         CALL_a16(cpu, memMap, info);
         cpu.extraCycles=12;
     } else{
@@ -1044,7 +1061,7 @@ void OpCodeMapping::Call::CALL_NZ_a16(LR35902& cpu, Memory::Map& memMap, OpStruc
 
 void OpCodeMapping::Call::CALL_Z_a16(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
     // jump if Z is set
-    if(cpu.registers.F.Z ) {
+    if(cpu.registers.F.Z) {
         CALL_a16(cpu, memMap, info);
         cpu.extraCycles=12;
     } else{
@@ -1054,7 +1071,7 @@ void OpCodeMapping::Call::CALL_Z_a16(LR35902& cpu, Memory::Map& memMap, OpStruct
 
 void OpCodeMapping::Call::CALL_NC_a16(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
     // jump if C is not set
-    if(!cpu.registers.F.C ) {
+    if(!cpu.registers.F.C) {
         CALL_a16(cpu, memMap, info);
         cpu.extraCycles=12;
     } else{
@@ -1064,7 +1081,7 @@ void OpCodeMapping::Call::CALL_NC_a16(LR35902& cpu, Memory::Map& memMap, OpStruc
 
 void OpCodeMapping::Call::CALL_C_a16(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
     // jump if Z is set
-    if(cpu.registers.F.C ) {
+    if(cpu.registers.F.C) {
         CALL_a16(cpu, memMap, info);
         cpu.extraCycles=12;
     } else{
@@ -1085,8 +1102,8 @@ void OpCodeMapping::Call::_push8(LR35902& cpu, Memory::Map& memMap, uint8_t val)
 }
 
 void OpCodeMapping::Call::_push16(LR35902& cpu, Memory::Map& memMap, uint16_t val){
-    memMap.write(static_cast<uint8_t>(val & 0xFF), --cpu.registers.SP);
     memMap.write(static_cast<uint8_t>(val >> 8), --cpu.registers.SP);
+    memMap.write(static_cast<uint8_t>(val & 0xFF), --cpu.registers.SP);
 }
 
 uint8_t OpCodeMapping::Call::_pop8(LR35902& cpu, Memory::Map& memMap){
@@ -1094,16 +1111,15 @@ uint8_t OpCodeMapping::Call::_pop8(LR35902& cpu, Memory::Map& memMap){
 }
 
 uint16_t OpCodeMapping::Call::_pop16(LR35902& cpu, Memory::Map& memMap){
-    int16_t val = memMap.read(cpu.registers.SP++) << 8;
-    val |= memMap.read(cpu.registers.SP++);
+    int16_t val = memMap.read(cpu.registers.SP++);
+    val |= memMap.read(cpu.registers.SP++) << 8;
     return val;
 }
 
 template<int target>
 void OpCodeMapping::Call::_rst(LR35902& cpu, Memory::Map& memMap, OpStructure&){
-    uint16_t index = *reinterpret_cast<uint8_t*>(++cpu.registers.PC);
-    index |=(*reinterpret_cast<uint8_t*>(++cpu.registers.PC)) << 8;
-
+    ++cpu.registers.PC;
+    const ptrdiff_t index = (cpu.registers.PC - memMap.getRomStart());
     _push16(cpu, memMap, static_cast<uint16_t>(index));
     cpu.registers.PC=memMap.getMemoryAt(target);
     cpu.changedPC = true;

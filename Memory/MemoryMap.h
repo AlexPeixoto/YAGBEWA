@@ -234,8 +234,10 @@ namespace Memory{
 			//Write here does not allow (for now), to write on vram
 			inline void write(uint8_t val, uint16_t addr) { 
 				//Tetris testing JOYP hack
-				if(addr == 0xFF00)
-					return;
+				//if(addr == 0xFF00){
+				//	std::cout << "Attempt to write at ff00" << std::endl;
+				//	return;
+				//}
 				if(addr < videoRam.position)
 					return;
 				// || 
@@ -268,6 +270,20 @@ namespace Memory{
 				//}
 				//Special write handling
 				switch(addr){
+					
+					case 0xFF00:
+						memory[addr] = val;
+						//Here I fake set all THE LOW 4 BITS.
+						//Have in mind that depending which bit is set we either read as a button (A, B, START, SELECT) or direction
+						/*Bit 5 - P15 Select Button Keys      (0=Select)
+						Bit 4 - P14 Select Direction Keys   (0=Select)
+						Bit 3 - P13 Input Down  or Start    (0=Pressed) (Read Only)
+						Bit 2 - P12 Input Up    or Select   (0=Pressed) (Read Only)
+						Bit 1 - P11 Input Left  or Button B (0=Pressed) (Read Only)
+						Bit 0 - P10 Input Right or Button A (0=Pressed) (Read Only)*/
+						memory[addr] |= 0xCF;
+						return;
+
 					//Reset 0xFF04 on attempts to write to it (Timer).
 					case 0xFF04:
 						memory[addr] = 0;
@@ -277,6 +293,7 @@ namespace Memory{
 						//PPU DMA TRANSFER
 						uint16_t startAddress = 0;
 						startAddress |= val << 8;
+						//std::cout << "DMA TO: " << std::hex << static_cast<uint32_t>(startAddress) << std::endl;
 						//Source:      XX00-XX9F   ;XX in range from 00-F1h
 						//Destination: FE00-FE9F
 						//costs 160 cycles (but not mapped yet).
@@ -285,7 +302,9 @@ namespace Memory{
 						memoryOpCost = 160;
 						return;
 				}
-				
+				if(addr == 0x800A){
+					std::cout << "Writing: " << std::hex << static_cast<uint32_t>(val) << std::endl;
+				}
 				memory[addr] = val;
 			}
 

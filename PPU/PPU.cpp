@@ -70,18 +70,23 @@ uint8_t Core::getMode(){
 
 void Core::initPalleteTable(std::array<Color, 4>& palette, uint16_t memPosition){
     const uint8_t paletteMem = bus->memoryMap[memPosition];
+    //std::cout << "Hex pallete mem value: " << std::hex << static_cast<uint32_t>(paletteMem) << " at " << std::hex << static_cast<uint32_t>(memPosition) << std::endl;
     for(int x=0; x<=3; x++){
         switch((paletteMem >> (x * 2)) & 0x3){
             case 0x00:
+                //std::cout << "Pallete for: " << x << " is 00 {FF}" << std::endl;
                 palette[x] = {0xFF, 0xFF, 0xFF};
                 continue;
             case 0x01:
+                //std::cout << "Pallete for: " << x << " is 01 {CC}" << std::endl;
                 palette[x] = {0xCC, 0xCC, 0xCC};
                 continue;
             case 0x02:
+                //std::cout << "Pallete for: " << x << " is 02 {66}" << std::endl;
                 palette[x] = {0x66, 0x66, 0x66};
                 continue;
             case 0x03:
+                //std::cout << "Pallete for: " << x << " is 03 {00}" << std::endl;
                 palette[x] = {0x00, 0x00, 0x00};
                 continue;
         }
@@ -108,14 +113,27 @@ void Core::initSprites(){
 void Core::renderLine(){
     //Lets check the tile mode first (tile = background)
     const uint16_t baseTileAddr = isTileDataSelectHigh() ? 0x8000 : 0x8800;
+    
     static uint16_t count=0;
+    
     const uint16_t baseSpriteAddr = 0x8000;
     const bool isTallSprite = isSpriteDoubleHeight();
 
     //Background map information, this is just the index to be used
     //To access the baseTileAddr above
     const uint16_t baseBackgroundMapAddr = isBgTileMapHigh() ? 0x9C00 : 0x9800;
-    
+    /*if(count++ >= 40000){
+        std::cout << "Tile addr : " << std::hex << static_cast<uint32_t>(baseTileAddr) << std::endl;
+        for(int addrPos = 0x8000; addrPos <= 0x87FF; addrPos++){
+            std::cout << "Tile Addr: " << std::hex << static_cast<uint32_t>(addrPos) << " value: " << std::hex << static_cast<uint32_t>(bus->memoryMap[addrPos]) << std::endl;
+        }
+        std::cout << "Tile map addr : " << std::hex << static_cast<uint32_t>(baseBackgroundMapAddr) << std::endl;
+        for(int addrPos = 0x9800; addrPos <= 0x9BFF; addrPos++){
+            std::cout << "Map Addr: " << std::hex << static_cast<uint32_t>(addrPos) << " value: " << std::hex << static_cast<uint32_t>(bus->memoryMap[addrPos]) << std::endl;
+        }
+        abort();
+    }*/
+
     //This is the line that I will render
     const uint8_t line = bus->memoryMap[LCD_LY_ADDR];
 
@@ -142,8 +160,15 @@ void Core::renderLine(){
         //Missing signed vs unsigned here (depending on the )
         //Here we are looking at the tilemap to extract the tile index
         const uint32_t tileMemPos = baseBackgroundMapAddr + (yTileAdjusted * 32 /*tiles per line*/) + xTileAdjusted;
-        const int tileIndex = bus->memoryMap[tileMemPos];   
-         
+        int tileIndex = bus->memoryMap[tileMemPos];
+        if (!isTileDataSelectHigh()){
+            //std::cout << "Before: " << tileIndex << std::endl;
+            if (tileIndex >= INT_MIN)
+                tileIndex = (static_cast<int>(tileIndex - INT_MIN) + INT_MIN);
+            tileIndex+=128;
+            //std::cout << "After: " << tileIndex << std::endl;
+        }
+
         const uint16_t colorByte = baseTileAddr +
                                   (tileIndex * 16) +
                                   (ySkipPixels * 2); //2 bytes per line
@@ -152,7 +177,7 @@ void Core::renderLine(){
         const uint8_t colorIndex_1 = bus->memoryMap[colorByte + 1];
         int bit = (xAdjusted % 8);
         bit -= 7;
-        bit *= -1;
+        bit = -bit;
         const uint8_t index = (colorIndex_0 >> bit) & 0x1 | (((colorIndex_1 >> bit) & 0x1) << 1);
 
         internalBuffer[x][line] = backgroundColorMap.at(index);
@@ -165,7 +190,6 @@ void Core::processMode0(){
     //Check if mode is also enabled
     if((bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0b00001000) == 0)
         bus->setInterruptFlag(CPU::INTERRUPTIONS_TYPE::LCDC);
-
     
     modeProcessed = 0;
 }
@@ -262,7 +286,6 @@ void Core::tick(uint16_t ticks) {
         //Is 153, we reset the line
         else{
             line = 0;
-            
             
 
             checkLYC_LY();

@@ -16,3 +16,4 @@ UnitTests/*_test
 UnitTests/UnitTests/CTestTestfile.cmake
 output
 log.out
+cpu_instrs.gb
