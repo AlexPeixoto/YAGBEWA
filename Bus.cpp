@@ -27,14 +27,12 @@ void Bus::runCycle() {
 	static uint64_t pendingCycles = 0;
 
 	//"Global" clock
-	uint32_t clock = pendingCycles;
-	//Reset pending cycles
-	pendingCycles = 0;
+	uint32_t clock = 0; //pendingCycles;
 
 	//Current number of cycles
 	uint32_t numberCyclesCurrent = 0;
 	while(clock < CYCLES_PER_FRAME){
-
+			
 		//For revert we still continue execution, but PC will fail to increase
 		if(cpu.getHaltType() == CPU::HaltType::None || cpu.getHaltType() == CPU::HaltType::Revert)
 		{
@@ -42,13 +40,15 @@ void Bus::runCycle() {
 
 			//This is to create a cycle acurrate emulation, where we "burn the cycles"
 			numberCyclesCurrent=cpu.tick();
-			//Did any memory OP added a cost?
-			numberCyclesCurrent+=memoryMap.getAndResetCost();	
+			//No need to add memory cost, the DMA doest halt the CPU, it just take that many cycles to complete
+			//So we dont calculate it, its the game's code job to swait for it to finish
 			clock+=numberCyclesCurrent;
 			totalCycles+=numberCyclesCurrent;
 		}
+		//This sometimes causes a skip on the whole line or just skips a step
 		//Graphics here, IT IS DONE with the CPU
-		ppu.tick(numberCyclesCurrent);
+		for(int clock=0; clock < numberCyclesCurrent; clock++)
+			ppu.tick();
 		//Timer, we use pending here
 		updateTimerValue();
 		clockUpdate(numberCyclesCurrent);
@@ -157,7 +157,7 @@ void Bus::performInterruption() {
 				//Reset IF flag
 				memoryMap[IF_ADDR] &= ~(1UL << x);
 				//Stop here, we serve this interruption, once it finishes we serve
-				//the next one (id we just set the PC twice we will only serve the one)
+				//the next one (if we just set the PC twice we will only serve the one)
 				//with the lowest priority
 				return;
 			}

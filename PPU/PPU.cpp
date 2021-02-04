@@ -52,7 +52,10 @@ namespace{
 }
 using namespace PPU;
 
-Core::Core(Bus* bus) : bus(bus){}
+Core::Core(Bus* bus) : bus(bus){
+    bus->memoryMap[LCD_LY_ADDR] = 153;
+    setMode(1);
+}
 
 void Core::setMode(uint8_t mode){
     bus->memoryMap[LCD_STATUS_REGISTER_ADDR] &= 0b11111100;
@@ -179,7 +182,6 @@ void Core::renderLine(){
         bit -= 7;
         bit = -bit;
         const uint8_t index = (colorIndex_0 >> bit) & 0x1 | (((colorIndex_1 >> bit) & 0x1) << 1);
-
         internalBuffer[x][line] = backgroundColorMap.at(index);
     }
 }
@@ -201,10 +203,7 @@ void Core::processMode1(){
     if((bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0b00010000) == 0)
         bus->setInterruptFlag(CPU::INTERRUPTIONS_TYPE::LCDC);
 
-    //Lets copy internal buffer into screen buffer (its not exactly needed, but more as a safety measure)
-    for(int x=0; x<160; x++)
-        for(int y=0; y<144; y++)
-            screen[x][y]=internalBuffer[x][y];
+    
     
     modeProcessed = 1;
 }
@@ -234,6 +233,11 @@ void Core::processMode3(){
         return;
 
     renderLine();
+    //Lets copy internal buffer into screen buffer (its not exactly needed, but more as a safety measure)
+    const uint8_t& line = bus->memoryMap[LCD_LY_ADDR];
+    for(int x=0; x<160; x++){
+        screen[x][line]=internalBuffer[x][line];
+    }
     
     modeProcessed = 3;
 }
@@ -245,14 +249,15 @@ void Core::processModes(){
     processMode3();
 }
 
-void Core::tick(uint16_t ticks) {
-    static uint16_t dots = 0;
+void Core::tick() {
+    static uint16_t cycles = 110;
     static bool lineRendered = false;
     if(!isLCDEnabled())
         return;
-    //Each 4 "dots" per CPU cycle
-    //Each scanline is 456 dots (114 CPU cycles) 
-    dots += ticks * 4;
+
+    //cycles = (cycles + 1) % 456;
+    if(cycles++ == 456)
+        cycles = 0;
     //Cycle through modes, 2, 3, 0, 1.
     //OAM, DRAWING, H-BLANK, V-BLANK
 
@@ -261,38 +266,25 @@ void Core::tick(uint16_t ticks) {
     //So I can just run once, as it would be expected that at this time everything was processed
     //This is usually called "Interrupt" on some docs, but I dont have to actually trigger an interruption
     //Just do what the PPU documentation states that its done at this time
-    if(dots <= 80){
+    if(cycles <= 80){
         setMode(2);
-    } else if(dots <= 252){
+    } else if(cycles <= 252){
         //Mode 3 is set to the shortest amount of time 172 dots (as we do the rendering in one shot)
         //then we give the most amount of time back to the CPU to perform operations
         //While it is possilble to have accurate timming currently its probably not worth it (unless some game is really bound to this timming).
         setMode(3);
-    } else if(dots <= 456){
+    } else if(cycles < 456){
         //Mode 0 does nothing, 
         lineRendered = false;
         setMode(0);
     } else {
-        dots -= CLOCKS_PER_LINE;
         uint8_t& line = bus->memoryMap[LCD_LY_ADDR];
-        //< 144 Normal render
-        //renderline
-        if(line < 144){
-        }
-        else if(line >=144 && line < 153){
+        if(line >=144 && line < 153){
             //if V-BLANK interrupt.. as its done only on line 144, its done only once (we will increment the line after that.)
             setMode(1);
         }
-        //Is 153, we reset the line
-        else{
+        if(line++ == 153)
             line = 0;
-            
-
-            checkLYC_LY();
-            return;
-        }
-        line++;
-        
     }
     
     //Those will only be triggered once, each one will validate itself

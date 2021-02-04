@@ -73,7 +73,7 @@ namespace PPU{
 
         public:
         Core(Bus* bus);
-        void tick(uint16_t ticks);
+        void tick();
         auto returnScreen() { return screen; }
     };
 }

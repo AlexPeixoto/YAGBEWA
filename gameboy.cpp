@@ -18,15 +18,15 @@ int main(int argc, char** argv){
 	*/
 	Bus bus;
 
-	bus.cartridge.loadRom("Tetris.gb");
+	//bus.cartridge.loadRom("Tetris.gb");
     //bus.cartridge.loadRom("drmario.gb");
     //bus.cartridge.loadRom("cpu_instrs.gb", true);
-    //bus.cartridge.loadRom("dmg_boot.gb", true);
+    bus.cartridge.loadRom("dmg_boot.gb", true);
     bus.initCPU();
 
     sf::RenderWindow window(sf::VideoMode(160, 144), "Gameboy");
-    window.setVerticalSyncEnabled(true); // call it once, after creating the window
-    window.setFramerateLimit(60); // call it once, after creating the window
+    window.setVerticalSyncEnabled(true);
+    window.setFramerateLimit(60); // TODO, CHANGE TO 60 WHEN TIMMING IS FIXED
     window.setSize({800, 700});
 
     // run the program as long as the window is open
