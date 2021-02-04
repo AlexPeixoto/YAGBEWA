@@ -126,7 +126,7 @@ void OpCodeMapping::Call::ABORT(LR35902& cpu, Memory::Map& memMap, OpStructure& 
 
 void OpCodeMapping::Call::CB_OPCODE(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
     cpu.registers.PC+=1;
-    std::cout << "[CB] - " << std::hex << static_cast<uint32_t>(*(cpu.registers.PC)) << " at " << std::hex << (cpu.registers.PC - memMap.getRomStart()) << std::endl;
+    //std::cout << "[CB] - " << std::hex << static_cast<uint32_t>(*(cpu.registers.PC)) << " at " << std::hex << (cpu.registers.PC - memMap.getRomStart()) << std::endl;
     OpStructure& cbInfo = cpu.mapping.cbInstructions.at(*cpu.registers.PC);
     cbInfo.call(cpu, memMap, cbInfo);
 }

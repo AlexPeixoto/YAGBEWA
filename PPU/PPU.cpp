@@ -256,8 +256,7 @@ void Core::tick() {
         return;
 
     //cycles = (cycles + 1) % 456;
-    if(cycles++ == 456)
-        cycles = 0;
+    
     //Cycle through modes, 2, 3, 0, 1.
     //OAM, DRAWING, H-BLANK, V-BLANK
 
@@ -266,33 +265,55 @@ void Core::tick() {
     //So I can just run once, as it would be expected that at this time everything was processed
     //This is usually called "Interrupt" on some docs, but I dont have to actually trigger an interruption
     //Just do what the PPU documentation states that its done at this time
-    if(cycles <= 80){
-        setMode(2);
-    } else if(cycles <= 252){
-        //Mode 3 is set to the shortest amount of time 172 dots (as we do the rendering in one shot)
-        //then we give the most amount of time back to the CPU to perform operations
-        //While it is possilble to have accurate timming currently its probably not worth it (unless some game is really bound to this timming).
-        setMode(3);
-    } else if(cycles < 456){
-        //Mode 0 does nothing, 
-        lineRendered = false;
-        setMode(0);
-    } else {
-        uint8_t& line = bus->memoryMap[LCD_LY_ADDR];
-        if(line >=144 && line < 153){
-            //if V-BLANK interrupt.. as its done only on line 144, its done only once (we will increment the line after that.)
-            setMode(1);
+    if(cycles++ >= 456)
+        cycles = 0;
+
+    //std::cout << "Cycles: " << static_cast<uint32_t>(cycles) << std::endl;
+
+    uint8_t& line = bus->memoryMap[LCD_LY_ADDR];
+    //std::cout << "Processing line: " << std::dec << static_cast<uint32_t>(line) << std::endl;
+    if(line == 10)
+        std::cout << 10;
+    if(line <= 144){
+        if(cycles <= 80){
+            setMode(2);
+            //std::cout << "<80" << std::endl;
+        } else if(cycles <= 252){
+            //Mode 3 is set to the shortest amount of time 172 dots (as we do the rendering in one shot)
+            //then we give the most amount of time back to the CPU to perform operations
+            //While it is possilble to have accurate timming currently its probably not worth it (unless some game is really bound to this timming).
+            setMode(3);
+            //std::cout << "<252" << std::endl;
+        } else if(cycles < 456){
+            //Mode 0 does nothing, 
+            lineRendered = false;
+            setMode(0);
         }
-        if(line++ == 153)
-            line = 0;
+        else {
+            // Increment line if 456
+            line++;
+            return;
+        }
+        processModes();
+        checkLYC_LY();
+    } else {
+        //if V-BLANK interrupt.. as its done only on line 144, its done only once (we will increment the line after that.)
+        setMode(1);
+        if(cycles == 456){
+            line++;
+            if(line == 153)
+                line = 0;
+        }
+        processModes();
+        checkLYC_LY();
     }
     
     //Those will only be triggered once, each one will validate itself
     //if the mode is set and if the mode processed is not itself (which means that it was not)
     //computed yet
-    processModes();
+    
 
-    checkLYC_LY();
+    
 }
 
 bool Core::isLCDEnabled() { return bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0b10000000; }

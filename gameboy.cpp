@@ -18,10 +18,10 @@ int main(int argc, char** argv){
 	*/
 	Bus bus;
 
-	//bus.cartridge.loadRom("Tetris.gb");
+	bus.cartridge.loadRom("Tetris.gb");
     //bus.cartridge.loadRom("drmario.gb");
     //bus.cartridge.loadRom("cpu_instrs.gb", true);
-    bus.cartridge.loadRom("dmg_boot.gb", true);
+    //bus.cartridge.loadRom("dmg_boot.gb", true);
     bus.initCPU();
 
     sf::RenderWindow window(sf::VideoMode(160, 144), "Gameboy");
@@ -33,6 +33,7 @@ int main(int argc, char** argv){
     sf::Texture texture;
     texture.create(160, 144);
     sf::Sprite background;
+    uint64_t frame = 0;
     while (window.isOpen()/* || windowDebug.isOpen()*/)
     {
         
@@ -59,6 +60,7 @@ int main(int argc, char** argv){
         texture.loadFromImage(image);
         background.setTexture(texture);
         window.draw(background);
+        //std::cout << "Frame: " << std::dec << frame++ << std::endl;
         window.display();
         //windowDebug.display();
     }
