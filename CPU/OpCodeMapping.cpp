@@ -106,6 +106,8 @@ uint16_t OpCodeMapping::executeNext(LR35902& cpu, Memory::Map& memMap){
     uint8_t* oldPC = cpu.registers.PC;
     op.call(cpu, memMap, op);
     /*std::cout << std::hex << static_cast<uint32_t>(*oldPC) << " at " << std::hex << (oldPC - memMap.getRomStart()) << " Call:" << std::dec << opcall++ << std::endl;
+    std::cout << "B: " << std::hex << static_cast<uint32_t>(cpu.registers.BC[0]) << std::endl;
+    std::cout << "SP: " << std::hex << static_cast<uint32_t>(cpu.registers.SP) << std::endl;
     std::cout << "A: " << std::hex << static_cast<uint32_t>(cpu.registers.A) << std::endl;
     std::cout << "B: " << std::hex << static_cast<uint32_t>(cpu.registers.BC[0]) << std::endl;
     std::cout << "C: " << std::hex << static_cast<uint32_t>(cpu.registers.BC[1]) << std::endl;
@@ -146,7 +148,7 @@ void OpCodeMapping::Call::HALT(LR35902& cpu, Memory::Map& memMap, OpStructure&){
 
 void OpCodeMapping::Call::STOP(LR35902& cpu, Memory::Map&, OpStructure&){
     //Also known as STOP 0 instruction 10 00.
-    cpu.registers.PC+=1;
+    ++cpu.registers.PC;
     cpu.stop = true;
 }
 
@@ -155,7 +157,7 @@ void OpCodeMapping::Call::LD_REG8_REG8(LR35902& cpu, Memory::Map& memMap, OpStru
 }
 
 void OpCodeMapping::Call::LD_REG8_d8(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
-    cpu.registers.PC+=1;
+    ++cpu.registers.PC;
     *(info.registers_8[0]) = *cpu.registers.PC;
 }
 
@@ -170,7 +172,7 @@ void OpCodeMapping::Call::LD_HL_d16(LR35902& cpu, Memory::Map&, OpStructure&){
 }
 void OpCodeMapping::Call::LD_SP_d16(LR35902& cpu, Memory::Map&, OpStructure&){
     cpu.registers.PC+=1;
-    cpu.registers.SP = *cpu.registers.PC;
+    cpu.registers.SP = *cpu.registers.PC & 0xFF;
     cpu.registers.PC+=1;
     cpu.registers.SP |= *cpu.registers.PC << 8;
 }
@@ -215,7 +217,7 @@ void OpCodeMapping::Call::LD_REG8_HL_V(LR35902& cpu, Memory::Map& memMap, OpStru
 
 void OpCodeMapping::Call::LD_HLV_d8(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
     const uint16_t addr = cpu.registers.HL[0] << 8 | cpu.registers.HL[1];
-    cpu.registers.PC+=1;
+    ++cpu.registers.PC;
     memMap.write(
         *cpu.registers.PC, //Write this value
         addr //At this location of the memory
@@ -223,7 +225,6 @@ void OpCodeMapping::Call::LD_HLV_d8(LR35902& cpu, Memory::Map& memMap, OpStructu
 }
 
 void OpCodeMapping::Call::LD_a16_SP(LR35902& cpu, Memory::Map& memMap, OpStructure&){
-    cpu.registers.PC+=1;
     uint16_t addr = *reinterpret_cast<uint8_t*>(++cpu.registers.PC);
     addr |=(*reinterpret_cast<uint8_t*>(++cpu.registers.PC)) << 8;
     //Store SP & $FF at address n16 and SP >> 8 at address n16 + 1.
@@ -282,6 +283,7 @@ void OpCodeMapping::Call::LD_a16_A(LR35902& cpu, Memory::Map& memMap, OpStructur
 void OpCodeMapping::Call::LD_A_a16(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
     uint16_t pos = *reinterpret_cast<uint8_t*>(++cpu.registers.PC);
     pos |=(*reinterpret_cast<uint8_t*>(++cpu.registers.PC)) << 8;
+    std::cout << "Reading addr: " << std::hex << static_cast<uint32_t>(pos) << std::endl;
     cpu.registers.A = memMap.read(pos);
 }
 
@@ -308,7 +310,7 @@ void OpCodeMapping::Call::LD_HL_SP_r8(LR35902& cpu, Memory::Map& memMap, OpStruc
 }
 
 void OpCodeMapping::Call::LD_SP_HL(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
-    cpu.registers.SP = cpu.registers.HL[0] << 0 | cpu.registers.HL[1];
+    cpu.registers.SP = cpu.registers.HL[0] << 8 | cpu.registers.HL[1];
 }
 
 void OpCodeMapping::Call::NOP(LR35902& cpu, Memory::Map& memMap, OpStructure& info){}
@@ -953,6 +955,7 @@ void OpCodeMapping::Call::JR_NZ_r8(LR35902& cpu, Memory::Map& memMap, OpStructur
     // jump if Z is not set
     ++cpu.registers.PC;
     if(!cpu.registers.F.Z ) {
+        std::cout << "NON ZERO JUMP" << std::endl;
        cpu.registers.PC+=*reinterpret_cast<int8_t*>(cpu.registers.PC);
        cpu.extraCycles=4;
     }
@@ -1042,7 +1045,7 @@ void OpCodeMapping::Call::CALL_a16(LR35902& cpu, Memory::Map& memMap, OpStructur
     target |=(*reinterpret_cast<uint8_t*>(++cpu.registers.PC)) << 8;
 
     //Increment again to point to proper PC
-    cpu.registers.PC++;
+    ++cpu.registers.PC;
     const ptrdiff_t index = (cpu.registers.PC - memMap.getRomStart());
     _push16(cpu, memMap, static_cast<uint16_t>(index));
     cpu.registers.PC=memMap.getMemoryAt(target);

@@ -169,7 +169,6 @@ void Core::renderLine(){
             if (tileIndex >= INT_MIN)
                 tileIndex = (static_cast<int>(tileIndex - INT_MIN) + INT_MIN);
             tileIndex+=128;
-            //std::cout << "After: " << tileIndex << std::endl;
         }
 
         const uint16_t colorByte = baseTileAddr +
@@ -178,9 +177,8 @@ void Core::renderLine(){
          
         const uint8_t colorIndex_0 = bus->memoryMap[colorByte];
         const uint8_t colorIndex_1 = bus->memoryMap[colorByte + 1];
-        int bit = (xAdjusted % 8);
-        bit -= 7;
-        bit = -bit;
+        //The most significant bit is on the left, so we "invert" the reading order
+        int bit = 7 - (xAdjusted % 8);
         const uint8_t index = (colorIndex_0 >> bit) & 0x1 | (((colorIndex_1 >> bit) & 0x1) << 1);
         internalBuffer[x][line] = backgroundColorMap.at(index);
     }
@@ -272,9 +270,8 @@ void Core::tick() {
 
     uint8_t& line = bus->memoryMap[LCD_LY_ADDR];
     //std::cout << "Processing line: " << std::dec << static_cast<uint32_t>(line) << std::endl;
-    if(line == 10)
-        std::cout << 10;
-    if(line <= 144){
+    //std::cout << "Line: " << std::dec << static_cast<uint32_t>(line) << std::endl;
+    if(line <= 143){
         if(cycles <= 80){
             setMode(2);
             //std::cout << "<80" << std::endl;
@@ -297,11 +294,14 @@ void Core::tick() {
         processModes();
         checkLYC_LY();
     } else {
+        //std::cout << "Me!!" << std::endl;
         //if V-BLANK interrupt.. as its done only on line 144, its done only once (we will increment the line after that.)
         setMode(1);
+
         if(cycles == 456){
             line++;
-            if(line == 153)
+            vblankServed = false;
+            if(line == 152)
                 line = 0;
         }
         processModes();
@@ -333,8 +333,10 @@ void Core::renderWindow() {
 
 void Core::checkLYC_LY(){
     //Checkk for VBLANK
-    if(bus->memoryMap[LCD_LY_ADDR] == 144/* && bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0x00010000*/) {
+    if(bus->memoryMap[LCD_LY_ADDR] == 144 && !vblankServed/* && bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0x00010000*/) {
         bus->setInterruptFlag(CPU::INTERRUPTIONS_TYPE::VBLANK);
+        vblankServed = true;
+        //std::cout << "Triggered" << std::endl;
 
         //If I also need to set LCDC during VBLANK
         if(bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0x00010000)

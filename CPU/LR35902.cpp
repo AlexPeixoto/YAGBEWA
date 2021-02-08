@@ -4,17 +4,17 @@
 using namespace CPU;
 
 LR35902::LR35902(Bus* bus) : bus(bus), mapping(*this) {
-    registers.A = 0x01;
-    registers.BC[0] = 0x0013;
-    registers.BC[1] = 0x13;
+    registers.A = 0x11;
+    registers.BC[0] = 0x01;
+    registers.BC[1] = 0x00;
     registers.DE[0] = 0x00;
-    registers.DE[1] = 0xD8;
-    registers.HL[0] = 0x01;
-    registers.HL[1] = 0x4D;
-    registers.F.Z = 1;
+    registers.DE[1] = 0x08;
+    registers.HL[0] = 0x00;
+    registers.HL[1] = 0x7C;
+    registers.F.Z = 0;
     registers.F.N = 0;
-    registers.F.H = 1;
-    registers.F.C = 1;
+    registers.F.H = 0;
+    registers.F.C = 0;
     registers.SP = 0xFFFE;
 }
 

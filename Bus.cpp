@@ -4,7 +4,7 @@ namespace{
 	const uint32_t FREQUENCY = 4194304;
 	const uint32_t FPS = 60;
 	//How many cycles we can process on each frame
-	const uint32_t CYCLES_PER_FRAME = 4194304/FPS;
+	const uint32_t CYCLES_PER_FRAME = FREQUENCY/FPS;
 	//DIV register is updated at a different pace, so we use it to properly update it
 	const uint32_t DIV_REGISTER_INCREMENT = 16384;
 	const uint16_t IE_ADDR = 0xFFFF;
@@ -47,7 +47,7 @@ void Bus::runCycle() {
 		}
 		//This sometimes causes a skip on the whole line or just skips a step
 		//Graphics here, IT IS DONE with the CPU
-		for(int clock=0; clock < numberCyclesCurrent; clock++)
+		for(int _clock=0; _clock < numberCyclesCurrent; _clock++)
 			ppu.tick();
 		//Timer, we use pending here
 		updateTimerValue();

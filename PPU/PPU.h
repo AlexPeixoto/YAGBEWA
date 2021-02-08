@@ -42,6 +42,8 @@ namespace PPU{
         std::array<Sprite, 40> sprites;
         //Mark an invalid mode
         uint8_t modeProcessed=5;
+        //Check if vblank was served this frame
+        bool vblankServed = false;
 
         Bus* bus;
 
