@@ -108,8 +108,8 @@ namespace Memory{
 				memory.at(0xFF43) = 0x00; //SCX
 				memory.at(0xFF45) = 0x00; //LYC
 				memory.at(0xFF47) = 0xFC; //BGP
-				memory.at(0xFF48) = 0xFF; //OBP0
-				memory.at(0xFF49) = 0xFF; //OBP1
+				memory.at(0xFF48) = 0xff; //OBP0
+				memory.at(0xFF49) = 0xff; //OBP1
 				memory.at(0xFF4A) = 0x00; //WY
 				memory.at(0xFF4B) = 0x00; //WX
 				memory.at(0xFFFF) = 0x00; //IE

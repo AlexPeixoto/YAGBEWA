@@ -105,6 +105,20 @@ uint16_t OpCodeMapping::executeNext(LR35902& cpu, Memory::Map& memMap){
     }
     uint8_t* oldPC = cpu.registers.PC;
     op.call(cpu, memMap, op);
+    static int call845 = 0;
+    /*std::cout << std::hex << static_cast<uint32_t>(*oldPC) << " at " << std::hex << (oldPC - memMap.getRomStart()) << " Call:" << std::dec << opcall++ << std::endl;
+    if((oldPC - memMap.getRomStart()) == 0xc845){
+        if(++call845 == 2){
+            for(uint32_t pos = 0; pos < 0xffff; pos++)
+            {
+                std::cout << std::hex << "0x" << static_cast<uint32_t>(pos) << " = " << static_cast<uint32_t>(memMap[pos]) << std::endl;
+            }
+            abort();
+        }
+    }*/
+    
+    
+    
     /*std::cout << std::hex << static_cast<uint32_t>(*oldPC) << " at " << std::hex << (oldPC - memMap.getRomStart()) << " Call:" << std::dec << opcall++ << std::endl;
     std::cout << "B: " << std::hex << static_cast<uint32_t>(cpu.registers.BC[0]) << std::endl;
     std::cout << "SP: " << std::hex << static_cast<uint32_t>(cpu.registers.SP) << std::endl;
@@ -171,16 +185,16 @@ void OpCodeMapping::Call::LD_HL_d16(LR35902& cpu, Memory::Map&, OpStructure&){
     _LD_REG16_d16(cpu.registers.HL, cpu);
 }
 void OpCodeMapping::Call::LD_SP_d16(LR35902& cpu, Memory::Map&, OpStructure&){
-    cpu.registers.PC+=1;
+    ++cpu.registers.PC;
     cpu.registers.SP = *cpu.registers.PC & 0xFF;
-    cpu.registers.PC+=1;
+    ++cpu.registers.PC;
     cpu.registers.SP |= *cpu.registers.PC << 8;
 }
 
 void OpCodeMapping::Call::_LD_REG16_d16(uint8_t reg[2], LR35902& cpu){
-    cpu.registers.PC+=1;
+    ++cpu.registers.PC;
     reg[1] = *cpu.registers.PC;
-    cpu.registers.PC+=1;
+    ++cpu.registers.PC;
     //Its zero because of <<
     reg[0] = *cpu.registers.PC;
 }
@@ -283,7 +297,7 @@ void OpCodeMapping::Call::LD_a16_A(LR35902& cpu, Memory::Map& memMap, OpStructur
 void OpCodeMapping::Call::LD_A_a16(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
     uint16_t pos = *reinterpret_cast<uint8_t*>(++cpu.registers.PC);
     pos |=(*reinterpret_cast<uint8_t*>(++cpu.registers.PC)) << 8;
-    std::cout << "Reading addr: " << std::hex << static_cast<uint32_t>(pos) << std::endl;
+    //std::cout << "Reading addr: " << std::hex << static_cast<uint32_t>(pos) << std::endl;
     cpu.registers.A = memMap.read(pos);
 }
 
@@ -337,7 +351,7 @@ void OpCodeMapping::Call::ADC8_HL_V(LR35902& cpu, Memory::Map& memMap, OpStructu
 }
 
 void OpCodeMapping::Call::ADC8_d8(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
-    cpu.registers.PC+=1;
+    ++cpu.registers.PC;
     const uint8_t val = *cpu.registers.PC;
     _adc(cpu, val);
 }
@@ -453,7 +467,7 @@ void OpCodeMapping::Call::SUB8_HL_V(LR35902& cpu, Memory::Map& memMap, OpStructu
 }
 
 void OpCodeMapping::Call::SUB8_d8(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
-    cpu.registers.PC+=1;
+    ++cpu.registers.PC;
     const uint8_t val = *cpu.registers.PC;
     _sub(cpu, val);
 }
@@ -845,8 +859,6 @@ void OpCodeMapping::Call::RR_HL(LR35902& cpu, Memory::Map& memMap, OpStructure& 
 }
 
 void OpCodeMapping::Call::SLA(LR35902& cpu, Memory::Map&, OpStructure& info){
-    //Check if after the shift it will "overflow"
-    
     cpu.registers.F.C = *(info.registers_8[0]) >> 7;
     *(info.registers_8[0]) <<= 1;
     cpu.registers.F.Z = (*(info.registers_8[0]) == 0);
@@ -948,14 +960,15 @@ void OpCodeMapping::Call::DAA(LR35902& cpu, Memory::Map&, OpStructure&){
 }
 
 void OpCodeMapping::Call::JR_r8(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
-    cpu.registers.PC+=*reinterpret_cast<int8_t*>(++cpu.registers.PC);
+    ++cpu.registers.PC;
+    cpu.registers.PC+=*reinterpret_cast<int8_t*>(cpu.registers.PC);
 }
 
 void OpCodeMapping::Call::JR_NZ_r8(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
     // jump if Z is not set
     ++cpu.registers.PC;
     if(!cpu.registers.F.Z ) {
-        std::cout << "NON ZERO JUMP" << std::endl;
+        //std::cout << "NON ZERO JUMP" << std::endl;
        cpu.registers.PC+=*reinterpret_cast<int8_t*>(cpu.registers.PC);
        cpu.extraCycles=4;
     }
@@ -998,8 +1011,8 @@ void OpCodeMapping::Call::JP_a16(LR35902& cpu, Memory::Map& memMap, OpStructure&
 
 void OpCodeMapping::Call::JP_NZ_a16(LR35902& cpu, Memory::Map& memMap, OpStructure& info) {
     if(!cpu.registers.F.Z ) {
-       JP_a16(cpu, memMap, info);
-       cpu.extraCycles=4;
+        JP_a16(cpu, memMap, info);
+        cpu.extraCycles=4;
     } else{
         cpu.registers.PC+=2;
     }
@@ -1007,8 +1020,8 @@ void OpCodeMapping::Call::JP_NZ_a16(LR35902& cpu, Memory::Map& memMap, OpStructu
 
 void OpCodeMapping::Call::JP_Z_a16(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
     if(cpu.registers.F.Z) {
-       JP_a16(cpu, memMap, info);
-       cpu.extraCycles=4;
+        JP_a16(cpu, memMap, info);
+        cpu.extraCycles=4;
     } else{
         cpu.registers.PC+=2;
     }
@@ -1016,8 +1029,8 @@ void OpCodeMapping::Call::JP_Z_a16(LR35902& cpu, Memory::Map& memMap, OpStructur
 
 void OpCodeMapping::Call::JP_NC_a16(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
     if(!cpu.registers.F.C) {
-       JP_a16(cpu, memMap, info);
-       cpu.extraCycles=4;
+        JP_a16(cpu, memMap, info);
+        cpu.extraCycles=4;
     } else{
         cpu.registers.PC+=2;
     }
@@ -1025,15 +1038,15 @@ void OpCodeMapping::Call::JP_NC_a16(LR35902& cpu, Memory::Map& memMap, OpStructu
 
 void OpCodeMapping::Call::JP_C_a16(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
     if(cpu.registers.F.C ) {
-       JP_a16(cpu, memMap, info);
-       cpu.extraCycles=4;
+        JP_a16(cpu, memMap, info);
+        cpu.extraCycles=4;
     } else{
         cpu.registers.PC+=2;
     }
 }
 void OpCodeMapping::Call::JP_HL(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
     const uint16_t addr = cpu.registers.HL[0] << 8 | cpu.registers.HL[1];
-    cpu.registers.PC=memMap.getMemoryAt(addr);
+    cpu.registers.PC = memMap.getMemoryAt(addr);
     cpu.changedPC = true;
 }
 

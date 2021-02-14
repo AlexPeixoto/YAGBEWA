@@ -21,7 +21,12 @@ int main(int argc, char** argv){
 	//bus.cartridge.loadRom("Tetris.gb");
     //bus.cartridge.loadRom("drmario.gb");
     //bus.cartridge.loadRom("cpu_instrs.gb", true);
-    bus.cartridge.loadRom("boot_regs-A.gb");
+    bus.cartridge.loadRom("07op.gb");
+    //bus.cartridge.loadRom("boot_regs-A.gb");
+    //bus.cartridge.loadRom("boot_div-A.gb");
+    
+    //Test after JOYP proper implementation
+    //bus.cartridge.loadRom("unused_hwio-C.gb");
     //bus.cartridge.loadRom("dmg_boot.gb", true);
     bus.initCPU();
 

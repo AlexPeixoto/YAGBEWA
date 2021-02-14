@@ -116,6 +116,7 @@ void Core::initSprites(){
 void Core::renderLine(){
     //Lets check the tile mode first (tile = background)
     const uint16_t baseTileAddr = isTileDataSelectHigh() ? 0x8000 : 0x8800;
+    std::cout << std::hex << static_cast<uint32_t>(baseTileAddr) << std::endl;
     
     static uint16_t count=0;
     
@@ -143,7 +144,8 @@ void Core::renderLine(){
     //I need 2 things here, my real Y position on the screen, this is calculated with line being rendered + SCY
     //which is the "adjustment"
     //0xFF42 + 0xFF44
-    const int yAdjusted = line + bus->memoryMap[LCD_SCY_ADDR];
+    const int yAdjusted = (line + bus->memoryMap[LCD_SCY_ADDR])%145;
+    std::cout << yAdjusted << std::endl;
     const int yTileAdjusted = (yAdjusted / 8);
     
     //Now I calculate the difference between the tile index and the adjustment
@@ -155,7 +157,7 @@ void Core::renderLine(){
         //Render background, have in mind that I could possibly do the opposite (render 32 tiles)
         //would probably be WAY cheaper
         //Should be pixel + scroll X
-        const int xAdjusted = x + bus->memoryMap[LCD_SCX_ADDR];
+        const int xAdjusted = (x + bus->memoryMap[LCD_SCX_ADDR] % 160);
         const int xTileAdjusted = (xAdjusted / 8);
         
         bool backgroundRendered = false;
@@ -201,8 +203,6 @@ void Core::processMode1(){
     if((bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0b00010000) == 0)
         bus->setInterruptFlag(CPU::INTERRUPTIONS_TYPE::LCDC);
 
-    
-    
     modeProcessed = 1;
 }
 
@@ -253,8 +253,6 @@ void Core::tick() {
     if(!isLCDEnabled())
         return;
 
-    //cycles = (cycles + 1) % 456;
-    
     //Cycle through modes, 2, 3, 0, 1.
     //OAM, DRAWING, H-BLANK, V-BLANK
 
@@ -266,21 +264,16 @@ void Core::tick() {
     if(cycles++ >= 456)
         cycles = 0;
 
-    //std::cout << "Cycles: " << static_cast<uint32_t>(cycles) << std::endl;
-
+    
     uint8_t& line = bus->memoryMap[LCD_LY_ADDR];
-    //std::cout << "Processing line: " << std::dec << static_cast<uint32_t>(line) << std::endl;
-    //std::cout << "Line: " << std::dec << static_cast<uint32_t>(line) << std::endl;
     if(line <= 143){
         if(cycles <= 80){
             setMode(2);
-            //std::cout << "<80" << std::endl;
         } else if(cycles <= 252){
             //Mode 3 is set to the shortest amount of time 172 dots (as we do the rendering in one shot)
             //then we give the most amount of time back to the CPU to perform operations
             //While it is possilble to have accurate timming currently its probably not worth it (unless some game is really bound to this timming).
             setMode(3);
-            //std::cout << "<252" << std::endl;
         } else if(cycles < 456){
             //Mode 0 does nothing, 
             lineRendered = false;
@@ -294,7 +287,6 @@ void Core::tick() {
         processModes();
         checkLYC_LY();
     } else {
-        //std::cout << "Me!!" << std::endl;
         //if V-BLANK interrupt.. as its done only on line 144, its done only once (we will increment the line after that.)
         setMode(1);
 
@@ -307,13 +299,6 @@ void Core::tick() {
         processModes();
         checkLYC_LY();
     }
-    
-    //Those will only be triggered once, each one will validate itself
-    //if the mode is set and if the mode processed is not itself (which means that it was not)
-    //computed yet
-    
-
-    
 }
 
 bool Core::isLCDEnabled() { return bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0b10000000; }

@@ -55,6 +55,7 @@ void RomManager::initController(const MBC &controllerType) {
 		controller.reset(new Controller::None());
 		break;
 	default:
+		controller.reset(new Controller::None());
 		break;
 	}
 	
