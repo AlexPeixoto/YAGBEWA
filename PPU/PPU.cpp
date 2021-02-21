@@ -116,9 +116,9 @@ void Core::initSprites(){
 void Core::renderLine(){
     //Lets check the tile mode first (tile = background)
     const uint16_t baseTileAddr = isTileDataSelectHigh() ? 0x8000 : 0x8800;
-    std::cout << std::hex << static_cast<uint32_t>(baseTileAddr) << std::endl;
+    //std::cout << std::hex << static_cast<uint32_t>(baseTileAddr) << std::endl;
     
-    static uint16_t count=0;
+    static uint64_t count=0;
     
     const uint16_t baseSpriteAddr = 0x8000;
     const bool isTallSprite = isSpriteDoubleHeight();
@@ -126,26 +126,27 @@ void Core::renderLine(){
     //Background map information, this is just the index to be used
     //To access the baseTileAddr above
     const uint16_t baseBackgroundMapAddr = isBgTileMapHigh() ? 0x9C00 : 0x9800;
-    /*if(count++ >= 40000){
-        std::cout << "Tile addr : " << std::hex << static_cast<uint32_t>(baseTileAddr) << std::endl;
+    if(count++ >= 50000){
+        /*std::cout << "Tile addr : " << std::hex << static_cast<uint32_t>(baseTileAddr) << std::endl;
         for(int addrPos = 0x8000; addrPos <= 0x87FF; addrPos++){
             std::cout << "Tile Addr: " << std::hex << static_cast<uint32_t>(addrPos) << " value: " << std::hex << static_cast<uint32_t>(bus->memoryMap[addrPos]) << std::endl;
         }
         std::cout << "Tile map addr : " << std::hex << static_cast<uint32_t>(baseBackgroundMapAddr) << std::endl;
         for(int addrPos = 0x9800; addrPos <= 0x9BFF; addrPos++){
             std::cout << "Map Addr: " << std::hex << static_cast<uint32_t>(addrPos) << " value: " << std::hex << static_cast<uint32_t>(bus->memoryMap[addrPos]) << std::endl;
-        }
-        abort();
-    }*/
+        }*/
+        //std::cout << "SCY =>  " << std::dec << static_cast<uint32_t>(bus->memoryMap[LCD_SCY_ADDR]) << std::endl;
+        //std::cout << "LY =>  " << static_cast<uint32_t>(bus->memoryMap[0xFF44]) << std::endl;
+        //abort();
+    }
 
     //This is the line that I will render
-    const uint8_t line = bus->memoryMap[LCD_LY_ADDR];
+    const uint16_t line = bus->memoryMap[LCD_LY_ADDR];
 
     //I need 2 things here, my real Y position on the screen, this is calculated with line being rendered + SCY
     //which is the "adjustment"
     //0xFF42 + 0xFF44
-    const int yAdjusted = (line + bus->memoryMap[LCD_SCY_ADDR])%145;
-    std::cout << yAdjusted << std::endl;
+    const int yAdjusted = (static_cast<uint32_t>(line) + bus->memoryMap[LCD_SCY_ADDR])%256;
     const int yTileAdjusted = (yAdjusted / 8);
     
     //Now I calculate the difference between the tile index and the adjustment
@@ -157,25 +158,26 @@ void Core::renderLine(){
         //Render background, have in mind that I could possibly do the opposite (render 32 tiles)
         //would probably be WAY cheaper
         //Should be pixel + scroll X
-        const int xAdjusted = (x + bus->memoryMap[LCD_SCX_ADDR] % 160);
+        const int xAdjusted = (x + bus->memoryMap[LCD_SCX_ADDR])%256;
         const int xTileAdjusted = (xAdjusted / 8);
         
-        bool backgroundRendered = false;
+        //bool backgroundRendered = false;
         //Each tile is a byte, so we retrieve the byte that corresponds to this position
         //Missing signed vs unsigned here (depending on the )
         //Here we are looking at the tilemap to extract the tile index
-        const uint32_t tileMemPos = baseBackgroundMapAddr + (yTileAdjusted * 32 /*tiles per line*/) + xTileAdjusted;
+        const uint32_t tileMemPos = baseBackgroundMapAddr + ((yTileAdjusted * 32 /*tiles per line*/)) + xTileAdjusted;
         int tileIndex = bus->memoryMap[tileMemPos];
-        if (!isTileDataSelectHigh()){
+        /*if (!isTileDataSelectHigh()){
             //std::cout << "Before: " << tileIndex << std::endl;
             if (tileIndex >= INT_MIN)
                 tileIndex = (static_cast<int>(tileIndex - INT_MIN) + INT_MIN);
             tileIndex+=128;
-        }
+        }*/
 
         const uint16_t colorByte = baseTileAddr +
-                                  (tileIndex * 16) +
-                                  (ySkipPixels * 2); //2 bytes per line
+                                  ((tileIndex * 16) +
+                                  (ySkipPixels * 2)); //2 bytes per line
+                                  
          
         const uint8_t colorIndex_0 = bus->memoryMap[colorByte];
         const uint8_t colorIndex_1 = bus->memoryMap[colorByte + 1];
@@ -233,6 +235,7 @@ void Core::processMode3(){
     renderLine();
     //Lets copy internal buffer into screen buffer (its not exactly needed, but more as a safety measure)
     const uint8_t& line = bus->memoryMap[LCD_LY_ADDR];
+    //std::cout << "line: " << std::dec << static_cast<uint32_t>(line) << std::endl;
     for(int x=0; x<160; x++){
         screen[x][line]=internalBuffer[x][line];
     }
