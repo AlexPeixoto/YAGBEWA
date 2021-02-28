@@ -120,10 +120,16 @@ void Bus::clockUpdate(uint16_t ticks) {
 
 //This should be moved to the CPU
 void Bus::performInterruption() {
+	const uint8_t _IE = memoryMap[IE_ADDR];
+	const uint8_t _IF = memoryMap[IF_ADDR];
+
+	//Specific unhalt mechanism for IF (Even if IE is zero)
+	if(_IF != 0){
+		cpu.resetHalt();
+	}
 	if(!cpu.interruptionsEnabled())
 		return;
 	
-
 	//Reset halt so CPU can continue to execute instructions
 	cpu.resetHalt();
 
@@ -131,16 +137,13 @@ void Bus::performInterruption() {
 	//If an interruption happens, and the HALT was triggered with disabled interruptions
 	//We just disable halt.
 	if(cpu.getHaltType() == CPU::HaltType::NoInterruption){
-		
 		//Instead of jumping we just continue here.
 		return;
 	}
 
 	//If there is any interruption enabled, and if there was any interruption triggered
-	const uint8_t _IE = memoryMap[IE_ADDR];
-	const uint8_t _IF = memoryMap[IF_ADDR];
+	
 	if(_IE != 0 && _IF != 0){
-		
 		//Look at the 5 possible bits and check if any is both enabled and checked
 		//Interruptuion priority goes from the highest bit to the lowest
 		for(int x=4; x>=0; x--){
@@ -151,7 +154,6 @@ void Bus::performInterruption() {
 				//Store PC on stack
 				//Have in mind that here the PC is already incremented, so no need to increment before push
 				cpu.pushPC();
-
 				
 				cpu.setPC(INTERRUPTION_TARGET[x]);
 				//Reset IF flag

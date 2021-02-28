@@ -19,9 +19,11 @@ int main(int argc, char** argv){
 	Bus bus;
 
 	//bus.cartridge.loadRom("Tetris.gb");
+    //bus.cartridge.loadRom("interrupts.gb");
     //bus.cartridge.loadRom("drmario.gb");
     //bus.cartridge.loadRom("cpu_instrs.gb", true);
     bus.cartridge.loadRom("07op.gb");
+    //bus.cartridge.loadRom("op.gb");
     //bus.cartridge.loadRom("boot_regs-A.gb");
     //bus.cartridge.loadRom("boot_div-A.gb");
     

@@ -144,7 +144,8 @@ void Core::renderLine(){
     const uint16_t line = bus->memoryMap[LCD_LY_ADDR];
 
     //I need 2 things here, my real Y position on the screen, this is calculated with line being rendered + SCY
-    //which is the "adjustment"
+    //which is the "adjustment". Also the reason why its 256 and not the height of the screen is because
+    //er are actually moving inside the "screen buffer" which is 256 x 256 (see SCX, its % 256 as well)
     //0xFF42 + 0xFF44
     const int yAdjusted = (static_cast<uint32_t>(line) + bus->memoryMap[LCD_SCY_ADDR])%256;
     const int yTileAdjusted = (yAdjusted / 8);
@@ -191,9 +192,6 @@ void Core::renderLine(){
 void Core::processMode0(){
     if(modeProcessed == 0 || getMode() != 0)
         return;
-    //Check if mode is also enabled
-    if((bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0b00001000) == 0)
-        bus->setInterruptFlag(CPU::INTERRUPTIONS_TYPE::LCDC);
     
     modeProcessed = 0;
 }
@@ -201,10 +199,6 @@ void Core::processMode1(){
     if(modeProcessed == 1 || getMode() != 1)
         return;
     
-    //Check if mode is also enabled
-    if((bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0b00010000) == 0)
-        bus->setInterruptFlag(CPU::INTERRUPTIONS_TYPE::LCDC);
-
     modeProcessed = 1;
 }
 
@@ -213,16 +207,11 @@ void Core::processMode2(){
     if(modeProcessed == 2 || getMode() != 2)
         return;
 
-    //Check if mode is also enabled
-    if((bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0b00100000) == 0)
-        bus->setInterruptFlag(CPU::INTERRUPTIONS_TYPE::LCDC);
-
     //Load backgroundColorMap palette from BGP_ADDR
     initPalleteTable(backgroundColorMap, BGP_ADDR);
     //Init both object palletes
     //initPalleteTable(objectPallete1, OBP0_ADDR);
     //initPalleteTable(objectPallate2, OBP1_ADDR);
-
     
     modeProcessed = 2;
 }
@@ -324,13 +313,12 @@ void Core::checkLYC_LY(){
     if(bus->memoryMap[LCD_LY_ADDR] == 144 && !vblankServed/* && bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0x00010000*/) {
         bus->setInterruptFlag(CPU::INTERRUPTIONS_TYPE::VBLANK);
         vblankServed = true;
-        //std::cout << "Triggered" << std::endl;
 
         //If I also need to set LCDC during VBLANK
         if(bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0x00010000)
             bus->setInterruptFlag(CPU::INTERRUPTIONS_TYPE::LCDC);
-
-    } else if(bus->memoryMap[LCD_LY_ADDR] == bus->memoryMap[LCD_LYC_ADDR]) {
+    } 
+    if(bus->memoryMap[LCD_LY_ADDR] == bus->memoryMap[LCD_LYC_ADDR]) {
         bus->memoryMap[LCD_STATUS_REGISTER_ADDR] |= 0b0000100;
         //If the coincidence interrupt is not enabled, we just skip this
         if((bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0b00100000) == 0)
@@ -338,7 +326,6 @@ void Core::checkLYC_LY(){
 
         //Set Coincidence flag
         bus->setInterruptFlag(CPU::INTERRUPTIONS_TYPE::LCDC);
-    } else{
         bus->memoryMap[LCD_STATUS_REGISTER_ADDR] &= ~(0b0000100);
-    }   
+    }  
 }

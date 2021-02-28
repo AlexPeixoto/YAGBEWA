@@ -118,7 +118,6 @@ uint16_t OpCodeMapping::executeNext(LR35902& cpu, Memory::Map& memMap){
     }*/
     
     
-    
     /*std::cout << std::hex << static_cast<uint32_t>(*oldPC) << " at " << std::hex << (oldPC - memMap.getRomStart()) << " Call:" << std::dec << opcall++ << std::endl;
     std::cout << "B: " << std::hex << static_cast<uint32_t>(cpu.registers.BC[0]) << std::endl;
     std::cout << "SP: " << std::hex << static_cast<uint32_t>(cpu.registers.SP) << std::endl;
@@ -310,8 +309,7 @@ void OpCodeMapping::Call::LD_A_C(LR35902& cpu, Memory::Map& memMap, OpStructure&
 }
 
 void OpCodeMapping::Call::LD_HL_SP_r8(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
-    cpu.registers.PC+=1;
-    const int8_t val = *reinterpret_cast<int8_t*>(cpu.registers.PC);
+    const int8_t val = *reinterpret_cast<int8_t*>(++cpu.registers.PC);
     cpu.registers.F.Z = 0;
     cpu.registers.F.N = 0;
     cpu.registers.F.C = ((static_cast<uint32_t>(cpu.registers.SP) + val) > 0xFF);
@@ -390,10 +388,8 @@ void OpCodeMapping::Call::_add(LR35902& cpu,  uint8_t val){
     cpu.registers.F.N = 0;
 }
 
-void OpCodeMapping::Call::ADD_SP_r8(LR35902& cpu, Memory::Map&, OpStructure& info){
-    
-    cpu.registers.PC+=1;
-    const int8_t val = *reinterpret_cast<int8_t*>(cpu.registers.PC);
+void OpCodeMapping::Call::ADD_SP_r8(LR35902& cpu, Memory::Map&, OpStructure& info){    
+    const int8_t val = *reinterpret_cast<int8_t*>(++cpu.registers.PC);
     cpu.registers.F.H = ((((cpu.registers.SP & 0xF) + (val & 0xF)) & 0x10) == 0x10);
     cpu.registers.F.C = ((static_cast<uint16_t>(cpu.registers.SP) + val) > 0xFF);
     cpu.registers.SP += val;
@@ -514,7 +510,7 @@ void OpCodeMapping::Call::INC_HL(LR35902& cpu, Memory::Map&, OpStructure& info){
 }
 
 void OpCodeMapping::Call::INC_SP(LR35902& cpu, Memory::Map&, OpStructure& info){
-    cpu.registers.SP++;
+    ++cpu.registers.SP;
     cpu.registers.F.N = 0;
 }
 
@@ -543,7 +539,7 @@ void OpCodeMapping::Call::DEC_HL(LR35902& cpu, Memory::Map&, OpStructure& info){
 }
 
 void OpCodeMapping::Call::DEC_SP(LR35902& cpu, Memory::Map&, OpStructure& info){
-    cpu.registers.SP--;
+    --cpu.registers.SP;
     cpu.registers.F.N = 1;
 }
 
