@@ -285,8 +285,10 @@ void Core::tick() {
         if(cycles == 456){
             line++;
             vblankServed = false;
-            if(line == 152)
+            if(line == 152){
+                std::cout << "Frame finished" << std::endl;
                 line = 0;
+            }
         }
         processModes();
         checkLYC_LY();

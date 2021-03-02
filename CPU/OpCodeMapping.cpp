@@ -89,10 +89,10 @@ uint16_t OpCodeMapping::executeNext(LR35902& cpu, Memory::Map& memMap){
 
     
     /*if(((cpu.registers.PC - memMap.getRomStart())) == 0x27){
-        std::cout << "Break here" << std::endl;
+        std::cout << "Break here" << "\n";
     }
     if(((cpu.registers.PC - memMap.getRomStart())) == 0xa3){
-        std::cout << "Break here" << std::endl;
+        std::cout << "Break here" << "\n";
     }*/
 
     //Go back one instruction, this should not cause problems as no instruction
@@ -106,32 +106,32 @@ uint16_t OpCodeMapping::executeNext(LR35902& cpu, Memory::Map& memMap){
     uint8_t* oldPC = cpu.registers.PC;
     op.call(cpu, memMap, op);
     static int call845 = 0;
-    /*std::cout << std::hex << static_cast<uint32_t>(*oldPC) << " at " << std::hex << (oldPC - memMap.getRomStart()) << " Call:" << std::dec << opcall++ << std::endl;
+    /*std::cout << std::hex << static_cast<uint32_t>(*oldPC) << " at " << std::hex << (oldPC - memMap.getRomStart()) << " Call:" << std::dec << opcall++ << "\n";
     if((oldPC - memMap.getRomStart()) == 0xc845){
         if(++call845 == 2){
             for(uint32_t pos = 0; pos < 0xffff; pos++)
             {
-                std::cout << std::hex << "0x" << static_cast<uint32_t>(pos) << " = " << static_cast<uint32_t>(memMap[pos]) << std::endl;
+                std::cout << std::hex << "0x" << static_cast<uint32_t>(pos) << " = " << static_cast<uint32_t>(memMap[pos]) << "\n";
             }
             abort();
         }
     }*/
     
     
-    /*std::cout << std::hex << static_cast<uint32_t>(*oldPC) << " at " << std::hex << (oldPC - memMap.getRomStart()) << " Call:" << std::dec << opcall++ << std::endl;
-    std::cout << "B: " << std::hex << static_cast<uint32_t>(cpu.registers.BC[0]) << std::endl;
-    std::cout << "SP: " << std::hex << static_cast<uint32_t>(cpu.registers.SP) << std::endl;
-    std::cout << "A: " << std::hex << static_cast<uint32_t>(cpu.registers.A) << std::endl;
-    std::cout << "B: " << std::hex << static_cast<uint32_t>(cpu.registers.BC[0]) << std::endl;
-    std::cout << "C: " << std::hex << static_cast<uint32_t>(cpu.registers.BC[1]) << std::endl;
-    std::cout << "D: " << std::hex << static_cast<uint32_t>(cpu.registers.DE[0]) << std::endl;
-    std::cout << "E: " << std::hex << static_cast<uint32_t>(cpu.registers.DE[1]) << std::endl;
-    std::cout << "H: " << std::hex << static_cast<uint32_t>(cpu.registers.HL[0]) << std::endl;
-    std::cout << "L: " << std::hex << static_cast<uint32_t>(cpu.registers.HL[1]) << std::endl;
-    std::cout << "F.Z: " << std::hex << static_cast<uint32_t>(cpu.registers.F.Z) << std::endl;
-    std::cout << "F.N: " << std::hex << static_cast<uint32_t>(cpu.registers.F.N) << std::endl;
-    std::cout << "F.H: " << std::hex << static_cast<uint32_t>(cpu.registers.F.H) << std::endl;
-    std::cout << "F.C: " << std::hex << static_cast<uint32_t>(cpu.registers.F.C) << std::endl;*/
+    /*std::cout << std::hex << static_cast<uint32_t>(*oldPC) << " at " << std::hex << (oldPC - memMap.getRomStart()) << " Call:" << std::dec << opcall++ << "\n";
+    std::cout << "B: " << std::hex << static_cast<uint32_t>(cpu.registers.BC[0]) << "\n";
+    std::cout << "SP: " << std::hex << static_cast<uint32_t>(cpu.registers.SP) << "\n";
+    std::cout << "A: " << std::hex << static_cast<uint32_t>(cpu.registers.A) << "\n";
+    std::cout << "B: " << std::hex << static_cast<uint32_t>(cpu.registers.BC[0]) << "\n";
+    std::cout << "C: " << std::hex << static_cast<uint32_t>(cpu.registers.BC[1]) << "\n";
+    std::cout << "D: " << std::hex << static_cast<uint32_t>(cpu.registers.DE[0]) << "\n";
+    std::cout << "E: " << std::hex << static_cast<uint32_t>(cpu.registers.DE[1]) << "\n";
+    std::cout << "H: " << std::hex << static_cast<uint32_t>(cpu.registers.HL[0]) << "\n";
+    std::cout << "L: " << std::hex << static_cast<uint32_t>(cpu.registers.HL[1]) << "\n";
+    std::cout << "F.Z: " << std::hex << static_cast<uint32_t>(cpu.registers.F.Z) << "\n";
+    std::cout << "F.N: " << std::hex << static_cast<uint32_t>(cpu.registers.F.N) << "\n";
+    std::cout << "F.H: " << std::hex << static_cast<uint32_t>(cpu.registers.F.H) << "\n";
+    std::cout << "F.C: " << std::hex << static_cast<uint32_t>(cpu.registers.F.C) << "\n";*/
     return op.cycleCount + cpu.extraCycles;
 }
 
@@ -141,7 +141,7 @@ void OpCodeMapping::Call::ABORT(LR35902& cpu, Memory::Map& memMap, OpStructure& 
 
 void OpCodeMapping::Call::CB_OPCODE(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
     cpu.registers.PC+=1;
-    //std::cout << "[CB] - " << std::hex << static_cast<uint32_t>(*(cpu.registers.PC)) << " at " << std::hex << (cpu.registers.PC - memMap.getRomStart()) << std::endl;
+    //std::cout << "[CB] - " << std::hex << static_cast<uint32_t>(*(cpu.registers.PC)) << " at " << std::hex << (cpu.registers.PC - memMap.getRomStart()) << "\n";
     OpStructure& cbInfo = cpu.mapping.cbInstructions.at(*cpu.registers.PC);
     cbInfo.call(cpu, memMap, cbInfo);
 }
@@ -296,7 +296,7 @@ void OpCodeMapping::Call::LD_a16_A(LR35902& cpu, Memory::Map& memMap, OpStructur
 void OpCodeMapping::Call::LD_A_a16(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
     uint16_t pos = *reinterpret_cast<uint8_t*>(++cpu.registers.PC);
     pos |=(*reinterpret_cast<uint8_t*>(++cpu.registers.PC)) << 8;
-    //std::cout << "Reading addr: " << std::hex << static_cast<uint32_t>(pos) << std::endl;
+    //std::cout << "Reading addr: " << std::hex << static_cast<uint32_t>(pos) << "\n";
     cpu.registers.A = memMap.read(pos);
 }
 
@@ -491,6 +491,8 @@ void OpCodeMapping::Call::INC_BC(LR35902& cpu, Memory::Map&, OpStructure& info){
     cpu.registers.BC[0] = val >> 8;
     cpu.registers.BC[1] = val & 0XFF;
     cpu.registers.F.N = 0;
+    cpu.registers.F.Z = (val == 0);
+    cpu.registers.F.H = ((((val & 0xF) + 1)     & 0x10) == 0x10);
 }
 
 void OpCodeMapping::Call::INC_DE(LR35902& cpu, Memory::Map&, OpStructure& info){
@@ -499,6 +501,8 @@ void OpCodeMapping::Call::INC_DE(LR35902& cpu, Memory::Map&, OpStructure& info){
     cpu.registers.DE[0] = val >> 8;
     cpu.registers.DE[1] = val & 0XFF;
     cpu.registers.F.N = 0;
+    cpu.registers.F.Z = (val == 0);
+    cpu.registers.F.H = ((((val & 0xF) + 1)     & 0x10) == 0x10);
 }
 
 void OpCodeMapping::Call::INC_HL(LR35902& cpu, Memory::Map&, OpStructure& info){
@@ -507,6 +511,8 @@ void OpCodeMapping::Call::INC_HL(LR35902& cpu, Memory::Map&, OpStructure& info){
     cpu.registers.HL[0] = val >> 8;
     cpu.registers.HL[1] = val & 0XFF;
     cpu.registers.F.N = 0;
+    cpu.registers.F.Z = (val == 0);
+    cpu.registers.F.H = ((((val & 0xF) + 1)     & 0x10) == 0x10);
 }
 
 void OpCodeMapping::Call::INC_SP(LR35902& cpu, Memory::Map&, OpStructure& info){
@@ -520,6 +526,8 @@ void OpCodeMapping::Call::DEC_BC(LR35902& cpu, Memory::Map&, OpStructure& info){
     cpu.registers.BC[0] = val >> 8;
     cpu.registers.BC[1] = val & 0XFF;
     cpu.registers.F.N = 1;
+    cpu.registers.F.Z = (val == 0);
+    cpu.registers.F.H = ((static_cast<int8_t>(val & 0xF) - 1) < 0);
 }
 
 void OpCodeMapping::Call::DEC_DE(LR35902& cpu, Memory::Map&, OpStructure& info){
@@ -528,6 +536,8 @@ void OpCodeMapping::Call::DEC_DE(LR35902& cpu, Memory::Map&, OpStructure& info){
     cpu.registers.DE[0] = val >> 8;
     cpu.registers.DE[1] = val & 0XFF;
     cpu.registers.F.N = 1;
+    cpu.registers.F.Z = (val == 0);
+    cpu.registers.F.H = ((static_cast<int8_t>(val & 0xF) - 1) < 0);
 }
 
 void OpCodeMapping::Call::DEC_HL(LR35902& cpu, Memory::Map&, OpStructure& info){
@@ -536,6 +546,8 @@ void OpCodeMapping::Call::DEC_HL(LR35902& cpu, Memory::Map&, OpStructure& info){
     cpu.registers.HL[0] = val >> 8;
     cpu.registers.HL[1] = val & 0XFF;
     cpu.registers.F.N = 1;
+    cpu.registers.F.Z = (val == 0);
+    cpu.registers.F.H = ((static_cast<int8_t>(val & 0xF) - 1) < 0);
 }
 
 void OpCodeMapping::Call::DEC_SP(LR35902& cpu, Memory::Map&, OpStructure& info){
@@ -644,12 +656,16 @@ void OpCodeMapping::Call::CP8_d8(LR35902& cpu, Memory::Map&, OpStructure&){
 
 void OpCodeMapping::Call::INC_HL_V(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
     const uint16_t addr = cpu.registers.HL[0] << 8 | cpu.registers.HL[1];
-    memMap.read(addr)++;
+    const uint8_t val = (++memMap.read(addr));
+    cpu.registers.F.Z = (val == 0);
+    cpu.registers.F.H = ((static_cast<int8_t>(val & 0xF) - 1) < 0);
 }
 
 void OpCodeMapping::Call::DEC_HL_V(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
     const uint16_t addr = cpu.registers.HL[0] << 8 | cpu.registers.HL[1];
-    memMap.read(addr)--;
+    const uint8_t val = (--memMap.read(addr));
+    cpu.registers.F.Z = (val == 0);
+    cpu.registers.F.H = ((static_cast<int8_t>(val & 0xF) - 1) < 0);
 }
 
 void OpCodeMapping::Call::RET(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
@@ -964,7 +980,7 @@ void OpCodeMapping::Call::JR_NZ_r8(LR35902& cpu, Memory::Map& memMap, OpStructur
     // jump if Z is not set
     ++cpu.registers.PC;
     if(!cpu.registers.F.Z ) {
-        //std::cout << "NON ZERO JUMP" << std::endl;
+        //std::cout << "NON ZERO JUMP" << "\n";
        cpu.registers.PC+=*reinterpret_cast<int8_t*>(cpu.registers.PC);
        cpu.extraCycles=4;
     }

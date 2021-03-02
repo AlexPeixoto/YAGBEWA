@@ -9,6 +9,11 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 
+//Sleep
+#include <chrono>
+#include <thread>
+
+
 
 int main(int argc, char** argv){
     /*if(argc != 2)
@@ -22,8 +27,13 @@ int main(int argc, char** argv){
     //bus.cartridge.loadRom("interrupts.gb");
     //bus.cartridge.loadRom("drmario.gb");
     //bus.cartridge.loadRom("cpu_instrs.gb", true);
-    bus.cartridge.loadRom("07op.gb");
-    //bus.cartridge.loadRom("op.gb");
+    //bus.cartridge.loadRom("03op.gb"); //FAILS
+    //bus.cartridge.loadRom("04op.gb");
+    //bus.cartridge.loadRom("07op.gb");
+    //bus.cartridge.loadRom("08op.gb");
+    bus.cartridge.loadRom("09op.gb"); //FAILS
+    //bus.cartridge.loadRom("10op.gb"); //FAILS
+    //bus.cartridge.loadRom("11op.gb"); //FAILS
     //bus.cartridge.loadRom("boot_regs-A.gb");
     //bus.cartridge.loadRom("boot_div-A.gb");
     
@@ -64,11 +74,12 @@ int main(int argc, char** argv){
                 image.setPixel(x, y, color);
             }
         }
-        
         texture.loadFromImage(image);
         background.setTexture(texture);
         window.draw(background);
-        //std::cout << "Frame: " << std::dec << frame++ << std::endl;
+        std::cout << "Frame: " << std::dec << frame++ << std::endl;
+        //if(frame == 650)
+        //    std::this_thread::sleep_for(std::chrono::seconds(100));
         window.display();
         //windowDebug.display();
     }
