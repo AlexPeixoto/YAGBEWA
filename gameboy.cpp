@@ -24,11 +24,11 @@ int main(int argc, char** argv){
 	Bus bus;
 
     //Games
-	//bus.cartridge.loadRom("Tetris.gb");
+	bus.cartridge.loadRom("Tetris.gb");
     //bus.cartridge.loadRom("drmario.gb");
 
     //Tests
-    bus.cartridge.loadRom("01op.gb"); //FAILS
+    //bus.cartridge.loadRom("01op.gb");
     //bus.cartridge.loadRom("02op.gb");
     //bus.cartridge.loadRom("03op.gb");
     //bus.cartridge.loadRom("04op.gb");

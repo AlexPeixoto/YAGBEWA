@@ -941,23 +941,23 @@ void OpCodeMapping::Call::CCF(LR35902& cpu, Memory::Map&, OpStructure&){
 }
 
 void OpCodeMapping::Call::DAA(LR35902& cpu, Memory::Map&, OpStructure&){
-    uint8_t& a = cpu.registers.A;
+    uint16_t a = (cpu.registers.A & 0xFF);
 
     // From https://forums.nesdev.com/viewtopic.php?t=15944.
     if (!cpu.registers.F.N) {  
-        // after an addition, adjust if (half-)carry occurred or if result is out of bounds
-        if (cpu.registers.F.C || a > 0x9F) { a += 0x60; cpu.registers.F.C = 1; }
-        if (cpu.registers.F.H || (a & 0xF) > 9) { a += 0x6; }
-        
+        if (cpu.registers.F.H || (a & 0xF) > 9) { a += 0x06; }
+        if (cpu.registers.F.C || a > 0x9F) { a += 0x60; }
     } else {  
         // after a subtraction, only adjust if (half-)carry occurred
+        if (cpu.registers.F.H) { a = (a - 0x06) & 0xFF; }
         if (cpu.registers.F.C) { a -= 0x60; }
-        if (cpu.registers.F.H) { a -= 0x6; }
     }
+    cpu.registers.A = (a & 0xFF);
     // these flags are always updated
-    cpu.registers.F.Z = (a == 0); // the usual z flag
-    cpu.registers.F.H = 0; // h flag is always cleared
-    cpu.registers.A = a;
+    cpu.registers.F.Z = (cpu.registers.A == 0);
+    cpu.registers.F.H = 0;
+    if((a & 0x100) == 0x100)
+        cpu.registers.F.C = 1;
 }
 
 void OpCodeMapping::Call::JR_r8(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
