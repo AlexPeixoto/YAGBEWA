@@ -27,13 +27,15 @@ int main(int argc, char** argv){
     //bus.cartridge.loadRom("interrupts.gb");
     //bus.cartridge.loadRom("drmario.gb");
     //bus.cartridge.loadRom("cpu_instrs.gb", true);
-    //bus.cartridge.loadRom("03op.gb"); //FAILS
+    //bus.cartridge.loadRom("03op.gb");
     //bus.cartridge.loadRom("04op.gb");
+    //bus.cartridge.loadRom("05op.gb");
+    //bus.cartridge.loadRom("06op.gb");
     //bus.cartridge.loadRom("07op.gb");
     //bus.cartridge.loadRom("08op.gb");
-    bus.cartridge.loadRom("09op.gb"); //FAILS
-    //bus.cartridge.loadRom("10op.gb"); //FAILS
-    //bus.cartridge.loadRom("11op.gb"); //FAILS
+    //bus.cartridge.loadRom("09op.gb");
+    //bus.cartridge.loadRom("10op.gb");
+    //bus.cartridge.loadRom("11op.gb"); //FAILS (SEGFAULT)
     //bus.cartridge.loadRom("boot_regs-A.gb");
     //bus.cartridge.loadRom("boot_div-A.gb");
     
