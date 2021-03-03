@@ -57,17 +57,17 @@ cbInstructions{
     //5x[0..F]
     {/* 5x0 */ 4, OP::_bit<2>, &cpu.registers.BC[0]}, {/* 5x1 */ 4, OP::_bit<2>, &cpu.registers.BC[1]}, {/* 5x2 */ 4, OP::_bit<2>, &cpu.registers.DE[0]}, {/* 5x3 */ 4, OP::_bit<2>, &cpu.registers.DE[1]}, {/* 5x4 */ 4, OP::_bit<2>, &cpu.registers.HL[0]}, {/* 5x5 */ 4, OP::_bit<2>, &cpu.registers.HL[1]}, {/* 5x6 */ 12, OP::_bit_hl<2>}, {/* 5x7 */ 4, OP::_bit<2>, &cpu.registers.A},{/* 5x8 */ 4, OP::_bit<3>, &cpu.registers.BC[0]}, {/* 5x9 */ 4, OP::_bit<3>, &cpu.registers.BC[1]}, {/* 5xA */ 4, OP::_bit<3>, &cpu.registers.DE[0]}, {/* 5xB */ 4, OP::_bit<3>, &cpu.registers.DE[1]}, {/* 5xC */ 4, OP::_bit<3>, &cpu.registers.HL[0]}, {/* 5xD */ 4, OP::_bit<3>, &cpu.registers.HL[1]}, {/* 5xE */ 12, OP::_bit_hl<3>}, {/* 5xF */ 4, OP::_bit<3>, &cpu.registers.A},
     //6x[0..F]
-    {/* 6x0 */ 4, OP::_bit<4>, &cpu.registers.BC[0]}, {/* 6x1 */ 4, OP::_bit<4>, &cpu.registers.BC[1]}, {/* 6x2 */ 4, OP::_bit<4>, &cpu.registers.DE[0]}, {/* 6x3 */ 4, OP::_bit<4>, &cpu.registers.DE[1]}, {/* 6x4 */ 4, OP::_bit<4>, &cpu.registers.HL[0]}, {/* 6x5 */ 4, OP::_bit<4>, &cpu.registers.HL[1]}, {/* 6x6 */ 12, OP::_bit_hl<4>}, {/* 6x7 */ 4, OP::_bit<4>, &cpu.registers.A},{/* 6x8 */ 4, OP::_bit<5>, &cpu.registers.BC[0]}, {/* 6x9 */ 4, OP::_bit<5>, &cpu.registers.BC[1]}, {/* 6xA */ 4, OP::_bit<5>, &cpu.registers.DE[0]}, {/* 6xB */ 4, OP::_bit<5>, &cpu.registers.DE[1]}, {/* 6xC */ 4, OP::_bit<5>, &cpu.registers.HL[0]}, {/* 6xD */ 4, OP::_bit<5>, &cpu.registers.HL[1]}, {/* §E */ 12, OP::_bit_hl<5>}, {/* 6xF */ 4, OP::_bit<5>, &cpu.registers.A},
+    {/* 6x0 */ 4, OP::_bit<4>, &cpu.registers.BC[0]}, {/* 6x1 */ 4, OP::_bit<4>, &cpu.registers.BC[1]}, {/* 6x2 */ 4, OP::_bit<4>, &cpu.registers.DE[0]}, {/* 6x3 */ 4, OP::_bit<4>, &cpu.registers.DE[1]}, {/* 6x4 */ 4, OP::_bit<4>, &cpu.registers.HL[0]}, {/* 6x5 */ 4, OP::_bit<4>, &cpu.registers.HL[1]}, {/* 6x6 */ 12, OP::_bit_hl<4>}, {/* 6x7 */ 4, OP::_bit<4>, &cpu.registers.A},{/* 6x8 */ 4, OP::_bit<5>, &cpu.registers.BC[0]}, {/* 6x9 */ 4, OP::_bit<5>, &cpu.registers.BC[1]}, {/* 6xA */ 4, OP::_bit<5>, &cpu.registers.DE[0]}, {/* 6xB */ 4, OP::_bit<5>, &cpu.registers.DE[1]}, {/* 6xC */ 4, OP::_bit<5>, &cpu.registers.HL[0]}, {/* 6xD */ 4, OP::_bit<5>, &cpu.registers.HL[1]}, {/* 6xE */ 12, OP::_bit_hl<5>}, {/* 6xF */ 4, OP::_bit<5>, &cpu.registers.A},
     //7x[0..F]
-    {/* 7x0 */ 4, OP::_bit<6>, &cpu.registers.BC[0]}, {/* 7x1 */ 4, OP::_bit<6>, &cpu.registers.BC[1]}, {/* 7x2 */ 4, OP::_bit<6>, &cpu.registers.DE[0]}, {/* 7x3 */ 4, OP::_bit<6>, &cpu.registers.DE[1]}, {/* 7x4 */ 4, OP::_bit<6>, &cpu.registers.HL[0]}, {/* 7x5 */ 4, OP::_bit<6>, &cpu.registers.HL[1]}, {/* 7x6 */ 12, OP::_bit_hl<6>}, {/* 7x7 */ 4, OP::_bit<6>, &cpu.registers.A},{/* 7x8 */ 4, OP::_bit<7>, &cpu.registers.BC[0]}, {/* 7x9 */ 4, OP::_bit<7>, &cpu.registers.BC[1]}, {/* 7xA */ 4, OP::_bit<7>, &cpu.registers.DE[0]}, {/* 7xB */ 4, OP::_bit<7>, &cpu.registers.DE[1]}, {/* 7xC */ 4, OP::_bit<7>, &cpu.registers.HL[0]}, {/* 7xD */ 4, OP::_bit<7>, &cpu.registers.HL[1]}, {/* §E */ 12, OP::_bit_hl<6>}, {/* 7xF */ 4, OP::_bit<7>, &cpu.registers.A},
+    {/* 7x0 */ 4, OP::_bit<6>, &cpu.registers.BC[0]}, {/* 7x1 */ 4, OP::_bit<6>, &cpu.registers.BC[1]}, {/* 7x2 */ 4, OP::_bit<6>, &cpu.registers.DE[0]}, {/* 7x3 */ 4, OP::_bit<6>, &cpu.registers.DE[1]}, {/* 7x4 */ 4, OP::_bit<6>, &cpu.registers.HL[0]}, {/* 7x5 */ 4, OP::_bit<6>, &cpu.registers.HL[1]}, {/* 7x6 */ 12, OP::_bit_hl<6>}, {/* 7x7 */ 4, OP::_bit<6>, &cpu.registers.A},{/* 7x8 */ 4, OP::_bit<7>, &cpu.registers.BC[0]}, {/* 7x9 */ 4, OP::_bit<7>, &cpu.registers.BC[1]}, {/* 7xA */ 4, OP::_bit<7>, &cpu.registers.DE[0]}, {/* 7xB */ 4, OP::_bit<7>, &cpu.registers.DE[1]}, {/* 7xC */ 4, OP::_bit<7>, &cpu.registers.HL[0]}, {/* 7xD */ 4, OP::_bit<7>, &cpu.registers.HL[1]}, {/* 7xE */ 12, OP::_bit_hl<7>}, {/* 7xF */ 4, OP::_bit<7>, &cpu.registers.A},
     //8x[0..F]
     {/* 8x0 */ 4, OP::_res<0>, &cpu.registers.BC[0]}, {/* 8x1 */ 4, OP::_res<0>, &cpu.registers.BC[1]}, {/* 8x2 */ 4, OP::_res<0>, &cpu.registers.DE[0]}, {/* 8x3 */ 4, OP::_res<0>, &cpu.registers.DE[1]}, {/* 8x4 */ 4, OP::_res<0>, &cpu.registers.HL[0]}, {/* 8x5 */ 4, OP::_res<0>, &cpu.registers.HL[1]}, {/* 8x6 */ 12, OP::_res_hl<0>}, {/* 8x7 */ 4, OP::_res<0>, &cpu.registers.A},{/* 8x8 */ 4, OP::_res<1>, &cpu.registers.BC[0]}, {/* 8x9 */ 4, OP::_res<1>, &cpu.registers.BC[1]}, {/* 8xA */ 4, OP::_res<1>, &cpu.registers.DE[0]}, {/* 8xB */ 4, OP::_res<1>, &cpu.registers.DE[1]}, {/* 8xC */ 4, OP::_res<1>, &cpu.registers.HL[0]}, {/* 8xD */ 4, OP::_res<1>, &cpu.registers.HL[1]}, {/* 8xE */ 12, OP::_res_hl<1>}, {/* 8xF */ 4, OP::_res<1>, &cpu.registers.A},
     //9x[0..F]
     {/* 9x0 */ 4, OP::_res<2>, &cpu.registers.BC[0]}, {/* 9x1 */ 4, OP::_res<2>, &cpu.registers.BC[1]}, {/* 9x2 */ 4, OP::_res<2>, &cpu.registers.DE[0]}, {/* 9x3 */ 4, OP::_res<2>, &cpu.registers.DE[1]}, {/* 9x4 */ 4, OP::_res<2>, &cpu.registers.HL[0]}, {/* 9x5 */ 4, OP::_res<2>, &cpu.registers.HL[1]}, {/* 9x6 */ 12, OP::_res_hl<2>}, {/* 9x7 */ 4, OP::_res<2>, &cpu.registers.A},{/* 9x8 */ 4, OP::_res<3>, &cpu.registers.BC[0]}, {/* 9x9 */ 4, OP::_res<3>, &cpu.registers.BC[1]}, {/* 9xA */ 4, OP::_res<3>, &cpu.registers.DE[0]}, {/* 9xB */ 4, OP::_res<3>, &cpu.registers.DE[1]}, {/* 9xC */ 4, OP::_res<3>, &cpu.registers.HL[0]}, {/* 9xD */ 4, OP::_res<3>, &cpu.registers.HL[1]}, {/* 9xE */ 12, OP::_res_hl<3>}, {/* 9xF */ 4, OP::_res<3>, &cpu.registers.A},
     //Ax[0..F]
-    {/* Ax0 */ 4, OP::_res<4>, &cpu.registers.BC[0]}, {/* Ax1 */ 4, OP::_res<4>, &cpu.registers.BC[1]}, {/* Ax2 */ 4, OP::_res<4>, &cpu.registers.DE[0]}, {/* Ax3 */ 4, OP::_res<4>, &cpu.registers.DE[1]}, {/* Ax4 */ 4, OP::_res<4>, &cpu.registers.HL[0]}, {/* Ax5 */ 4, OP::_res<4>, &cpu.registers.HL[1]}, {/* Ax6 */ 12, OP::_res_hl<4>}, {/* Ax7 */ 4, OP::_res<4>, &cpu.registers.A},{/* Ax8 */ 4, OP::_res<5>, &cpu.registers.BC[0]}, {/* Ax9 */ 4, OP::_res<5>, &cpu.registers.BC[1]}, {/* AxA */ 4, OP::_res<5>, &cpu.registers.DE[0]}, {/* AxB */ 4, OP::_res<5>, &cpu.registers.DE[1]}, {/* AxC */ 4, OP::_res<5>, &cpu.registers.HL[0]}, {/* AxD */ 4, OP::_res<5>, &cpu.registers.HL[1]}, {/* §E */ 12, OP::_res_hl<5>}, {/* AxF */ 4, OP::_res<5>, &cpu.registers.A},
+    {/* Ax0 */ 4, OP::_res<4>, &cpu.registers.BC[0]}, {/* Ax1 */ 4, OP::_res<4>, &cpu.registers.BC[1]}, {/* Ax2 */ 4, OP::_res<4>, &cpu.registers.DE[0]}, {/* Ax3 */ 4, OP::_res<4>, &cpu.registers.DE[1]}, {/* Ax4 */ 4, OP::_res<4>, &cpu.registers.HL[0]}, {/* Ax5 */ 4, OP::_res<4>, &cpu.registers.HL[1]}, {/* Ax6 */ 12, OP::_res_hl<4>}, {/* Ax7 */ 4, OP::_res<4>, &cpu.registers.A},{/* Ax8 */ 4, OP::_res<5>, &cpu.registers.BC[0]}, {/* Ax9 */ 4, OP::_res<5>, &cpu.registers.BC[1]}, {/* AxA */ 4, OP::_res<5>, &cpu.registers.DE[0]}, {/* AxB */ 4, OP::_res<5>, &cpu.registers.DE[1]}, {/* AxC */ 4, OP::_res<5>, &cpu.registers.HL[0]}, {/* AxD */ 4, OP::_res<5>, &cpu.registers.HL[1]}, {/* AXE */ 12, OP::_res_hl<5>}, {/* AxF */ 4, OP::_res<5>, &cpu.registers.A},
     //Bx[0..F]
-    {/* Bx0 */ 4, OP::_res<6>, &cpu.registers.BC[0]}, {/* Bx1 */ 4, OP::_res<6>, &cpu.registers.BC[1]}, {/* Bx2 */ 4, OP::_res<6>, &cpu.registers.DE[0]}, {/* Bx3 */ 4, OP::_res<6>, &cpu.registers.DE[1]}, {/* Bx4 */ 4, OP::_res<6>, &cpu.registers.HL[0]}, {/* Bx5 */ 4, OP::_res<6>, &cpu.registers.HL[1]}, {/* Bx6 */ 12, OP::_res_hl<6>}, {/* Bx7 */ 4, OP::_res<6>, &cpu.registers.A},{/* Bx8 */ 4, OP::_res<7>, &cpu.registers.BC[0]}, {/* Bx9 */ 4, OP::_res<7>, &cpu.registers.BC[1]}, {/* BxA */ 4, OP::_res<7>, &cpu.registers.DE[0]}, {/* BxB */ 4, OP::_res<7>, &cpu.registers.DE[1]}, {/* BxC */ 4, OP::_res<7>, &cpu.registers.HL[0]}, {/* BxD */ 4, OP::_res<7>, &cpu.registers.HL[1]}, {/* §E */ 12, OP::_res_hl<7>}, {/* BxF */ 4, OP::_res<7>, &cpu.registers.A},
+    {/* Bx0 */ 4, OP::_res<6>, &cpu.registers.BC[0]}, {/* Bx1 */ 4, OP::_res<6>, &cpu.registers.BC[1]}, {/* Bx2 */ 4, OP::_res<6>, &cpu.registers.DE[0]}, {/* Bx3 */ 4, OP::_res<6>, &cpu.registers.DE[1]}, {/* Bx4 */ 4, OP::_res<6>, &cpu.registers.HL[0]}, {/* Bx5 */ 4, OP::_res<6>, &cpu.registers.HL[1]}, {/* Bx6 */ 12, OP::_res_hl<6>}, {/* Bx7 */ 4, OP::_res<6>, &cpu.registers.A},{/* Bx8 */ 4, OP::_res<7>, &cpu.registers.BC[0]}, {/* Bx9 */ 4, OP::_res<7>, &cpu.registers.BC[1]}, {/* BxA */ 4, OP::_res<7>, &cpu.registers.DE[0]}, {/* BxB */ 4, OP::_res<7>, &cpu.registers.DE[1]}, {/* BxC */ 4, OP::_res<7>, &cpu.registers.HL[0]}, {/* BxD */ 4, OP::_res<7>, &cpu.registers.HL[1]}, {/* BXE */ 12, OP::_res_hl<7>}, {/* BxF */ 4, OP::_res<7>, &cpu.registers.A},
     //Cx[0..F]
     {/* Cx0 */ 4, OP::_set<0>, &cpu.registers.BC[0]}, {/* Cx1 */ 4, OP::_set<0>, &cpu.registers.BC[1]}, {/* Cx2 */ 4, OP::_set<0>, &cpu.registers.DE[0]}, {/* Cx3 */ 4, OP::_set<0>, &cpu.registers.DE[1]}, {/* Cx4 */ 4, OP::_set<0>, &cpu.registers.HL[0]}, {/* Cx5 */ 4, OP::_set<0>, &cpu.registers.HL[1]}, {/* Cx6 */ 12, OP::_set_hl<0>}, {/* Cx7 */ 4, OP::_set<0>, &cpu.registers.A},{/* Cx8 */ 4, OP::_set<1>, &cpu.registers.BC[0]}, {/* Cx9 */ 4, OP::_set<1>, &cpu.registers.BC[1]}, {/* CxA */ 4, OP::_set<1>, &cpu.registers.DE[0]}, {/* CxB */ 4, OP::_set<1>, &cpu.registers.DE[1]}, {/* CxC */ 4, OP::_set<1>, &cpu.registers.HL[0]}, {/* CxD */ 4, OP::_set<1>, &cpu.registers.HL[1]}, {/* CxE */ 12, OP::_set_hl<1>}, {/* CxF */ 4, OP::_set<1>, &cpu.registers.A},
     //Dx[0..F]
@@ -642,14 +642,17 @@ void OpCodeMapping::Call::INC_HL_V(LR35902& cpu, Memory::Map& memMap, OpStructur
     const uint16_t addr = cpu.registers.HL[0] << 8 | cpu.registers.HL[1];
     const uint8_t val = (++memMap.read(addr));
     cpu.registers.F.Z = (val == 0);
-    cpu.registers.F.H = ((static_cast<int8_t>(val & 0xF) - 1) < 0);
+    //If we half carry 4 bits, it mean that we set the 5th and the first 4 are 0
+    cpu.registers.F.H = ((static_cast<int16_t>(val & 0xF)) == 0);
+    cpu.registers.F.N = 0;
 }
 
 void OpCodeMapping::Call::DEC_HL_V(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
     const uint16_t addr = cpu.registers.HL[0] << 8 | cpu.registers.HL[1];
     const uint8_t val = (--memMap.read(addr));
     cpu.registers.F.Z = (val == 0);
-    cpu.registers.F.H = ((static_cast<int8_t>(val & 0xF) - 1) < 0);
+    cpu.registers.F.H = ((static_cast<int16_t>(val & 0xF)) == 0xF);
+    cpu.registers.F.N = 1;
 }
 
 void OpCodeMapping::Call::RET(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
@@ -801,7 +804,7 @@ void OpCodeMapping::Call::RL_HL(LR35902& cpu, Memory::Map& memMap, OpStructure& 
     uint8_t& val = memMap.read(addr);
     cpu.registers.F._C = cpu.registers.F.C;
     cpu.registers.F.C = val >> 7;
-    val = val << 1 | cpu.registers.F.C;
+    val = val << 1 | cpu.registers.F._C;
     cpu.registers.F.Z = (val == 0);
     cpu.registers.F.H = cpu.registers.F.N = 0;
 }
@@ -834,7 +837,7 @@ void OpCodeMapping::Call::RRC(LR35902& cpu, Memory::Map&, OpStructure& info){
 void OpCodeMapping::Call::RRC_HL(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
     const uint16_t addr = cpu.registers.HL[0] << 8 | cpu.registers.HL[1];
     uint8_t& val = memMap.read(addr);
-    cpu.registers.F.C = *(info.registers_8[0]) & 0x1;
+    cpu.registers.F.C = val & 0x1;
     val = val >> 1 | cpu.registers.F.C << 7;
     cpu.registers.F.Z = (val == 0);
     cpu.registers.F.H = cpu.registers.F.N = 0;
@@ -850,8 +853,8 @@ void OpCodeMapping::Call::RR_HL(LR35902& cpu, Memory::Map& memMap, OpStructure& 
     const uint16_t addr = cpu.registers.HL[0] << 8 | cpu.registers.HL[1];
     uint8_t& val = memMap.read(addr);
     cpu.registers.F._C = cpu.registers.F.C;
-    cpu.registers.F.C = *(info.registers_8[0]) & 0x1;
-    val = val >> 1 | cpu.registers.F.C << 7;
+    cpu.registers.F.C = val & 0x1;
+    val = val >> 1 | cpu.registers.F._C << 7;
     cpu.registers.F.Z = (val == 0);
     cpu.registers.F.H = cpu.registers.F.N = 0;
 }
@@ -883,7 +886,7 @@ void OpCodeMapping::Call::SRA(LR35902& cpu, Memory::Map&, OpStructure& info){
 void OpCodeMapping::Call::SRA_HL(LR35902& cpu, Memory::Map& memMap, OpStructure&){
     const uint16_t addr = cpu.registers.HL[0] << 8 | cpu.registers.HL[1];
     uint8_t& val = memMap.read(addr);
-    cpu.registers.F.C = val >> 7;
+    cpu.registers.F.C = val & 0x1;
     //shift right arithmetic (b7=b7)
     val = val >> 1 | val & 0b10000000;
     cpu.registers.F.Z = (val == 0);

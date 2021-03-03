@@ -23,10 +23,13 @@ int main(int argc, char** argv){
 	*/
 	Bus bus;
 
+    //Games
 	//bus.cartridge.loadRom("Tetris.gb");
-    //bus.cartridge.loadRom("interrupts.gb");
     //bus.cartridge.loadRom("drmario.gb");
-    //bus.cartridge.loadRom("cpu_instrs.gb", true);
+
+    //Tests
+    bus.cartridge.loadRom("01op.gb"); //FAILS
+    //bus.cartridge.loadRom("02op.gb");
     //bus.cartridge.loadRom("03op.gb");
     //bus.cartridge.loadRom("04op.gb");
     //bus.cartridge.loadRom("05op.gb");
@@ -35,18 +38,14 @@ int main(int argc, char** argv){
     //bus.cartridge.loadRom("08op.gb");
     //bus.cartridge.loadRom("09op.gb");
     //bus.cartridge.loadRom("10op.gb");
-    //bus.cartridge.loadRom("11op.gb"); //FAILS (SEGFAULT)
+    //bus.cartridge.loadRom("11op.gb");
     //bus.cartridge.loadRom("boot_regs-A.gb");
     //bus.cartridge.loadRom("boot_div-A.gb");
-    
-    //Test after JOYP proper implementation
-    //bus.cartridge.loadRom("unused_hwio-C.gb");
-    //bus.cartridge.loadRom("dmg_boot.gb", true);
     bus.initCPU();
 
     sf::RenderWindow window(sf::VideoMode(160, 144), "Gameboy");
     window.setVerticalSyncEnabled(true);
-    window.setFramerateLimit(60); // TODO, CHANGE TO 60 WHEN TIMMING IS FIXED
+    window.setFramerateLimit(60);
     window.setSize({800, 700});
 
     // run the program as long as the window is open
