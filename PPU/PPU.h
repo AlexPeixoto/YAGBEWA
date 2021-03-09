@@ -18,11 +18,11 @@ namespace PPU{
         //10 sprites per line
         struct Sprite{
             //0 means that its inside the "screen" (as we want to be able to make in move inside)
-            //So 0x08 (as the sprite is 8 pixels width) means "0" on the screen
-            uint8_t posX;
-            //0 means that its inside the "screen" (as we want to be able to make in move inside)
             //So 0x10 (as the sprite is 16 pixels height) means "0" on the screen
             uint8_t posY;
+            //0 means that its inside the "screen" (as we want to be able to make in move inside)
+            //So 0x08 (as the sprite is 8 pixels width) means "0" on the screen
+            uint8_t posX;
             uint8_t tileIndex; //index;
             //DOUBLE CHECK
             //1 - Above background pixels with value 0, below non-0 pixels
@@ -38,7 +38,7 @@ namespace PPU{
         std::array<std::array<Color, 144>, 160> screen, internalBuffer;
         
         //Set pixel value for 00, 01, 10, 11.
-        std::array<Color, 4> backgroundColorMap, objectPallete1, objectPallate2;
+        std::array<Color, 4> backgroundColorMap, objectPallete1, objectPallete2;
         //Store sprites
         std::array<Sprite, 40> sprites;
         //Store the used sprites at this time.

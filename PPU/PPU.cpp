@@ -44,8 +44,8 @@ namespace{
     //Tile data start
     //each block is a 128 tile with 16 bytes each
     //each 2 bytes is a line (so each line is 16 bits)
-    constexpr uint16_t TILE_ADDR = 0x8000;
-    constexpr uint16_t TILE_SIZE = 0x17FF;
+    constexpr uint16_t SPRITE_ADDR = 0x8000;
+    constexpr uint16_t SPRITE_SIZE = 0x17FF;
 
     constexpr uint16_t CLOCKS_PER_LINE = 456;
 
@@ -127,49 +127,23 @@ void Core::getSpritesOnLine(){
     const uint8_t height = isTallSprite ? 16 : 8;
     for(uint8_t pos=0; pos < 40; pos++){
         const auto sprite = sprites.at(pos);
-        //Sprite goes into the screen, so its always - 16 (even if the sprite is only 8 pixels heigh)
-        //std::cout << "ALMSG: " << std::endl
-        //          << "Checking pos: " << static_cast<uint32_t>(pos) << std::endl
-        //          << "Checking posX: " << static_cast<uint32_t>(sprite.posX) << std::endl
-        //          << "Checking posY: " << static_cast<uint32_t>(sprite.posY) << std::endl;
+        const int16_t realPosX = sprite.posX - 8;
         const int16_t realPosY = sprite.posY - 16;
-        if(realPosY <= line && (realPosY + height) >= line &&
+        if(realPosY <= line && (realPosY + height) > line &&
             //Check if we are inside the screen
-            sprite.posX >= 0 && sprite.posX <= 144){
+            realPosX > 0 && realPosX <= 168){
                 spritesIndex[spritesOnLine++] = pos;
                 //As per GB documentation we only support 10 sprites per line.
                 if(spritesOnLine == 10)
                     break;
         }
     }
-    std::cout << "Total of load sprites Selected: " << static_cast<uint32_t>(spritesOnLine) << std::endl; 
 }
 
 void Core::renderLine(){
     //Lets check the tile mode first (tile = background)
     const uint16_t baseTileAddr = isTileDataSelectHigh() ? 0x8000 : 0x8800;
-    //std::cout << std::hex << static_cast<uint32_t>(baseTileAddr) << std::endl;
-    
-    static uint64_t count=0;
-    
-    const uint16_t baseSpriteAddr = 0x8000;
-
-    //Background map information, this is just the index to be used
-    //To access the baseTileAddr above
     const uint16_t baseBackgroundMapAddr = isBgTileMapHigh() ? 0x9C00 : 0x9800;
-    if(count++ >= 50000){
-        /*std::cout << "Tile addr : " << std::hex << static_cast<uint32_t>(baseTileAddr) << std::endl;
-        for(int addrPos = 0x8000; addrPos <= 0x87FF; addrPos++){
-            std::cout << "Tile Addr: " << std::hex << static_cast<uint32_t>(addrPos) << " value: " << std::hex << static_cast<uint32_t>(bus->memoryMap[addrPos]) << std::endl;
-        }
-        std::cout << "Tile map addr : " << std::hex << static_cast<uint32_t>(baseBackgroundMapAddr) << std::endl;
-        for(int addrPos = 0x9800; addrPos <= 0x9BFF; addrPos++){
-            std::cout << "Map Addr: " << std::hex << static_cast<uint32_t>(addrPos) << " value: " << std::hex << static_cast<uint32_t>(bus->memoryMap[addrPos]) << std::endl;
-        }*/
-        //std::cout << "SCY =>  " << std::dec << static_cast<uint32_t>(bus->memoryMap[LCD_SCY_ADDR]) << std::endl;
-        //std::cout << "LY =>  " << static_cast<uint32_t>(bus->memoryMap[0xFF44]) << std::endl;
-        //abort();
-    }
 
     //This is the line that I will render
     const uint16_t line = bus->memoryMap[LCD_LY_ADDR];
@@ -193,7 +167,6 @@ void Core::renderLine(){
         const int xAdjusted = (x + bus->memoryMap[LCD_SCX_ADDR])%256;
         const int xTileAdjusted = (xAdjusted / 8);
         
-        //bool backgroundRendered = false;
         //Each tile is a byte, so we retrieve the byte that corresponds to this position
         //Missing signed vs unsigned here (depending on the )
         //Here we are looking at the tilemap to extract the tile index
@@ -210,16 +183,21 @@ void Core::renderLine(){
                                             ((tileIndex * 16) +
                                             (backgroundLine * 2)); //2 bytes per line
 
-         
         const uint8_t backgroundColorIndex_0 = bus->memoryMap[backgroundColorByte];
         const uint8_t backgroundColorIndex_1 = bus->memoryMap[backgroundColorByte + 1];
         // The most significant bit is on the left, so we "invert" the reading order
-        int bit = 7 - (xAdjusted % 8);
-        const uint8_t backgroundPixelIndex = (backgroundColorIndex_0 >> bit) & 0x1 | 
-                                             (((backgroundColorIndex_1 >> bit) & 0x1) << 1);
+        int backgroundBit = 7 - (xAdjusted % 8);
+        const uint8_t backgroundPixelIndex = (backgroundColorIndex_0 >> backgroundBit) & 0x1 | 
+                                             (((backgroundColorIndex_1 >> backgroundBit) & 0x1) << 1);
         internalBuffer[x][line] = backgroundColorMap.at(backgroundPixelIndex);
         
         //Now lets see if the is a sprite for this pixel/line
+        //PUT INSIDE RENDER_SPRITE perhaps
+        //Why not render the 10 sprites per line instead of crossing the data per pixel?
+        //It is better to do the 10 sprites per line, the performance is wayy better, the only reason is
+        //consistency....
+        //As this is more of an experiment there is no concern here from performance perspective
+        //This can easily be changed, but I wanted to do something different just to learn.....
         for(uint8_t spritePos = 0; spritePos < spritesOnLine; spritePos++) {
             const uint8_t pos = spritesIndex.at(spritePos);
             const auto& sprite = sprites.at(pos);
@@ -227,11 +205,13 @@ void Core::renderLine(){
             //pixel in the buffer, so we check here.
             if(sprite.priority && backgroundPixelIndex == 0)
                 continue;
-            if(sprite.posX <= x && (sprite.posX + SPRITE_WIDTH) >= x) {
-                //So the sprite should be shown at this pixel, so lets retrieve the pixel
-                //data (similar to the background) and then put it on the internalBuffer
-                const auto& selectedPallete = sprite.pallete ? objectPallate2 : objectPallete1;
-                int16_t spriteLine = line - sprite.posY - 16;
+            
+            //Currently missing SCX and SCY here, not sure if its needed
+            int16_t spriteRow = x - (sprite.posX - 8);
+            int16_t spriteLine = line - (sprite.posY - 16);
+            if(spriteRow >= 0 && spriteRow <= 7) {
+                const auto& selectedPallete = sprite.pallete ? objectPallete2 : objectPallete1;
+                //Do we need to perform any flip?
                 if(sprite.flipY) {
                     //We are reading it from the other direction. Also if its double height we multiply
                     //the height by 2, if not just by 1.
@@ -240,24 +220,26 @@ void Core::renderLine(){
                     spriteLine = -spriteLine;
                 }
 
-                const uint16_t spriteColorByte = baseSpriteAddr +
-                                               ((sprite.tileIndex * 16) +
-                                                (spriteLine * 2)); //2 bytes per line
-
-                //The difference between the pixel being rendered and the pos is what pixel I want
-                //So we retrieve the byte for the line, but shift by the row (8 pos = 8 bits)
-                uint16_t spriteRow = x - sprite.posY - 8;
                 if(sprite.flipX) {
                     spriteRow -= (SPRITE_WIDTH);
                     spriteRow = -spriteRow;
                 }
 
+                //So the sprite should be shown at this pixel, so lets retrieve the pixel
+                //data (similar to the background) and then put it on the internalBuffer
+                const uint16_t spriteColorByte = SPRITE_ADDR +
+                                ((sprite.tileIndex * 16) +
+                                (spriteLine * 2)); //2 bytes per line
+
                 const uint8_t spriteColorIndex_0 = bus->memoryMap[spriteColorByte];
                 const uint8_t spriteColorIndex_1 = bus->memoryMap[spriteColorByte + 1];
+                int spriteBit = 7 - spriteRow;
                 // The most significant bit is on the left, so we "invert" the reading order
-                const uint8_t spritePixelIndex = (spriteColorIndex_0 >> spriteRow) & 0x1 | 
-                                                    (((spriteColorIndex_1 >> spriteRow) & 0x1) << 1);
-                internalBuffer[x][line] = selectedPallete.at(spritePixelIndex);
+                const uint8_t spritePixelIndex = (spriteColorIndex_0 >> spriteBit) & 0x1 | 
+                                                (((spriteColorIndex_1 >> spriteBit) & 0x1) << 1);
+                //std::cout << "SpritePixelIndex:" << spritePixelIndex << std::endl;
+                if(spritePixelIndex)
+                    internalBuffer[x][line] = selectedPallete.at(spritePixelIndex);
 
             }
         }
@@ -286,7 +268,7 @@ void Core::processMode2(){
     initPalleteTable(backgroundColorMap, BGP_ADDR);
     //Init both object palletes
     initPalleteTable(objectPallete1, OBP0_ADDR);
-    initPalleteTable(objectPallate2, OBP1_ADDR);
+    initPalleteTable(objectPallete2, OBP1_ADDR);
 
     //Load all the sprites from memory
     if(isSpriteEnabled()){
