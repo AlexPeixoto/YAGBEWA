@@ -49,17 +49,22 @@ namespace{
 
     constexpr uint16_t CLOCKS_PER_LINE = 456;
 
+    //8 Pixels
+    constexpr uint8_t SPRITE_WIDTH = 8;
+    constexpr uint8_t SPRITE_HEIGHT = 8;
 }
 using namespace PPU;
 
 Core::Core(Bus* bus) : bus(bus){
     bus->memoryMap[LCD_LY_ADDR] = 153;
+    spritesOnLine = 0;
     setMode(1);
 }
 
 void Core::setMode(uint8_t mode){
+    //2 first bits are the mode
     bus->memoryMap[LCD_STATUS_REGISTER_ADDR] &= 0b11111100;
-    bus->memoryMap[LCD_STATUS_REGISTER_ADDR] |= mode;
+    bus->memoryMap[LCD_STATUS_REGISTER_ADDR] |= (mode & 0x3);
     //We also check if the the specifc bit for that interrupt is enabled, if it is
     //during the mode switch we trigger a LCDC interrupt
     const uint8_t modeBit = (mode + 3);
@@ -100,17 +105,44 @@ void Core::initSprites(){
     for(int x=0; x<40; x++){
         //4 bytes per entry
         const uint8_t spacing = 4;
-        const uint8_t flags = bus->memoryMap[OAM_TABLE_ADDR + spacing + 3];
+        const uint8_t flags = bus->memoryMap[OAM_TABLE_ADDR + (x * spacing) + 3];
         sprites.at(x) = {
-            bus->memoryMap[OAM_TABLE_ADDR + spacing], //pos x
-            bus->memoryMap[OAM_TABLE_ADDR + spacing + 1], //pos y
-            bus->memoryMap[OAM_TABLE_ADDR + spacing + 2], //tile number
+            bus->memoryMap[OAM_TABLE_ADDR + (x * spacing)], //pos x
+            bus->memoryMap[OAM_TABLE_ADDR + (x * spacing) + 1], //pos y
+            bus->memoryMap[OAM_TABLE_ADDR + (x * spacing) + 2], //tile number
             static_cast<uint8_t>(flags & 0b1000000), //Priority
             static_cast<uint8_t>(flags & 0b0100000), //Y-Flip
             static_cast<uint8_t>(flags & 0b0010000), //X-Flip
             static_cast<uint8_t>(flags & 0b0001000) //Palette
         };
     }
+}
+
+void Core::getSpritesOnLine(){
+    //Look for all the positions on the line
+    spritesOnLine=0;
+    const bool isTallSprite = isSpriteDoubleHeight();
+    const uint16_t line = bus->memoryMap[LCD_LY_ADDR];
+    //If its tall its 16 pixels, if not its 8
+    const uint8_t height = isTallSprite ? 16 : 8;
+    for(uint8_t pos=0; pos < 40; pos++){
+        const auto sprite = sprites.at(pos);
+        //Sprite goes into the screen, so its always - 16 (even if the sprite is only 8 pixels heigh)
+        //std::cout << "ALMSG: " << std::endl
+        //          << "Checking pos: " << static_cast<uint32_t>(pos) << std::endl
+        //          << "Checking posX: " << static_cast<uint32_t>(sprite.posX) << std::endl
+        //          << "Checking posY: " << static_cast<uint32_t>(sprite.posY) << std::endl;
+        const int16_t realPosY = sprite.posY - 16;
+        if(realPosY <= line && (realPosY + height) >= line &&
+            //Check if we are inside the screen
+            sprite.posX >= 0 && sprite.posX <= 144){
+                spritesIndex[spritesOnLine++] = pos;
+                //As per GB documentation we only support 10 sprites per line.
+                if(spritesOnLine == 10)
+                    break;
+        }
+    }
+    std::cout << "Total of load sprites Selected: " << static_cast<uint32_t>(spritesOnLine) << std::endl; 
 }
 
 void Core::renderLine(){
@@ -121,7 +153,6 @@ void Core::renderLine(){
     static uint64_t count=0;
     
     const uint16_t baseSpriteAddr = 0x8000;
-    const bool isTallSprite = isSpriteDoubleHeight();
 
     //Background map information, this is just the index to be used
     //To access the baseTileAddr above
@@ -152,7 +183,7 @@ void Core::renderLine(){
     
     //Now I calculate the difference between the tile index and the adjustment
     //For example, I know that each tile is 8 pixels, so if SCY is 14 I skip the first Tile, then 6 pixels of the picked tile
-    const int ySkipPixels = (yAdjusted % 8);
+    const int backgroundLine = (yAdjusted % 8);
 
     //This should ALL be white
     for(int x=0; x<160; x++){
@@ -168,24 +199,68 @@ void Core::renderLine(){
         //Here we are looking at the tilemap to extract the tile index
         const uint32_t tileMemPos = baseBackgroundMapAddr + ((yTileAdjusted * 32 /*tiles per line*/)) + xTileAdjusted;
         int tileIndex = bus->memoryMap[tileMemPos];
-        /*if (!isTileDataSelectHigh()){
-            //std::cout << "Before: " << tileIndex << std::endl;
+        // Used by dr mario :)
+        if (!isTileDataSelectHigh()){
             if (tileIndex >= INT_MIN)
                 tileIndex = (static_cast<int>(tileIndex - INT_MIN) + INT_MIN);
             tileIndex+=128;
-        }*/
+        }
 
-        const uint16_t colorByte = baseTileAddr +
-                                  ((tileIndex * 16) +
-                                  (ySkipPixels * 2)); //2 bytes per line
-                                  
+        const uint16_t backgroundColorByte = baseTileAddr +
+                                            ((tileIndex * 16) +
+                                            (backgroundLine * 2)); //2 bytes per line
+
          
-        const uint8_t colorIndex_0 = bus->memoryMap[colorByte];
-        const uint8_t colorIndex_1 = bus->memoryMap[colorByte + 1];
-        //The most significant bit is on the left, so we "invert" the reading order
+        const uint8_t backgroundColorIndex_0 = bus->memoryMap[backgroundColorByte];
+        const uint8_t backgroundColorIndex_1 = bus->memoryMap[backgroundColorByte + 1];
+        // The most significant bit is on the left, so we "invert" the reading order
         int bit = 7 - (xAdjusted % 8);
-        const uint8_t index = (colorIndex_0 >> bit) & 0x1 | (((colorIndex_1 >> bit) & 0x1) << 1);
-        internalBuffer[x][line] = backgroundColorMap.at(index);
+        const uint8_t backgroundPixelIndex = (backgroundColorIndex_0 >> bit) & 0x1 | 
+                                             (((backgroundColorIndex_1 >> bit) & 0x1) << 1);
+        internalBuffer[x][line] = backgroundColorMap.at(backgroundPixelIndex);
+        
+        //Now lets see if the is a sprite for this pixel/line
+        for(uint8_t spritePos = 0; spritePos < spritesOnLine; spritePos++) {
+            const uint8_t pos = spritesIndex.at(spritePos);
+            const auto& sprite = sprites.at(pos);
+            //If the priority is set in such a way that we need to be behind 0 we actually dont put the
+            //pixel in the buffer, so we check here.
+            if(sprite.priority && backgroundPixelIndex == 0)
+                continue;
+            if(sprite.posX <= x && (sprite.posX + SPRITE_WIDTH) >= x) {
+                //So the sprite should be shown at this pixel, so lets retrieve the pixel
+                //data (similar to the background) and then put it on the internalBuffer
+                const auto& selectedPallete = sprite.pallete ? objectPallate2 : objectPallete1;
+                int16_t spriteLine = line - sprite.posY - 16;
+                if(sprite.flipY) {
+                    //We are reading it from the other direction. Also if its double height we multiply
+                    //the height by 2, if not just by 1.
+                    spriteLine -= (SPRITE_HEIGHT * (isSpriteDoubleHeight() + 1));
+                    //So we read in a negative way relative to the sprite pos
+                    spriteLine = -spriteLine;
+                }
+
+                const uint16_t spriteColorByte = baseSpriteAddr +
+                                               ((sprite.tileIndex * 16) +
+                                                (spriteLine * 2)); //2 bytes per line
+
+                //The difference between the pixel being rendered and the pos is what pixel I want
+                //So we retrieve the byte for the line, but shift by the row (8 pos = 8 bits)
+                uint16_t spriteRow = x - sprite.posY - 8;
+                if(sprite.flipX) {
+                    spriteRow -= (SPRITE_WIDTH);
+                    spriteRow = -spriteRow;
+                }
+
+                const uint8_t spriteColorIndex_0 = bus->memoryMap[spriteColorByte];
+                const uint8_t spriteColorIndex_1 = bus->memoryMap[spriteColorByte + 1];
+                // The most significant bit is on the left, so we "invert" the reading order
+                const uint8_t spritePixelIndex = (spriteColorIndex_0 >> spriteRow) & 0x1 | 
+                                                    (((spriteColorIndex_1 >> spriteRow) & 0x1) << 1);
+                internalBuffer[x][line] = selectedPallete.at(spritePixelIndex);
+
+            }
+        }
     }
 }
 
@@ -210,8 +285,14 @@ void Core::processMode2(){
     //Load backgroundColorMap palette from BGP_ADDR
     initPalleteTable(backgroundColorMap, BGP_ADDR);
     //Init both object palletes
-    //initPalleteTable(objectPallete1, OBP0_ADDR);
-    //initPalleteTable(objectPallate2, OBP1_ADDR);
+    initPalleteTable(objectPallete1, OBP0_ADDR);
+    initPalleteTable(objectPallate2, OBP1_ADDR);
+
+    //Load all the sprites from memory
+    if(isSpriteEnabled()){
+        initSprites();
+        getSpritesOnLine();
+    }
     
     modeProcessed = 2;
 }
@@ -286,7 +367,7 @@ void Core::tick() {
             line++;
             vblankServed = false;
             if(line == 152){
-                std::cout << "Frame finished" << std::endl;
+                std::cout << "FRAME: Finished" << std::endl;
                 line = 0;
             }
         }
@@ -311,16 +392,20 @@ void Core::renderWindow() {
 }
 
 void Core::checkLYC_LY(){
-    //Checkk for VBLANK
+    //Check for VBLANK
     if(bus->memoryMap[LCD_LY_ADDR] == 144 && !vblankServed/* && bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0x00010000*/) {
+        //This is managed by the main IE/IF structure not the LCDC
         bus->setInterruptFlag(CPU::INTERRUPTIONS_TYPE::VBLANK);
         vblankServed = true;
 
         //If I also need to set LCDC during VBLANK
-        if(bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0x00010000)
+        if(bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0b00010000)
             bus->setInterruptFlag(CPU::INTERRUPTIONS_TYPE::LCDC);
+
+        bus->memoryMap[LCD_STATUS_REGISTER_ADDR] &= ~(0b00010000);
     } 
-    if(bus->memoryMap[LCD_LY_ADDR] == bus->memoryMap[LCD_LYC_ADDR]) {
+    //MIMICS STAT IRQ Blocking
+    else if(bus->memoryMap[LCD_LY_ADDR] == bus->memoryMap[LCD_LYC_ADDR]) {
         bus->memoryMap[LCD_STATUS_REGISTER_ADDR] |= 0b0000100;
         //If the coincidence interrupt is not enabled, we just skip this
         if((bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0b00100000) == 0)
@@ -328,6 +413,6 @@ void Core::checkLYC_LY(){
 
         //Set Coincidence flag
         bus->setInterruptFlag(CPU::INTERRUPTIONS_TYPE::LCDC);
-        bus->memoryMap[LCD_STATUS_REGISTER_ADDR] &= ~(0b0000100);
+        bus->memoryMap[LCD_STATUS_REGISTER_ADDR] &= ~(0b00100000);
     }  
 }

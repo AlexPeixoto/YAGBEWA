@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <unordered_set>
 #include <ctype.h>
 
 class Bus;
@@ -22,7 +23,7 @@ namespace PPU{
             //0 means that its inside the "screen" (as we want to be able to make in move inside)
             //So 0x10 (as the sprite is 16 pixels height) means "0" on the screen
             uint8_t posY;
-            uint8_t tileNumber; //index;
+            uint8_t tileIndex; //index;
             //DOUBLE CHECK
             //1 - Above background pixels with value 0, below non-0 pixels
             //0 - On top of everything (There is an weird behaviour depending on the position, not sure if that will be emulated)
@@ -40,6 +41,10 @@ namespace PPU{
         std::array<Color, 4> backgroundColorMap, objectPallete1, objectPallate2;
         //Store sprites
         std::array<Sprite, 40> sprites;
+        //Store the used sprites at this time.
+        std::array<uint8_t, 10> spritesIndex;
+        //Total of sprites on line
+        uint8_t spritesOnLine;
         //Mark an invalid mode
         uint8_t modeProcessed=5;
         //Check if vblank was served this frame
@@ -66,6 +71,7 @@ namespace PPU{
 
         void initPalleteTable(std::array<Color, 4>& palette, uint16_t memPosition);
         void initSprites();
+        void getSpritesOnLine();
 
         void processModes();
         void processMode0();
