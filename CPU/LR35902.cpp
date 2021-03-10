@@ -22,8 +22,6 @@ LR35902::~LR35902() {}
 
 void LR35902::initPC(bool headless = false) {
     registers.PC = bus->memoryMap.getMemoryAt(headless ? 0x000 : 0x100);
-    
-    //abort();
 }
 
 void LR35902::setPC(uint16_t target) { 

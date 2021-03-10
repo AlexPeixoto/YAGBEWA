@@ -28,8 +28,8 @@ namespace PPU{
             //1 - Above background pixels with value 0, below non-0 pixels
             //0 - On top of everything (There is an weird behaviour depending on the position, not sure if that will be emulated)
             uint8_t priority:1;
-            uint8_t flipX:1;
             uint8_t flipY:1;
+            uint8_t flipX:1;
             uint8_t pallete:1; //ff48 for 0 or FF49 for 1
         }; 
         //Gameboy resolution is 160x144.
@@ -61,10 +61,11 @@ namespace PPU{
         bool isBgTileMapHigh();
         bool isSpriteDoubleHeight();
         bool isSpriteEnabled();
-        bool isBGWindowDisplayPriority();
+        bool isBGWindowDisplayEnabled();
 
         void renderLine();
-        void renderWindow();
+        //Returns the generated pixel (usefull to check for transparency)
+        uint8_t renderBackgroundWindowPixel(uint16_t x, bool isWindow);
 
         void setMode(uint8_t mode);
         uint8_t getMode();

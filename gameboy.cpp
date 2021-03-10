@@ -24,9 +24,10 @@ int main(int argc, char** argv){
 	Bus bus;
 
     //Games
-	bus.cartridge.loadRom("Tetris.gb");
+	//bus.cartridge.loadRom("Tetris.gb");
     //bus.cartridge.loadRom("drmario.gb");
 
+    bus.cartridge.loadRom("dmg-acid2.gb");
     //Tests
     //bus.cartridge.loadRom("01op.gb");
     //bus.cartridge.loadRom("02op.gb");
@@ -78,8 +79,8 @@ int main(int argc, char** argv){
         texture.loadFromImage(image);
         background.setTexture(texture);
         window.draw(background);
-        std::cout << "Frame: " << std::dec << frame++ << std::endl;
-        //if(frame == 650)
+        //std::cout << "Frame: " << std::dec << frame++ << std::endl;
+        //if(frame == 60)
         //    std::this_thread::sleep_for(std::chrono::seconds(100));
         window.display();
         //windowDebug.display();

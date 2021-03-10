@@ -106,14 +106,15 @@ void Core::initSprites(){
         //4 bytes per entry
         const uint8_t spacing = 4;
         const uint8_t flags = bus->memoryMap[OAM_TABLE_ADDR + (x * spacing) + 3];
+        //std::cout << "FULL FLAG: " << static_cast<uint32_t>(flags) << std::endl;
         sprites.at(x) = {
             bus->memoryMap[OAM_TABLE_ADDR + (x * spacing)], //pos x
             bus->memoryMap[OAM_TABLE_ADDR + (x * spacing) + 1], //pos y
             bus->memoryMap[OAM_TABLE_ADDR + (x * spacing) + 2], //tile number
-            static_cast<uint8_t>(flags & 0b1000000), //Priority
-            static_cast<uint8_t>(flags & 0b0100000), //Y-Flip
-            static_cast<uint8_t>(flags & 0b0010000), //X-Flip
-            static_cast<uint8_t>(flags & 0b0001000) //Palette
+            static_cast<uint8_t>((flags & 0b10000000) >> 7), //Priority
+            static_cast<uint8_t>((flags & 0b01000000) >> 6), //Y-Flip
+            static_cast<uint8_t>((flags & 0b00100000) >> 5), //X-Flip
+            static_cast<uint8_t>((flags & 0b00010000) >> 4) //Palette
         };
     }
 }
@@ -139,58 +140,76 @@ void Core::getSpritesOnLine(){
         }
     }
 }
-
-void Core::renderLine(){
-    //Lets check the tile mode first (tile = background)
-    const uint16_t baseTileAddr = isTileDataSelectHigh() ? 0x8000 : 0x8800;
-    const uint16_t baseBackgroundMapAddr = isBgTileMapHigh() ? 0x9C00 : 0x9800;
-
-    //This is the line that I will render
+uint8_t Core::renderBackgroundWindowPixel(uint16_t x, bool isWindow){
     const uint16_t line = bus->memoryMap[LCD_LY_ADDR];
 
+    /*if(!isBGWindowDisplayEnabled()){
+        //std::cout << "Disabled for y = " << static_cast<uint32_t>(bus->memoryMap[LCD_LY_ADDR]) << std::endl;
+        internalBuffer[x][line] = backgroundColorMap.at(0);
+        return 0;
+    }
+    if(isWindow && !isWindowDisplayEnabled())
+        return 0;
+    */
     //I need 2 things here, my real Y position on the screen, this is calculated with line being rendered + SCY
     //which is the "adjustment". Also the reason why its 256 and not the height of the screen is because
     //er are actually moving inside the "screen buffer" which is 256 x 256 (see SCX, its % 256 as well)
     //0xFF42 + 0xFF44
-    const int yAdjusted = (static_cast<uint32_t>(line) + bus->memoryMap[LCD_SCY_ADDR])%256;
+    const int yAdjusted = isWindow ? static_cast<uint32_t>(line) + bus->memoryMap[LCD_WY_ADDR] : (static_cast<uint32_t>(line) + bus->memoryMap[LCD_SCY_ADDR])%256;
+    //const int yAdjusted = (static_cast<uint32_t>(line) + bus->memoryMap[LCD_SCY_ADDR])%256;
     const int yTileAdjusted = (yAdjusted / 8);
     
     //Now I calculate the difference between the tile index and the adjustment
     //For example, I know that each tile is 8 pixels, so if SCY is 14 I skip the first Tile, then 6 pixels of the picked tile
     const int backgroundLine = (yAdjusted % 8);
 
+    //Lets check the tile mode first (tile = background)
+    const uint16_t baseTileAddr = isTileDataSelectHigh() ? 0x8000 : 0x8800;
+    const uint16_t baseBackgroundMapAddr = isWindow ? (isWindowTileMapDisplaySelectHigh() ? 0x9C00 : 0x9800) :
+                                                      (isBgTileMapHigh() ? 0x9C00 : 0x9800);
+
+    //Render background, have in mind that I could possibly do the opposite (render 32 tiles)
+    //would probably be WAY cheaper
+    //Should be pixel + scroll X
+    const int xAdjusted = isWindow ? (x + bus->memoryMap[LCD_WX_ADDR]) : (x + bus->memoryMap[LCD_SCX_ADDR])%256;
+    const int xTileAdjusted = (xAdjusted / 8);
+    
+    //Each tile is a byte, so we retrieve the byte that corresponds to this position
+    //Here we are looking at the tilemap to extract the tile index
+    const uint32_t tileMemPos = baseBackgroundMapAddr + ((yTileAdjusted * 32 /*tiles per line*/)) + xTileAdjusted;
+    int tileIndex = bus->memoryMap[tileMemPos];
+    // Used by dr mario :)
+    if (!isWindow && !isTileDataSelectHigh()){
+        if (tileIndex >= INT_MIN)
+            tileIndex = (static_cast<int>(tileIndex - INT_MIN) + INT_MIN);
+        tileIndex+=128;
+    }
+
+    const uint16_t backgroundColorByte = baseTileAddr +
+                                        ((tileIndex * 16) +
+                                        (backgroundLine * 2)); //2 bytes per line
+
+    const uint8_t backgroundColorIndex_0 = bus->memoryMap[backgroundColorByte];
+    const uint8_t backgroundColorIndex_1 = bus->memoryMap[backgroundColorByte + 1];
+    // The most significant bit is on the left, so we "invert" the reading order
+    int backgroundBit = 7 - (xAdjusted % 8);
+    const uint8_t backgroundPixelIndex = (backgroundColorIndex_0 >> backgroundBit) & 0x1 | 
+                                            (((backgroundColorIndex_1 >> backgroundBit) & 0x1) << 1);
+    internalBuffer[x][line] = backgroundColorMap.at(backgroundPixelIndex);
+    
+    return backgroundPixelIndex;
+}
+void Core::renderLine(){
+    //This is the line that I will render
+    const uint16_t line = bus->memoryMap[LCD_LY_ADDR];
     //This should ALL be white
     for(int x=0; x<160; x++){
-        //Render background, have in mind that I could possibly do the opposite (render 32 tiles)
-        //would probably be WAY cheaper
-        //Should be pixel + scroll X
-        const int xAdjusted = (x + bus->memoryMap[LCD_SCX_ADDR])%256;
-        const int xTileAdjusted = (xAdjusted / 8);
+        //const uint8_t windowPixelIndex = renderBackgroundWindowPixel(x, true);
+        //if(windowPixelIndex)
+        //    continue;
+        const uint8_t backgroundPixelIndex = renderBackgroundWindowPixel(x, false);
         
-        //Each tile is a byte, so we retrieve the byte that corresponds to this position
-        //Missing signed vs unsigned here (depending on the )
-        //Here we are looking at the tilemap to extract the tile index
-        const uint32_t tileMemPos = baseBackgroundMapAddr + ((yTileAdjusted * 32 /*tiles per line*/)) + xTileAdjusted;
-        int tileIndex = bus->memoryMap[tileMemPos];
-        // Used by dr mario :)
-        if (!isTileDataSelectHigh()){
-            if (tileIndex >= INT_MIN)
-                tileIndex = (static_cast<int>(tileIndex - INT_MIN) + INT_MIN);
-            tileIndex+=128;
-        }
-
-        const uint16_t backgroundColorByte = baseTileAddr +
-                                            ((tileIndex * 16) +
-                                            (backgroundLine * 2)); //2 bytes per line
-
-        const uint8_t backgroundColorIndex_0 = bus->memoryMap[backgroundColorByte];
-        const uint8_t backgroundColorIndex_1 = bus->memoryMap[backgroundColorByte + 1];
-        // The most significant bit is on the left, so we "invert" the reading order
-        int backgroundBit = 7 - (xAdjusted % 8);
-        const uint8_t backgroundPixelIndex = (backgroundColorIndex_0 >> backgroundBit) & 0x1 | 
-                                             (((backgroundColorIndex_1 >> backgroundBit) & 0x1) << 1);
-        internalBuffer[x][line] = backgroundColorMap.at(backgroundPixelIndex);
-        
+        //const uint8_t backgroundPixelIndex = 1;
         //Now lets see if the is a sprite for this pixel/line
         //PUT INSIDE RENDER_SPRITE perhaps
         //Why not render the 10 sprites per line instead of crossing the data per pixel?
@@ -201,10 +220,9 @@ void Core::renderLine(){
         for(uint8_t spritePos = 0; spritePos < spritesOnLine; spritePos++) {
             const uint8_t pos = spritesIndex.at(spritePos);
             const auto& sprite = sprites.at(pos);
-            //If the priority is set in such a way that we need to be behind 0 we actually dont put the
-            //pixel in the buffer, so we check here.
-            if(sprite.priority && backgroundPixelIndex == 0)
-                continue;
+            // Bit7   BG and Window over OBJ (0=No, 1=BG and Window colors 1-3 over the OBJ)
+            //if(sprite.priority && backgroundPixelIndex)
+            //   continue;
             
             //Currently missing SCX and SCY here, not sure if its needed
             int16_t spriteRow = x - (sprite.posX - 8);
@@ -215,14 +233,12 @@ void Core::renderLine(){
                 if(sprite.flipY) {
                     //We are reading it from the other direction. Also if its double height we multiply
                     //the height by 2, if not just by 1.
-                    spriteLine -= (SPRITE_HEIGHT * (isSpriteDoubleHeight() + 1));
+                    spriteLine = (SPRITE_HEIGHT * (isSpriteDoubleHeight() + 1)) - spriteLine;
                     //So we read in a negative way relative to the sprite pos
-                    spriteLine = -spriteLine;
+                    //spriteLine = -spriteLine;
                 }
-
                 if(sprite.flipX) {
-                    spriteRow -= (SPRITE_WIDTH);
-                    spriteRow = -spriteRow;
+                    spriteRow = (SPRITE_WIDTH - spriteRow);
                 }
 
                 //So the sprite should be shown at this pixel, so lets retrieve the pixel
@@ -243,6 +259,7 @@ void Core::renderLine(){
 
             }
         }
+        //renderBackgroundWindowPixel(x, true);
     }
 }
 
@@ -283,10 +300,9 @@ void Core::processMode3(){
     //Mode 3 is always enabled
     if(modeProcessed == 3 || getMode() != 3)
         return;
-
-    renderLine();
     //Lets copy internal buffer into screen buffer (its not exactly needed, but more as a safety measure)
     const uint8_t& line = bus->memoryMap[LCD_LY_ADDR];
+    renderLine();
     //std::cout << "line: " << std::dec << static_cast<uint32_t>(line) << std::endl;
     for(int x=0; x<160; x++){
         screen[x][line]=internalBuffer[x][line];
@@ -365,13 +381,7 @@ bool Core::isTileDataSelectHigh() { return bus->memoryMap[LCD_CONTROL_REGISTER_A
 bool Core::isBgTileMapHigh() { return bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0b00001000; }
 bool Core::isSpriteDoubleHeight() { return bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0b00000100; }
 bool Core::isSpriteEnabled() { return bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0b00000010; }
-bool Core::isBGWindowDisplayPriority() { return bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0x1; }
-
-
-//Have in mind that the window is not THE WINDOW, it is a subsection that the PPU can render
-void Core::renderWindow() { 
-
-}
+bool Core::isBGWindowDisplayEnabled() { return bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0x1; }
 
 void Core::checkLYC_LY(){
     //Check for VBLANK
