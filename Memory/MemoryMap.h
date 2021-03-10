@@ -252,8 +252,9 @@ namespace Memory{
 				 * During modes 2 and 3, the CPU cannot access OAM (FE00h-FE9Fh).
 				 * During mode 3, the CPU cannot access VRAM or CGB Palette Data (FF69,FF6B).
 				 */
-				if(addr == 0xFF40){
-					std::cout << "LCD CONTROLLER ATTEMPT" << std::endl;
+				if(addr == 0xFF41){
+					//7th bit (last one) is always 1
+					val |= 0b10000000;
 				}
 				switch(memory[0xFF41] & 0x3){
 					case 2:
