@@ -221,8 +221,8 @@ void Core::renderLine(){
             const uint8_t pos = spritesIndex.at(spritePos);
             const auto& sprite = sprites.at(pos);
             // Bit7   BG and Window over OBJ (0=No, 1=BG and Window colors 1-3 over the OBJ)
-            //if(sprite.priority && backgroundPixelIndex)
-            //   continue;
+            if(sprite.priority && backgroundPixelIndex)
+               continue;
             
             //Currently missing SCX and SCY here, not sure if its needed
             int16_t spriteRow = x - (sprite.posX - 8);
@@ -238,7 +238,7 @@ void Core::renderLine(){
                     //spriteLine = -spriteLine;
                 }
                 if(sprite.flipX) {
-                    spriteRow = (SPRITE_WIDTH - spriteRow);
+                    spriteRow = (SPRITE_WIDTH - spriteRow) - 1;
                 }
 
                 //So the sprite should be shown at this pixel, so lets retrieve the pixel

@@ -238,6 +238,7 @@ namespace Memory{
 				//	std::cout << "Attempt to write at ff00" << std::endl;
 				//	return;
 				//}
+				
 				if(addr < videoRam.position)
 					return;
 				// || 
@@ -251,17 +252,22 @@ namespace Memory{
 				 * During modes 2 and 3, the CPU cannot access OAM (FE00h-FE9Fh).
 				 * During mode 3, the CPU cannot access VRAM or CGB Palette Data (FF69,FF6B).
 				 */
+				if(addr == 0xFF40){
+					std::cout << "LCD CONTROLLER ATTEMPT" << std::endl;
+				}
 				switch(memory[0xFF41] & 0x3){
-					case 0x10:
+					case 2:
+						//NO OAM ACCESS
 						if(addr >= 0xF300 && addr <= 0xFE9F)
 							return;
-					case 0x11:
+					case 0x3:
+						//NO OAM
 						if(addr >= 0xF300 && addr <= 0xFE9F)
 							return;
 						if(addr == 0xFF69 || addr == 0xFF6B)
 							return;
 						//No VRAM access for you
-						if(addr >= 0x8000 || addr <= 0x9FF)
+						if(addr >= 0x8000 && addr <= 0x9FF)
 							return;
 				}
 				//if(addr >= 0xc000 && addr <= 0xc09f){
@@ -301,9 +307,6 @@ namespace Memory{
 						//DMA costs 160 CPU cycles
 						memoryOpCost = 160;
 						return;
-				}
-				if(addr == 0x800A){
-					std::cout << "Writing: " << std::hex << static_cast<uint32_t>(val) << std::endl;
 				}
 				memory[addr] = val;
 			}
