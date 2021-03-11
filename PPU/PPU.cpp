@@ -142,33 +142,46 @@ void Core::getSpritesOnLine(){
 }
 uint8_t Core::renderBackgroundWindowPixel(uint16_t x, bool isWindow){
     const uint16_t line = bus->memoryMap[LCD_LY_ADDR];
-
+    const int windowX = bus->memoryMap[LCD_WX_ADDR] - 7;
+    const int windowY = bus->memoryMap[LCD_WY_ADDR];
+    
+    //Dont render when not needed
     if(!isBGWindowDisplayEnabled()){
-        internalBuffer[x][line] = backgroundColorMap.at(0);
+        if(!isWindow)
+            internalBuffer[x][line] = backgroundColorMap.at(0);
         return 0;
     }
     if(isWindow){
-        //internalBuffer[x][line] = backgroundColorMap.at(0);
         //Skip if window is disabled
         if(!isWindowDisplayEnabled())
             return 0;
         //Skip id window is out of bounds
-        if(bus->memoryMap[LCD_WX_ADDR] < 0 || bus->memoryMap[LCD_WX_ADDR] > 144 ||
-           bus->memoryMap[LCD_WY_ADDR] < 0 || bus->memoryMap[LCD_WY_ADDR] > 166)
+        if(windowX < 0 || windowX > 144 ||
+           windowY < 0 || windowY > 166)
+            return 0;
+
+        //Nothing to render here
+        if(x < windowX || line < windowY)
             return 0;
     }
+
+    if(isWindow)
+        std::cout << "Last Line: " << std::dec << wyLastLineCommited << std::endl;
     
     //I need 2 things here, my real Y position on the screen, this is calculated with line being rendered + SCY
     //which is the "adjustment". Also the reason why its 256 and not the height of the screen is because
     //er are actually moving inside the "screen buffer" which is 256 x 256 (see SCX, its % 256 as well)
     //0xFF42 + 0xFF44
-    const int yAdjusted = isWindow ? static_cast<uint32_t>(line) + bus->memoryMap[LCD_WY_ADDR] : (static_cast<uint32_t>(line) + bus->memoryMap[LCD_SCY_ADDR])%256;
-    //const int yAdjusted = (static_cast<uint32_t>(line) + bus->memoryMap[LCD_SCY_ADDR])%256;
+    const int yAdjusted = isWindow ? static_cast<uint32_t>(line) - windowY : (static_cast<uint32_t>(line) + bus->memoryMap[LCD_SCY_ADDR])%256;
     const int yTileAdjusted = (yAdjusted / 8);
     
     //Now I calculate the difference between the tile index and the adjustment
     //For example, I know that each tile is 8 pixels, so if SCY is 14 I skip the first Tile, then 6 pixels of the picked tile
     const int backgroundLine = (yAdjusted % 8);
+    if(isWindow){
+        std::cout << "Updating to: " << std::dec <<  yAdjusted << std::endl;
+        wyLastLine = yAdjusted;
+    }
 
     //Lets check the tile mode first (tile = background)
     const uint16_t baseTileAddr = isTileDataSelectHigh() ? 0x8000 : 0x8800;
@@ -177,7 +190,7 @@ uint8_t Core::renderBackgroundWindowPixel(uint16_t x, bool isWindow){
 
     //Render background, have in mind that I could possibly do the opposite (render 32 tiles)
     //would probably be WAY cheaper
-    const int xAdjusted = isWindow ? (x + bus->memoryMap[LCD_WX_ADDR] - 7) : (x + bus->memoryMap[LCD_SCX_ADDR])%256;
+    const int xAdjusted = isWindow ? (x - windowX) : (x + bus->memoryMap[LCD_SCX_ADDR])%256;
     const int xTileAdjusted = (xAdjusted / 8);
     
     //Each tile is a byte, so we retrieve the byte that corresponds to this position
@@ -185,9 +198,8 @@ uint8_t Core::renderBackgroundWindowPixel(uint16_t x, bool isWindow){
     const uint32_t tileMemPos = baseBackgroundMapAddr + ((yTileAdjusted * 32 /*tiles per line*/)) + xTileAdjusted;
     int tileIndex = bus->memoryMap[tileMemPos];
     // Used by dr mario :)
-    if (!isWindow && !isTileDataSelectHigh()){
-        if (tileIndex >= INT_MIN)
-            tileIndex = (static_cast<int>(tileIndex - INT_MIN) + INT_MIN);
+    if (!isTileDataSelectHigh()){
+        tileIndex = *reinterpret_cast<int8_t*>(&bus->memoryMap[tileMemPos]);
         tileIndex+=128;
     }
 
@@ -268,13 +280,13 @@ void Core::renderLine(){
     const uint16_t line = bus->memoryMap[LCD_LY_ADDR];
     //This should ALL be white
     for(int x=0; x<160; x++){
-        //const uint8_t windowPixelIndex = renderBackgroundWindowPixel(x, true);
-        //if(windowPixelIndex)
-        //    continue;
-        //renderBackgroundWindowPixel(x, true);
-        //continue;
-        const uint8_t backgroundPixelIndex = renderBackgroundWindowPixel(x, false);
-        //continue;
+        internalBuffer[x][line] = {255, 0, 0};
+        //const uint8_t backgroundPixelIndex = 0;
+        uint8_t backgroundPixelIndex = renderBackgroundWindowPixel(x, false);
+        //internalBuffer[x][line] = {255, 0, 0};
+        if(!backgroundPixelIndex)
+            backgroundPixelIndex = renderBackgroundWindowPixel(x, true);
+
         //Why not render the 10 sprites per line instead of crossing the data per pixel?
         //It is better to do the 10 sprites per line, the performance is wayy better, the only reason is
         //consistency....
@@ -362,6 +374,11 @@ void Core::tick() {
     if(cycles++ >= 456)
         cycles = 0;
 
+    if(!isWindowDisplayEnabled() && wyLastLine > wyLastLineCommited) {
+        wyLastLineCommited = wyLastLine;
+        wyLastLine = 0;
+    }
+
     uint8_t& line = bus->memoryMap[LCD_LY_ADDR];
     if(line <= 143){
         if(cycles <= 80){
@@ -376,8 +393,7 @@ void Core::tick() {
         } else if(cycles < 456){
             //Mode 0 does nothing, 
             lineRendered = false;
-            setMode(0);
-            
+            setMode(0);   
         }
         else {
             // Increment line if 456
@@ -394,7 +410,7 @@ void Core::tick() {
         //if V-BLANK interrupt.. as its done only on line 144, its done only once (we will increment the line after that.)
         setMode(1);
         processModes();
-
+        wyLastLineCommited = wyLastLine = 0;
         if(cycles == 456){
             line++;
             //std::cout << "LY: " << std::hex << static_cast<uint32_t>(bus->memoryMap[LCD_LY_ADDR]) << std::endl;

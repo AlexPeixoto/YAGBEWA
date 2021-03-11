@@ -51,7 +51,8 @@ namespace PPU{
         bool vblankServed = false;
         //Check if LYC=LC was served on that line already
         bool LYCLCServed = false;
-
+        uint16_t wyLastLine = 0;
+        uint16_t wyLastLineCommited = 0;
 
         Bus* bus;
 
