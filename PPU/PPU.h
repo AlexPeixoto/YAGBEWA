@@ -49,6 +49,9 @@ namespace PPU{
         uint8_t modeProcessed=5;
         //Check if vblank was served this frame
         bool vblankServed = false;
+        //Check if LYC=LC was served on that line already
+        bool LYCLCServed = false;
+
 
         Bus* bus;
 

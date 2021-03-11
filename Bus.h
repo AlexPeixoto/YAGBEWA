@@ -21,6 +21,7 @@ private:
     
 	void updateTimerValue();
 	void clockUpdate(uint16_t ticks);
+	bool isInterruptionPending();
 	void performInterruption();
 
 public:

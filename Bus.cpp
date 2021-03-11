@@ -1,4 +1,5 @@
 #include <Bus.h>
+#include <bitset>
 
 namespace{
 	const uint32_t FREQUENCY = 4194304;
@@ -27,37 +28,50 @@ void Bus::runCycle() {
 	static uint64_t pendingCycles = 0;
 
 	//"Global" clock
-	uint32_t clock = 0; //pendingCycles;
+	uint32_t clock = pendingCycles; //pendingCycles;
 
 	//Current number of cycles
-	uint32_t numberCyclesCurrent = 0;
+		
 	while(clock < CYCLES_PER_FRAME){
-			
-		//For revert we still continue execution, but PC will fail to increase
-		if(cpu.getHaltType() == CPU::HaltType::None || cpu.getHaltType() == CPU::HaltType::Revert)
+		uint32_t numberCyclesCurrent = 0;
+		
+		uint8_t cost = memoryMap.getAndTick4();
+		if( cost == 0 &&  //Are we still paying for the DMA
+			!cpu.stopped() &&  //Is the CPU stopped?
+			//For revert we still continue execution, but PC will fail to increase
+			(cpu.getHaltType() == CPU::HaltType::None || cpu.getHaltType() == CPU::HaltType::Revert))
 		{
 			cpu.enableInterruptionIfOnNext();
 
 			//This is to create a cycle acurrate emulation, where we "burn the cycles"
 			numberCyclesCurrent=cpu.tick();
+			//std::cout << "Background enabled: " << (((memoryMap[0xFF40] & 0x1) == 0x1) ? "1" : "0") << std::endl; 
 			//No need to add memory cost, the DMA doest halt the CPU, it just take that many cycles to complete
 			//So we dont calculate it, its the game's code job to swait for it to finish
 			clock+=numberCyclesCurrent;
 			totalCycles+=numberCyclesCurrent;
+			//std::cout << "NOT HALTED" << std::endl;
+		} else {
+			//std::cout << "HALTED" << std::endl;
+			cost += 4;
 		}
+		/*if(cpu.interruptionsEnabled() && cpu.interruptionsEnabled()){
+			cost += 12;
+		}*/
+		numberCyclesCurrent += cost;
+		clock += cost;
+
 		//This sometimes causes a skip on the whole line or just skips a step
 		//Graphics here, IT IS DONE with the CPU
-		for(int _clock=0; _clock < numberCyclesCurrent; _clock++)
-			ppu.tick();
+		for(int _clock=0; _clock < numberCyclesCurrent; _clock++){
+			ppu.tick();	
+		}
+
 		//Timer, we use pending here
 		updateTimerValue();
 		clockUpdate(numberCyclesCurrent);
 		//Interruptions
-		performInterruption();
-		
-
-		//Extra thing that can be done here is to get "remaining cycles (like if the limit is 10 and we ran 12, we have to discount from next frame)"
-		//That should not be a huge ISSUE, but still
+		performInterruption();		
 	}
 	//Store remaining cycles to burn on next execution.
 	pendingCycles = clock - CYCLES_PER_FRAME;
@@ -84,6 +98,8 @@ void Bus::updateTimerValue() {
 }
 
 void Bus::setInterruptFlag(CPU::INTERRUPTIONS_TYPE type){
+	//std::cout << "SET IF TO: " << static_cast<uint32_t>(type) << std::endl;
+	//std::cout << "STAT VALUE: " << static_cast<uint32_t>(memoryMap[0XFF41]) << std::endl;
 	memoryMap[IF_ADDR] |= (1UL << static_cast<int>(type));
 }
 
@@ -117,21 +133,28 @@ void Bus::clockUpdate(uint16_t ticks) {
 		return;
 	}
 }
-
+bool Bus::isInterruptionPending() {
+	const uint8_t _IE = memoryMap[IE_ADDR];
+	const uint8_t _IF = memoryMap[IF_ADDR];
+	return ((_IF & _IE) & 0x1F);
+}
 //This should be moved to the CPU
 void Bus::performInterruption() {
 	const uint8_t _IE = memoryMap[IE_ADDR];
 	const uint8_t _IF = memoryMap[IF_ADDR];
 
-	//Specific unhalt mechanism for IF (Even if IE is zero)
-	if(_IF != 0){
+	//Specific unhalt mechanism if we have an interruption to be served
+	if(isInterruptionPending()){
 		cpu.resetHalt();
+		cpu.resume();
+	} else {
+		//No interruption to serve, so lets get out
+		return;
 	}
+
+	//We undo the halt if _IF is set even if interrupts are not enabled
 	if(!cpu.interruptionsEnabled())
 		return;
-	
-	//Reset halt so CPU can continue to execute instructions
-	cpu.resetHalt();
 
 	//RevertPC interruption bug is handled directly on executeNext.
 	//If an interruption happens, and the HALT was triggered with disabled interruptions
@@ -141,28 +164,25 @@ void Bus::performInterruption() {
 		return;
 	}
 
-	//If there is any interruption enabled, and if there was any interruption triggered
-	
-	if(_IE != 0 && _IF != 0){
-		//Look at the 5 possible bits and check if any is both enabled and checked
-		//Interruptuion priority goes from the highest bit to the lowest
-		for(int x=4; x>=0; x--){
-			if((_IE >> x) & 0x1 && (_IF >> x) & 0x1){
-				//Disable interruption
-				cpu.disableInterruptions();
+	//Look at the 5 possible bits and check if any is both enabled and checked
+	//Interruptuion priority goes from the highest bit to the lowest
+	for(int x=4; x>=0; x--){
+		if((_IE >> x) & 0x1 && (_IF >> x) & 0x1){
+			//Disable interruption
+			cpu.disableInterruptions();
 
-				//Store PC on stack
-				//Have in mind that here the PC is already incremented, so no need to increment before push
-				cpu.pushPC();
-				
-				cpu.setPC(INTERRUPTION_TARGET[x]);
-				//Reset IF flag
-				memoryMap[IF_ADDR] &= ~(1UL << x);
-				//Stop here, we serve this interruption, once it finishes we serve
-				//the next one (if we just set the PC twice we will only serve the one)
-				//with the lowest priority
-				return;
-			}
+			//Store PC on stack
+			//Have in mind that here the PC is already incremented, so no need to increment before push
+			cpu.pushPC();
+			//std::cout << "Interrupt to: " << std::hex << static_cast<uint32_t>(INTERRUPTION_TARGET[x]) << std::endl;
+			
+			cpu.setPC(INTERRUPTION_TARGET[x]);
+			//Reset IF flag (we DO NOT reset the IE flag here)
+			memoryMap[IF_ADDR] &= ~(1UL << x);
+			//Stop here, we serve this interruption, once it finishes we serve
+			//the next one (if we just set the PC twice we will only serve the one)
+			//with the lowest priority
+			return;
 		}
 	}
 }

@@ -118,8 +118,8 @@ uint16_t OpCodeMapping::executeNext(LR35902& cpu, Memory::Map& memMap){
     }*/
     
     
-    /*std::cout << std::hex << static_cast<uint32_t>(*oldPC) << " at " << std::hex << (oldPC - memMap.getRomStart()) << " Call:" << std::dec << opcall++ << "\n";
-    std::cout << "B: " << std::hex << static_cast<uint32_t>(cpu.registers.BC[0]) << "\n";
+    //std::cout << std::hex << static_cast<uint32_t>(*oldPC) << " at " << std::hex << (oldPC - memMap.getRomStart()) << " Call:" << std::dec << opcall++ << "\n";
+    /*std::cout << "B: " << std::hex << static_cast<uint32_t>(cpu.registers.BC[0]) << "\n";
     std::cout << "SP: " << std::hex << static_cast<uint32_t>(cpu.registers.SP) << "\n";
     std::cout << "A: " << std::hex << static_cast<uint32_t>(cpu.registers.A) << "\n";
     std::cout << "B: " << std::hex << static_cast<uint32_t>(cpu.registers.BC[0]) << "\n";
@@ -148,15 +148,15 @@ void OpCodeMapping::Call::CB_OPCODE(LR35902& cpu, Memory::Map& memMap, OpStructu
 
 void OpCodeMapping::Call::HALT(LR35902& cpu, Memory::Map& memMap, OpStructure&){
     if(cpu.imeType != IMEType::Enabled){
-        if((memMap[0xFFFF] & memMap[0xFF0F] & 0x1F) != 0){
+        if((memMap[0xFFFF] & memMap[0xFF0F] & 0x1F) == 0x1F){
             cpu.haltType = HaltType::Revert;
         }
-        else if((memMap[0xFFFF] & memMap[0xFF0F] & 0x1F) == 0){
+        else if((memMap[0xFFFF] & memMap[0xFF0F] & 0x1F) != 0x1F){
             cpu.haltType = HaltType::NoInterruption;
         }
+    } else {
+        cpu.haltType = HaltType::Normal;
     }
-
-    cpu.haltType = HaltType::Normal;
 }
 
 void OpCodeMapping::Call::STOP(LR35902& cpu, Memory::Map&, OpStructure&){
@@ -196,6 +196,7 @@ void OpCodeMapping::Call::_LD_REG16_d16(uint8_t reg[2], LR35902& cpu){
     ++cpu.registers.PC;
     //Its zero because of <<
     reg[0] = *cpu.registers.PC;
+
 }
 
 // Store value in register REG8 into byte pointed to by register r16.

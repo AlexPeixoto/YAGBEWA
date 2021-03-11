@@ -67,7 +67,7 @@ void Core::setMode(uint8_t mode){
     bus->memoryMap[LCD_STATUS_REGISTER_ADDR] |= (mode & 0x3);
     //We also check if the the specifc bit for that interrupt is enabled, if it is
     //during the mode switch we trigger a LCDC interrupt
-    const uint8_t modeBit = (mode + 3);
+    const uint8_t modeBit = (mode + 2);
     if(bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & (1UL << modeBit))
         bus->setInterruptFlag(CPU::INTERRUPTIONS_TYPE::LCDC);
 }
@@ -132,7 +132,7 @@ void Core::getSpritesOnLine(){
         const int16_t realPosY = sprite.posY - 16;
         if(realPosY <= line && (realPosY + height) > line &&
             //Check if we are inside the screen
-            realPosX > 0 && realPosX <= 168){
+            realPosX >= 0 && realPosX <= 168){
                 spritesIndex[spritesOnLine++] = pos;
                 //As per GB documentation we only support 10 sprites per line.
                 if(spritesOnLine == 10)
@@ -143,14 +143,15 @@ void Core::getSpritesOnLine(){
 uint8_t Core::renderBackgroundWindowPixel(uint16_t x, bool isWindow){
     const uint16_t line = bus->memoryMap[LCD_LY_ADDR];
 
-    /*if(!isBGWindowDisplayEnabled()){
-        //std::cout << "Disabled for y = " << static_cast<uint32_t>(bus->memoryMap[LCD_LY_ADDR]) << std::endl;
+    if(!isBGWindowDisplayEnabled()){
         internalBuffer[x][line] = backgroundColorMap.at(0);
         return 0;
     }
-    if(isWindow && !isWindowDisplayEnabled())
+    if(isWindow && !isWindowDisplayEnabled()){
+        internalBuffer[x][line] = backgroundColorMap.at(0);
         return 0;
-    */
+    }
+    
     //I need 2 things here, my real Y position on the screen, this is calculated with line being rendered + SCY
     //which is the "adjustment". Also the reason why its 256 and not the height of the screen is because
     //er are actually moving inside the "screen buffer" which is 256 x 256 (see SCX, its % 256 as well)
@@ -170,7 +171,6 @@ uint8_t Core::renderBackgroundWindowPixel(uint16_t x, bool isWindow){
 
     //Render background, have in mind that I could possibly do the opposite (render 32 tiles)
     //would probably be WAY cheaper
-    //Should be pixel + scroll X
     const int xAdjusted = isWindow ? (x + bus->memoryMap[LCD_WX_ADDR]) : (x + bus->memoryMap[LCD_SCX_ADDR])%256;
     const int xTileAdjusted = (xAdjusted / 8);
     
@@ -208,8 +208,7 @@ void Core::renderLine(){
         //if(windowPixelIndex)
         //    continue;
         const uint8_t backgroundPixelIndex = renderBackgroundWindowPixel(x, false);
-        
-        //const uint8_t backgroundPixelIndex = 1;
+        //continue;
         //Now lets see if the is a sprite for this pixel/line
         //PUT INSIDE RENDER_SPRITE perhaps
         //Why not render the 10 sprites per line instead of crossing the data per pixel?
@@ -217,28 +216,31 @@ void Core::renderLine(){
         //consistency....
         //As this is more of an experiment there is no concern here from performance perspective
         //This can easily be changed, but I wanted to do something different just to learn.....
+        //Used for priority;
+        uint16_t lastPos = 257;
         for(uint8_t spritePos = 0; spritePos < spritesOnLine; spritePos++) {
             const uint8_t pos = spritesIndex.at(spritePos);
             const auto& sprite = sprites.at(pos);
             // Bit7   BG and Window over OBJ (0=No, 1=BG and Window colors 1-3 over the OBJ)
             if(sprite.priority && backgroundPixelIndex)
                continue;
-            
-            //Currently missing SCX and SCY here, not sure if its needed
+
             int16_t spriteRow = x - (sprite.posX - 8);
             int16_t spriteLine = line - (sprite.posY - 16);
             if(spriteRow >= 0 && spriteRow <= 7) {
+                
                 const auto& selectedPallete = sprite.pallete ? objectPallete2 : objectPallete1;
-                //Do we need to perform any flip?
                 if(sprite.flipY) {
                     //We are reading it from the other direction. Also if its double height we multiply
                     //the height by 2, if not just by 1.
                     spriteLine = (SPRITE_HEIGHT * (isSpriteDoubleHeight() + 1)) - spriteLine;
-                    //So we read in a negative way relative to the sprite pos
-                    //spriteLine = -spriteLine;
+                    //Properly adjust it so our range is 0-15
+                    spriteLine -= 1;
                 }
                 if(sprite.flipX) {
-                    spriteRow = (SPRITE_WIDTH - spriteRow) - 1;
+                    spriteRow = (SPRITE_WIDTH - spriteRow);
+                    //Properly adjust it so our range is 0-7
+                    spriteRow -= 1;
                 }
 
                 //So the sprite should be shown at this pixel, so lets retrieve the pixel
@@ -254,9 +256,9 @@ void Core::renderLine(){
                 const uint8_t spritePixelIndex = (spriteColorIndex_0 >> spriteBit) & 0x1 | 
                                                 (((spriteColorIndex_1 >> spriteBit) & 0x1) << 1);
                 //std::cout << "SpritePixelIndex:" << spritePixelIndex << std::endl;
-                if(spritePixelIndex)
+                if(spritePixelIndex){
                     internalBuffer[x][line] = selectedPallete.at(spritePixelIndex);
-
+                }
             }
         }
         //renderBackgroundWindowPixel(x, true);
@@ -324,6 +326,12 @@ void Core::tick() {
     if(!isLCDEnabled())
         return;
 
+    /*std::cout << "LY: " << std::hex << static_cast<uint32_t>(bus->memoryMap[LCD_LY_ADDR]) << std::endl;
+    std::cout << "LYC: " << std::hex << static_cast<uint32_t>(bus->memoryMap[LCD_LYC_ADDR]) << std::endl;
+    std::cout << "STAT: " << std::hex << static_cast<uint32_t>(bus->memoryMap[LCD_STATUS_REGISTER_ADDR]) << std::endl;
+    std::cout << "CONTROL: " << std::hex << static_cast<uint32_t>(bus->memoryMap[LCD_CONTROL_REGISTER_ADDR]) << std::endl;
+    std::cout << "Background: " << std::dec << static_cast<uint32_t>(isBGWindowDisplayEnabled()) << std::endl;*/
+    
     //Cycle through modes, 2, 3, 0, 1.
     //OAM, DRAWING, H-BLANK, V-BLANK
 
@@ -335,57 +343,73 @@ void Core::tick() {
     if(cycles++ >= 456)
         cycles = 0;
 
-    
     uint8_t& line = bus->memoryMap[LCD_LY_ADDR];
     if(line <= 143){
         if(cycles <= 80){
             setMode(2);
+            //processModes();
         } else if(cycles <= 252){
             //Mode 3 is set to the shortest amount of time 172 dots (as we do the rendering in one shot)
             //then we give the most amount of time back to the CPU to perform operations
             //While it is possilble to have accurate timming currently its probably not worth it (unless some game is really bound to this timming).
             setMode(3);
+            //processModes();
         } else if(cycles < 456){
             //Mode 0 does nothing, 
             lineRendered = false;
             setMode(0);
+            
         }
         else {
             // Increment line if 456
             line++;
+            checkLYC_LY();
+            //std::cout << "LY: " << std::hex << static_cast<uint32_t>(bus->memoryMap[LCD_LY_ADDR]) << std::endl;
+            //std::cout << "LYC: " << std::hex << static_cast<uint32_t>(bus->memoryMap[LCD_LYC_ADDR]) << std::endl;
             return;
         }
         processModes();
-        checkLYC_LY();
+        //checkLYC_LY();
+        
     } else {
         //if V-BLANK interrupt.. as its done only on line 144, its done only once (we will increment the line after that.)
         setMode(1);
+        processModes();
 
         if(cycles == 456){
             line++;
-            vblankServed = false;
+            //std::cout << "LY: " << std::hex << static_cast<uint32_t>(bus->memoryMap[LCD_LY_ADDR]) << std::endl;
+            //std::cout << "LYC: " << std::hex << static_cast<uint32_t>(bus->memoryMap[LCD_LYC_ADDR]) << std::endl;
+            vblankServed = LYCLCServed = false;
             if(line == 152){
-                std::cout << "FRAME: Finished" << std::endl;
                 line = 0;
+                //std::cout << "LY: " << std::hex << static_cast<uint32_t>(bus->memoryMap[LCD_LY_ADDR]) << std::endl;
+                //std::cout << "LYC: " << std::hex << static_cast<uint32_t>(bus->memoryMap[LCD_LYC_ADDR]) << std::endl;
             }
-        }
-        processModes();
-        checkLYC_LY();
+            checkLYC_LY();
+        }   
     }
 }
 
-bool Core::isLCDEnabled() { return bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0b10000000; }
-bool Core::isWindowTileMapDisplaySelectHigh() { return bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0b01000000; }
-bool Core::isWindowDisplayEnabled() { return bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0b00100000; }
-bool Core::isTileDataSelectHigh() { return bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0b00010000; }
-bool Core::isBgTileMapHigh() { return bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0b00001000; }
-bool Core::isSpriteDoubleHeight() { return bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0b00000100; }
-bool Core::isSpriteEnabled() { return bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0b00000010; }
-bool Core::isBGWindowDisplayEnabled() { return bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0x1; }
+bool Core::isLCDEnabled() { return (bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0b10000000) == 0b10000000; }
+bool Core::isWindowTileMapDisplaySelectHigh() { return (bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0b01000000) == 0b01000000; }
+bool Core::isWindowDisplayEnabled() { return (bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0b00100000) == 0b00100000; }
+bool Core::isTileDataSelectHigh() { return (bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0b00010000) == 0b00010000; }
+bool Core::isBgTileMapHigh() { return (bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0b00001000) == 0b00001000; }
+bool Core::isSpriteDoubleHeight() { return (bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0b00000100) == 0b00000100; }
+bool Core::isSpriteEnabled() { return (bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0b00000010) == 0b00000010; }
+bool Core::isBGWindowDisplayEnabled() { return (bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0x1) == 0x1; }
 
 void Core::checkLYC_LY(){
+    //Set coincidence bit
+    if(bus->memoryMap[LCD_LY_ADDR] == bus->memoryMap[LCD_LYC_ADDR]){
+        bus->memoryMap[LCD_STATUS_REGISTER_ADDR] |= 0b0000100;
+    }
     //Check for VBLANK
-    if(bus->memoryMap[LCD_LY_ADDR] == 144 && !vblankServed/* && bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0x00010000*/) {
+    //std::cout << "Stop at: " << std::dec << static_cast<uint32_t>(bus->memoryMap[LCD_LYC_ADDR]) << std::endl;
+    //std::cout << "Compare at: " << std::dec << static_cast<uint32_t>(bus->memoryMap[LCD_LY_ADDR])
+    //          << " and " << std::dec << static_cast<uint32_t>(bus->memoryMap[LCD_LYC_ADDR]) << std::endl;
+    if(bus->memoryMap[LCD_LY_ADDR] == 144 && !vblankServed) {
         //This is managed by the main IE/IF structure not the LCDC
         bus->setInterruptFlag(CPU::INTERRUPTIONS_TYPE::VBLANK);
         vblankServed = true;
@@ -397,14 +421,15 @@ void Core::checkLYC_LY(){
         bus->memoryMap[LCD_STATUS_REGISTER_ADDR] &= ~(0b00010000);
     } 
     //MIMICS STAT IRQ Blocking
-    else if(bus->memoryMap[LCD_LY_ADDR] == bus->memoryMap[LCD_LYC_ADDR]) {
-        bus->memoryMap[LCD_STATUS_REGISTER_ADDR] |= 0b0000100;
-        //If the coincidence interrupt is not enabled, we just skip this
-        if((bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0b00100000) == 0)
-            return;
-
+    else if(
+        (bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0x4) == 0x4 &&
+        (bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0x40) == 0x40) {
+        //std::cout << "IINTERRUPT TRIGGERED LYX=LC: " << std::hex << static_cast<uint32_t>(bus->memoryMap[LCD_LY_ADDR]) << std::endl;
         //Set Coincidence flag
+        bus->memoryMap[LCD_STATUS_REGISTER_ADDR] |= 0b0000100;
         bus->setInterruptFlag(CPU::INTERRUPTIONS_TYPE::LCDC);
-        bus->memoryMap[LCD_STATUS_REGISTER_ADDR] &= ~(0b00100000);
+        //bus->memoryMap[LCD_STATUS_REGISTER_ADDR] &= ~(0b00100000);
+        //Unset the flags
+        bus->memoryMap[LCD_STATUS_REGISTER_ADDR] &= ~(0b00000100);
     }  
 }

@@ -24,19 +24,20 @@ int main(int argc, char** argv){
 	Bus bus;
 
     //Games
-	//bus.cartridge.loadRom("Tetris.gb");
+	bus.cartridge.loadRom("Tetris.gb");
     //bus.cartridge.loadRom("drmario.gb");
 
-    bus.cartridge.loadRom("dmg-acid2.gb");
+    //SCX ONLY USED FOR FOOTER
+    //bus.cartridge.loadRom("dmg-acid2.gb");
     //Tests
     //bus.cartridge.loadRom("01op.gb");
-    //bus.cartridge.loadRom("02op.gb");
+    //bus.cartridge.loadRom("02op.gb"); //interrupts
     //bus.cartridge.loadRom("03op.gb");
     //bus.cartridge.loadRom("04op.gb");
     //bus.cartridge.loadRom("05op.gb");
     //bus.cartridge.loadRom("06op.gb");
     //bus.cartridge.loadRom("07op.gb");
-    //bus.cartridge.loadRom("08op.gb");
+    //bus.cartridge.loadRom("08op.gb"); //misc
     //bus.cartridge.loadRom("09op.gb");
     //bus.cartridge.loadRom("10op.gb");
     //bus.cartridge.loadRom("11op.gb");

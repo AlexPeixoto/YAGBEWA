@@ -72,9 +72,11 @@ namespace Memory{
 			//Mainly used for UT
 			Map(){}
 
-			uint16_t getAndResetCost(){
+			uint16_t getAndTick4(){
+				if(memoryOpCost<=0)
+					return 0;
 				uint16_t tmp = memoryOpCost;
-				memoryOpCost = 0;
+				memoryOpCost -= 4;
 				return tmp;
 			}
 
@@ -261,7 +263,7 @@ namespace Memory{
 						//NO OAM ACCESS
 						if(addr >= 0xF300 && addr <= 0xFE9F)
 							return;
-					case 0x3:
+					case 3:
 						//NO OAM
 						if(addr >= 0xF300 && addr <= 0xFE9F)
 							return;
@@ -309,6 +311,11 @@ namespace Memory{
 						memoryOpCost = 160;
 						return;
 				}
+				if(addr == 0xFF0F)
+					std::cout << "UPDATING IF TO: " << static_cast<uint32_t>(val) << std::endl;
+
+				if(addr == 0xFFFF)
+					std::cout << "UPDATING IE TO: " << static_cast<uint32_t>(val) << std::endl;
 				memory[addr] = val;
 			}
 

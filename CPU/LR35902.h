@@ -63,6 +63,7 @@ namespace CPU{
 		void setPC(uint16_t target);
 
 		bool stopped() { return stop; }
+		void resume() { stop = false; }
 		bool interruptionsEnabled() { return imeType == IMEType::Enabled; }
 		void disableInterruptions() { imeType = IMEType::None; }
 		//Interruptions are enabled on next loop
