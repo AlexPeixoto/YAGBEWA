@@ -47,12 +47,9 @@ namespace PPU{
         uint8_t spritesOnLine;
         //Mark an invalid mode
         uint8_t modeProcessed=5;
-        //Check if vblank was served this frame
-        bool vblankServed = false;
-        //Check if LYC=LC was served on that line already
-        bool LYCLCServed = false;
-        uint16_t wyLastLine = 0;
-        uint16_t wyLastLineCommited = 0;
+        //Mechanism to remember the last rendered window y on this frame
+        uint32_t wyLastLine = 0;
+        uint32_t wyLastLineCommited = 0;
 
         Bus* bus;
 

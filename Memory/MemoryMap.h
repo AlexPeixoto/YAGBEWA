@@ -50,6 +50,8 @@ namespace Memory{
 			MemoryArray memory;
 			Bus* bus;
 
+			uint8_t buttons, directions;
+
 			//Some very rare occasions (like DMA) creates a cycle cost
 			uint16_t memoryOpCost = 0;
         public:
@@ -71,6 +73,11 @@ namespace Memory{
 			};
 			//Mainly used for UT
 			Map(){}
+
+			void setButtonsDirections(uint8_t buttons, uint8_t directions){
+				this->buttons = buttons;
+				this->directions = directions;
+			}
 
 			uint16_t getAndTick4(){
 				if(memoryOpCost<=0)
@@ -236,17 +243,19 @@ namespace Memory{
 			//Write here does not allow (for now), to write on vram
 			inline void write(uint8_t val, uint16_t addr) { 
 				//Tetris testing JOYP hack
-				//if(addr == 0xFF00){
-				//	std::cout << "Attempt to write at ff00" << std::endl;
-				//	return;
-				//}
+				if(addr == 0xFF00){
+					//Button
+					if((val & 0b00100000)== 0b00100000){
+						memory[addr] = buttons;
+					} else if((val & 0b00100000)== 0b00100000){
+						memory[addr] = directions;
+					}
+					return;
+				}
 				
 				if(addr < videoRam.position)
 					return;
-				// || 
-				//	//Prohibited areas
-				//	addr >= 0xE000 && addr <= 0xFDFF)
-				//	return;
+
 				//Block CPU writes on mode 2 or 3 to the VRAM memory
 				/*
 				 * When the LCD controller is reading a particular part of video memory, that memory is inaccessible to the CPU.
@@ -302,7 +311,6 @@ namespace Memory{
 						//PPU DMA TRANSFER
 						uint16_t startAddress = 0;
 						startAddress |= val << 8;
-						//std::cout << "DMA TO: " << std::hex << static_cast<uint32_t>(startAddress) << std::endl;
 						//Source:      XX00-XX9F   ;XX in range from 00-F1h
 						//Destination: FE00-FE9F
 						//costs 160 cycles (but not mapped yet).
@@ -311,11 +319,7 @@ namespace Memory{
 						memoryOpCost = 160;
 						return;
 				}
-				if(addr == 0xFF0F)
-					std::cout << "UPDATING IF TO: " << static_cast<uint32_t>(val) << std::endl;
 
-				if(addr == 0xFFFF)
-					std::cout << "UPDATING IE TO: " << static_cast<uint32_t>(val) << std::endl;
 				memory[addr] = val;
 			}
 

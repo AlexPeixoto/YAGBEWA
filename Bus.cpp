@@ -30,7 +30,7 @@ void Bus::runCycle() {
 	//"Global" clock
 	uint32_t clock = pendingCycles; //pendingCycles;
 
-	//Current number of cycles
+	//memoryMap.setButtonsDirections(buttons, directions);
 		
 	while(clock < CYCLES_PER_FRAME){
 		uint32_t numberCyclesCurrent = 0;
@@ -45,14 +45,11 @@ void Bus::runCycle() {
 
 			//This is to create a cycle acurrate emulation, where we "burn the cycles"
 			numberCyclesCurrent=cpu.tick();
-			//std::cout << "Background enabled: " << (((memoryMap[0xFF40] & 0x1) == 0x1) ? "1" : "0") << std::endl; 
 			//No need to add memory cost, the DMA doest halt the CPU, it just take that many cycles to complete
 			//So we dont calculate it, its the game's code job to swait for it to finish
 			clock+=numberCyclesCurrent;
 			totalCycles+=numberCyclesCurrent;
-			//std::cout << "NOT HALTED" << std::endl;
 		} else {
-			//std::cout << "HALTED" << std::endl;
 			cost += 4;
 		}
 		/*if(cpu.interruptionsEnabled() && cpu.interruptionsEnabled()){
@@ -98,12 +95,11 @@ void Bus::updateTimerValue() {
 }
 
 void Bus::setInterruptFlag(CPU::INTERRUPTIONS_TYPE type){
-	//std::cout << "SET IF TO: " << static_cast<uint32_t>(type) << std::endl;
-	//std::cout << "STAT VALUE: " << static_cast<uint32_t>(memoryMap[0XFF41]) << std::endl;
 	memoryMap[IF_ADDR] |= (1UL << static_cast<int>(type));
 }
 
 //This does *NOT* implement the obscure behaviour of the DIV
+//Also this is quite untested
 void Bus::clockUpdate(uint16_t ticks) {
 	//Isolated number of ticks for the timer
 	static uint32_t clockTicks=0;
@@ -136,15 +132,16 @@ void Bus::clockUpdate(uint16_t ticks) {
 bool Bus::isInterruptionPending() {
 	const uint8_t _IE = memoryMap[IE_ADDR];
 	const uint8_t _IF = memoryMap[IF_ADDR];
-	return ((_IF & _IE) & 0x1F);
+	return ((_IF & _IE));// & 0x1F);
 }
+
 //This should be moved to the CPU
 void Bus::performInterruption() {
 	const uint8_t _IE = memoryMap[IE_ADDR];
 	const uint8_t _IF = memoryMap[IF_ADDR];
 
 	//Specific unhalt mechanism if we have an interruption to be served
-	if(isInterruptionPending()){
+	if(_IF){ //isInterruptionPending()){
 		cpu.resetHalt();
 		cpu.resume();
 	} else {
@@ -174,7 +171,6 @@ void Bus::performInterruption() {
 			//Store PC on stack
 			//Have in mind that here the PC is already incremented, so no need to increment before push
 			cpu.pushPC();
-			//std::cout << "Interrupt to: " << std::hex << static_cast<uint32_t>(INTERRUPTION_TARGET[x]) << std::endl;
 			
 			cpu.setPC(INTERRUPTION_TARGET[x]);
 			//Reset IF flag (we DO NOT reset the IE flag here)

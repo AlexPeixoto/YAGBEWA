@@ -78,23 +78,18 @@ uint8_t Core::getMode(){
 
 void Core::initPalleteTable(std::array<Color, 4>& palette, uint16_t memPosition){
     const uint8_t paletteMem = bus->memoryMap[memPosition];
-    //std::cout << "Hex pallete mem value: " << std::hex << static_cast<uint32_t>(paletteMem) << " at " << std::hex << static_cast<uint32_t>(memPosition) << std::endl;
     for(int x=0; x<=3; x++){
         switch((paletteMem >> (x * 2)) & 0x3){
             case 0x00:
-                //std::cout << "Pallete for: " << x << " is 00 {FF}" << std::endl;
                 palette[x] = {0xFF, 0xFF, 0xFF};
                 continue;
             case 0x01:
-                //std::cout << "Pallete for: " << x << " is 01 {CC}" << std::endl;
                 palette[x] = {0xCC, 0xCC, 0xCC};
                 continue;
             case 0x02:
-                //std::cout << "Pallete for: " << x << " is 02 {66}" << std::endl;
                 palette[x] = {0x66, 0x66, 0x66};
                 continue;
             case 0x03:
-                //std::cout << "Pallete for: " << x << " is 03 {00}" << std::endl;
                 palette[x] = {0x00, 0x00, 0x00};
                 continue;
         }
@@ -106,7 +101,6 @@ void Core::initSprites(){
         //4 bytes per entry
         const uint8_t spacing = 4;
         const uint8_t flags = bus->memoryMap[OAM_TABLE_ADDR + (x * spacing) + 3];
-        //std::cout << "FULL FLAG: " << static_cast<uint32_t>(flags) << std::endl;
         sprites.at(x) = {
             bus->memoryMap[OAM_TABLE_ADDR + (x * spacing)], //pos x
             bus->memoryMap[OAM_TABLE_ADDR + (x * spacing) + 1], //pos y
@@ -144,63 +138,83 @@ uint8_t Core::renderBackgroundWindowPixel(uint16_t x, bool isWindow){
     const uint16_t line = bus->memoryMap[LCD_LY_ADDR];
     const int windowX = bus->memoryMap[LCD_WX_ADDR] - 7;
     const int windowY = bus->memoryMap[LCD_WY_ADDR];
-    
+    bool stopRenderingOfPixel = false;
+    bool commitPosition = false;
     //Dont render when not needed
     if(!isBGWindowDisplayEnabled()){
+        //We fill as empty color if not window (when disabled)
         if(!isWindow)
             internalBuffer[x][line] = backgroundColorMap.at(0);
-        return 0;
+        stopRenderingOfPixel = commitPosition = true;
     }
     if(isWindow){
         //Skip if window is disabled
         if(!isWindowDisplayEnabled())
-            return 0;
+            stopRenderingOfPixel = true;
+
         //Skip id window is out of bounds
         if(windowX < 0 || windowX > 144 ||
            windowY < 0 || windowY > 166)
-            return 0;
+            stopRenderingOfPixel = commitPosition = true;
 
         //Nothing to render here
         if(x < windowX || line < windowY)
-            return 0;
+            stopRenderingOfPixel = true;
     }
-
-    if(isWindow)
-        std::cout << "Last Line: " << std::dec << wyLastLineCommited << std::endl;
+    if(stopRenderingOfPixel){
+        //Here I mimic the behaviour where it has to remember the
+        //last rendered line (Broken, but i will leave it here for now)
+        if(commitPosition && wyLastLine > wyLastLineCommited) {
+            //The last line that I rendered, so start from next one
+            wyLastLineCommited = wyLastLine + 1;
+            wyLastLine = 0;
+        }
+        return 0;
+    }
     
     //I need 2 things here, my real Y position on the screen, this is calculated with line being rendered + SCY
     //which is the "adjustment". Also the reason why its 256 and not the height of the screen is because
     //er are actually moving inside the "screen buffer" which is 256 x 256 (see SCX, its % 256 as well)
     //0xFF42 + 0xFF44
-    const int yAdjusted = isWindow ? static_cast<uint32_t>(line) - windowY : (static_cast<uint32_t>(line) + bus->memoryMap[LCD_SCY_ADDR])%256;
+    const int yAdjusted = isWindow ? (static_cast<uint32_t>(line) - windowY) + wyLastLineCommited : 
+        //Now I calculate the difference between the tile index and the adjustment
+        //For example, I know that each tile is 8 pixels, so if SCY is 14 I skip the first Tile, then 6 pixels of the picked tile    
+        //ELSE
+        (static_cast<uint32_t>(line) + bus->memoryMap[LCD_SCY_ADDR])%256;
     const int yTileAdjusted = (yAdjusted / 8);
     
-    //Now I calculate the difference between the tile index and the adjustment
-    //For example, I know that each tile is 8 pixels, so if SCY is 14 I skip the first Tile, then 6 pixels of the picked tile
+    
     const int backgroundLine = (yAdjusted % 8);
-    if(isWindow){
-        std::cout << "Updating to: " << std::dec <<  yAdjusted << std::endl;
-        wyLastLine = yAdjusted;
-    }
 
     //Lets check the tile mode first (tile = background)
     const uint16_t baseTileAddr = isTileDataSelectHigh() ? 0x8000 : 0x8800;
     const uint16_t baseBackgroundMapAddr = isWindow ? (isWindowTileMapDisplaySelectHigh() ? 0x9C00 : 0x9800) :
                                                       (isBgTileMapHigh() ? 0x9C00 : 0x9800);
 
-    //Render background, have in mind that I could possibly do the opposite (render 32 tiles)
+    //Render tiles, have in mind that I could possibly do the opposite (render 32 tiles)
     //would probably be WAY cheaper
-    const int xAdjusted = isWindow ? (x - windowX) : (x + bus->memoryMap[LCD_SCX_ADDR])%256;
+    const int xAdjusted = isWindow ? (x - windowX) : 
+        //Same thing that I did with SCY, add the scroll
+        //ELSE
+        (x + bus->memoryMap[LCD_SCX_ADDR])%256;
     const int xTileAdjusted = (xAdjusted / 8);
     
     //Each tile is a byte, so we retrieve the byte that corresponds to this position
     //Here we are looking at the tilemap to extract the tile index
-    const uint32_t tileMemPos = baseBackgroundMapAddr + ((yTileAdjusted * 32 /*tiles per line*/)) + xTileAdjusted;
+    uint32_t tileMemPos = baseBackgroundMapAddr + ((yTileAdjusted * 32 /*tiles per line*/)) + xTileAdjusted;
     int tileIndex = bus->memoryMap[tileMemPos];
-    // Used by dr mario :)
+    // Used by dr mario :) and many others
     if (!isTileDataSelectHigh()){
         tileIndex = *reinterpret_cast<int8_t*>(&bus->memoryMap[tileMemPos]);
         tileIndex+=128;
+    }
+    
+    //Is that a window, should I store the line that I
+    //am rendering to remember later???
+    if(isWindow){
+        if(yAdjusted > wyLastLine){
+            wyLastLine = yAdjusted;
+        }
     }
 
     const uint16_t backgroundColorByte = baseTileAddr +
@@ -264,7 +278,6 @@ void Core::renderSpritePixel(uint16_t x, uint16_t existingPixel){
             // The most significant bit is on the left, so we "invert" the reading order
             const uint8_t spritePixelIndex = (spriteColorIndex_0 >> spriteBit) & 0x1 | 
                                             (((spriteColorIndex_1 >> spriteBit) & 0x1) << 1);
-            //std::cout << "SpritePixelIndex:" << spritePixelIndex << std::endl;
             if(spritePixelIndex){
                 if(sprite.posX < lastPos){
                     internalBuffer[x][line] = selectedPallete.at(spritePixelIndex);
@@ -283,7 +296,6 @@ void Core::renderLine(){
         internalBuffer[x][line] = {255, 0, 0};
         //const uint8_t backgroundPixelIndex = 0;
         uint8_t backgroundPixelIndex = renderBackgroundWindowPixel(x, false);
-        //internalBuffer[x][line] = {255, 0, 0};
         if(!backgroundPixelIndex)
             backgroundPixelIndex = renderBackgroundWindowPixel(x, true);
 
@@ -336,7 +348,6 @@ void Core::processMode3(){
     //Lets copy internal buffer into screen buffer (its not exactly needed, but more as a safety measure)
     const uint8_t& line = bus->memoryMap[LCD_LY_ADDR];
     renderLine();
-    //std::cout << "line: " << std::dec << static_cast<uint32_t>(line) << std::endl;
     for(int x=0; x<160; x++){
         screen[x][line]=internalBuffer[x][line];
     }
@@ -357,69 +368,41 @@ void Core::tick() {
     if(!isLCDEnabled())
         return;
 
-    /*std::cout << "LY: " << std::hex << static_cast<uint32_t>(bus->memoryMap[LCD_LY_ADDR]) << std::endl;
-    std::cout << "LYC: " << std::hex << static_cast<uint32_t>(bus->memoryMap[LCD_LYC_ADDR]) << std::endl;
-    std::cout << "STAT: " << std::hex << static_cast<uint32_t>(bus->memoryMap[LCD_STATUS_REGISTER_ADDR]) << std::endl;
-    std::cout << "CONTROL: " << std::hex << static_cast<uint32_t>(bus->memoryMap[LCD_CONTROL_REGISTER_ADDR]) << std::endl;
-    std::cout << "Background: " << std::dec << static_cast<uint32_t>(isBGWindowDisplayEnabled()) << std::endl;*/
-    
-    //Cycle through modes, 2, 3, 0, 1.
-    //OAM, DRAWING, H-BLANK, V-BLANK
-
-    //During modes 2 and 3 CPU cannot access the OAM
-    //During mode 3 CPU cannot access VRAM
-    //So I can just run once, as it would be expected that at this time everything was processed
-    //This is usually called "Interrupt" on some docs, but I dont have to actually trigger an interruption
-    //Just do what the PPU documentation states that its done at this time
     if(cycles++ >= 456)
         cycles = 0;
 
-    if(!isWindowDisplayEnabled() && wyLastLine > wyLastLineCommited) {
-        wyLastLineCommited = wyLastLine;
-        wyLastLine = 0;
-    }
-
+    //Cycle through modes, 2, 3, 0, 1.
+    //OAM, DRAWING, H-BLANK, V-BLANK
     uint8_t& line = bus->memoryMap[LCD_LY_ADDR];
     if(line <= 143){
         if(cycles <= 80){
             setMode(2);
-            //processModes();
         } else if(cycles <= 252){
             //Mode 3 is set to the shortest amount of time 172 dots (as we do the rendering in one shot)
             //then we give the most amount of time back to the CPU to perform operations
-            //While it is possilble to have accurate timming currently its probably not worth it (unless some game is really bound to this timming).
+            //While it is possible to have accurate timming currently its probably not worth it (unless some game is really bound to this timming).
             setMode(3);
-            //processModes();
         } else if(cycles < 456){
             //Mode 0 does nothing, 
             lineRendered = false;
             setMode(0);   
         }
+        //H-BLANK
         else {
-            // Increment line if 456
             line++;
             checkLYC_LY();
-            //std::cout << "LY: " << std::hex << static_cast<uint32_t>(bus->memoryMap[LCD_LY_ADDR]) << std::endl;
-            //std::cout << "LYC: " << std::hex << static_cast<uint32_t>(bus->memoryMap[LCD_LYC_ADDR]) << std::endl;
             return;
         }
         processModes();
-        //checkLYC_LY();
-        
     } else {
-        //if V-BLANK interrupt.. as its done only on line 144, its done only once (we will increment the line after that.)
+        //V-BLANK
         setMode(1);
         processModes();
-        wyLastLineCommited = wyLastLine = 0;
         if(cycles == 456){
             line++;
-            //std::cout << "LY: " << std::hex << static_cast<uint32_t>(bus->memoryMap[LCD_LY_ADDR]) << std::endl;
-            //std::cout << "LYC: " << std::hex << static_cast<uint32_t>(bus->memoryMap[LCD_LYC_ADDR]) << std::endl;
-            vblankServed = LYCLCServed = false;
             if(line == 152){
+                wyLastLineCommited = wyLastLine = 0;
                 line = 0;
-                //std::cout << "LY: " << std::hex << static_cast<uint32_t>(bus->memoryMap[LCD_LY_ADDR]) << std::endl;
-                //std::cout << "LYC: " << std::hex << static_cast<uint32_t>(bus->memoryMap[LCD_LYC_ADDR]) << std::endl;
             }
             checkLYC_LY();
         }   
@@ -436,18 +419,15 @@ bool Core::isSpriteEnabled() { return (bus->memoryMap[LCD_CONTROL_REGISTER_ADDR]
 bool Core::isBGWindowDisplayEnabled() { return (bus->memoryMap[LCD_CONTROL_REGISTER_ADDR] & 0x1) == 0x1; }
 
 void Core::checkLYC_LY(){
-    //Set coincidence bit
+    //Set coincidence bit (could do all in the else if, but this matches more
+    //the documentation description).
     if(bus->memoryMap[LCD_LY_ADDR] == bus->memoryMap[LCD_LYC_ADDR]){
         bus->memoryMap[LCD_STATUS_REGISTER_ADDR] |= 0b0000100;
     }
     //Check for VBLANK
-    //std::cout << "Stop at: " << std::dec << static_cast<uint32_t>(bus->memoryMap[LCD_LYC_ADDR]) << std::endl;
-    //std::cout << "Compare at: " << std::dec << static_cast<uint32_t>(bus->memoryMap[LCD_LY_ADDR])
-    //          << " and " << std::dec << static_cast<uint32_t>(bus->memoryMap[LCD_LYC_ADDR]) << std::endl;
-    if(bus->memoryMap[LCD_LY_ADDR] == 144 && !vblankServed) {
+    if(bus->memoryMap[LCD_LY_ADDR] == 144) {
         //This is managed by the main IE/IF structure not the LCDC
         bus->setInterruptFlag(CPU::INTERRUPTIONS_TYPE::VBLANK);
-        vblankServed = true;
 
         //If I also need to set LCDC during VBLANK
         if(bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0b00010000)
@@ -459,7 +439,6 @@ void Core::checkLYC_LY(){
     else if(
         (bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0x4) == 0x4 &&
         (bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0x40) == 0x40) {
-        //std::cout << "IINTERRUPT TRIGGERED LYX=LC: " << std::hex << static_cast<uint32_t>(bus->memoryMap[LCD_LY_ADDR]) << std::endl;
         //Set Coincidence flag
         bus->memoryMap[LCD_STATUS_REGISTER_ADDR] |= 0b0000100;
         bus->setInterruptFlag(CPU::INTERRUPTIONS_TYPE::LCDC);

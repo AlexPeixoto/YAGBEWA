@@ -18,6 +18,8 @@ private:
 	uint16_t inputClockSelect;
     CPU::LR35902 cpu;
 	PPU::Core ppu;
+	uint8_t buttons = 0;
+	uint8_t directions = 0;
     
 	void updateTimerValue();
 	void clockUpdate(uint16_t ticks);
@@ -31,6 +33,11 @@ public:
     ~Bus ();
 
 	void initCPU(){ cpu.initPC(cartridge.isHeadless());}
+	void setButtons(uint8_t buttons){this->buttons = buttons;}
+	void setDirections(uint8_t directions){this->directions = directions;}
+
+	uint8_t getButtons(){return buttons;}
+	uint8_t getDirections(){return directions;}
 
 	void runCycle();
 	void setInterruptFlag(CPU::INTERRUPTIONS_TYPE type);
