@@ -69,6 +69,7 @@ namespace PPU{
         void renderLine();
         //Returns the generated pixel (usefull to check for transparency)
         uint8_t renderBackgroundWindowPixel(uint16_t x, bool isWindow);
+        void renderSpritePixel(uint16_t x, uint16_t existingPixel);
 
         void setMode(uint8_t mode);
         uint8_t getMode();
