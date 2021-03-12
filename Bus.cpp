@@ -30,7 +30,7 @@ void Bus::runCycle() {
 	//"Global" clock
 	uint32_t clock = pendingCycles; //pendingCycles;
 
-	//memoryMap.setButtonsDirections(buttons, directions);
+	memoryMap.setButtonsDirections(buttons, directions);
 		
 	while(clock < CYCLES_PER_FRAME){
 		uint32_t numberCyclesCurrent = 0;
@@ -55,6 +55,10 @@ void Bus::runCycle() {
 		/*if(cpu.interruptionsEnabled() && cpu.interruptionsEnabled()){
 			cost += 12;
 		}*/
+		if(memoryMap.triggerJOYP){
+			memoryMap.triggerJOYP = false;
+			setInterruptFlag(CPU::INTERRUPTIONS_TYPE::JOYP);
+		}
 		numberCyclesCurrent += cost;
 		clock += cost;
 
@@ -174,6 +178,8 @@ void Bus::performInterruption() {
 			
 			cpu.setPC(INTERRUPTION_TARGET[x]);
 			//Reset IF flag (we DO NOT reset the IE flag here)
+			if(x == static_cast<int>(CPU::INTERRUPTIONS_TYPE::JOYP))
+				abort();
 			memoryMap[IF_ADDR] &= ~(1UL << x);
 			//Stop here, we serve this interruption, once it finishes we serve
 			//the next one (if we just set the PC twice we will only serve the one)

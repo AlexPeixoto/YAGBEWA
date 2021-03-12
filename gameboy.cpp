@@ -9,29 +9,24 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 
-//Sleep
-#include <chrono>
-#include <thread>
-
-
-uint8_t buildJOYPDirections(){
+uint8_t buildJOYPDirections(const sf::Keyboard::Key& code){
     uint8_t result = 
         0x0 |
-        sf::Keyboard::isKeyPressed(sf::Keyboard::Down) << 3 |
-        sf::Keyboard::isKeyPressed(sf::Keyboard::Up) << 2 |
-        sf::Keyboard::isKeyPressed(sf::Keyboard::Left) << 1 |
-        sf::Keyboard::isKeyPressed(sf::Keyboard::Right);
+        (code == sf::Keyboard::Down) << 3 |
+        (code == sf::Keyboard::Up) << 2 |
+        (code == sf::Keyboard::Left) << 1 |
+        (code == sf::Keyboard::Right);
 
     return result;
 }
 
-uint8_t buildJOYPButtons(){
+uint8_t buildJOYPButtons(const sf::Keyboard::Key& code){
     uint8_t result = 
         0x0 |
-        sf::Keyboard::isKeyPressed(sf::Keyboard::Return) << 3 |
-        sf::Keyboard::isKeyPressed(sf::Keyboard::Space) << 2 |
-        sf::Keyboard::isKeyPressed(sf::Keyboard::A) << 1 |
-        sf::Keyboard::isKeyPressed(sf::Keyboard::B);
+        (code == sf::Keyboard::Return) << 3 |
+        (code == sf::Keyboard::Space) << 2 |
+        (code == sf::Keyboard::B) << 1 |
+        (code == sf::Keyboard::A);
         
     return result;
 }
@@ -81,16 +76,24 @@ int main(int argc, char** argv){
     while (window.isOpen())
     {
         sf::Event event;
+
+        //Reset button
+        bus.setDirections(0);
+        bus.setButtons(0);
         while (window.pollEvent(event))
         {
             // "close requested" event: we close the window
             if (event.type == sf::Event::Closed)
                 window.close();
+
+            if (event.type == sf::Event::KeyPressed){
+                bus.setDirections(buildJOYPDirections(event.key.code));
+                bus.setButtons(buildJOYPButtons(event.key.code));
+            } 
         }
         window.clear();
         bus.runCycle();
-        bus.setDirections(buildJOYPDirections());
-        bus.setButtons(buildJOYPButtons());
+        
         auto buffer = bus.getPPUFrameBuffer();
         sf::Image image = texture.copyToImage();
         for(int x=0; x<160; x++){

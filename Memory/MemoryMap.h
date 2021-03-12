@@ -74,6 +74,7 @@ namespace Memory{
 			//Mainly used for UT
 			Map(){}
 
+			bool triggerJOYP = false;
 			void setButtonsDirections(uint8_t buttons, uint8_t directions){
 				this->buttons = buttons;
 				this->directions = directions;
@@ -122,9 +123,7 @@ namespace Memory{
 				memory.at(0xFF4A) = 0x00; //WY
 				memory.at(0xFF4B) = 0x00; //WX
 				memory.at(0xFFFF) = 0x00; //IE
-				memory.at(0xFF00) = 0xff; //JOYP
-				
-				//Set FF00 as F and prevent any further writes to it until IO is done 
+				memory.at(0xFF00) = 0xFF; //JOYP
 			};
 
 			void loadNintendoLogo(){
@@ -245,10 +244,18 @@ namespace Memory{
 				//Tetris testing JOYP hack
 				if(addr == 0xFF00){
 					//Button
-					if((val & 0b00100000)== 0b00100000){
-						memory[addr] = buttons;
-					} else if((val & 0b00100000)== 0b00100000){
-						memory[addr] = directions;
+					if(((val >> 5) & 0x1) == 0){
+						memory[addr] =  ~buttons;
+						if((memory[addr] & 0xF) != 0xF){
+							triggerJOYP = true;
+						}
+					} else if(((val >> 4) & 0x1) == 0){
+						memory[addr] =  ~directions;
+						if((memory[addr] & 0xF) != 0xF){
+							triggerJOYP = true;
+						}
+					} else{
+						memory[addr] = 0x0F;
 					}
 					return;
 				}
@@ -289,19 +296,7 @@ namespace Memory{
 				//Special write handling
 				switch(addr){
 					
-					case 0xFF00:
-						memory[addr] = val;
-						//Here I fake set all THE LOW 4 BITS.
-						//Have in mind that depending which bit is set we either read as a button (A, B, START, SELECT) or direction
-						/*Bit 5 - P15 Select Button Keys      (0=Select)
-						Bit 4 - P14 Select Direction Keys   (0=Select)
-						Bit 3 - P13 Input Down  or Start    (0=Pressed) (Read Only)
-						Bit 2 - P12 Input Up    or Select   (0=Pressed) (Read Only)
-						Bit 1 - P11 Input Left  or Button B (0=Pressed) (Read Only)
-						Bit 0 - P10 Input Right or Button A (0=Pressed) (Read Only)*/
-						memory[addr] |= 0xCF;
-						return;
-
+					
 					//Reset 0xFF04 on attempts to write to it (Timer).
 					case 0xFF04:
 						memory[addr] = 0;
