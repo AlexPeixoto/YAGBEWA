@@ -1,4 +1,4 @@
-# GBEmulator
+# YAGBEWA (Yet another gameboy emulator without audio)
 
 This is a non 100% accurate gameboy emulator.
 This was implemented only as a fun side-project and has not the goal to be more than a reference.
