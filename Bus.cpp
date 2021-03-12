@@ -9,10 +9,6 @@ namespace{
 	//DIV register is updated at a different pace, so we use it to properly update it
 	const uint32_t DIV_REGISTER_INCREMENT = 16384;
 	const uint32_t DIV_REGISTER_INCREMENT_PER_FRAME = DIV_REGISTER_INCREMENT/FPS;
-	const uint16_t IE_ADDR = 0xFFFF;
-	const uint16_t IF_ADDR = 0xFF0F;
-
-	const uint16_t INTERRUPTION_TARGET[] = {0x40, 0x48, 0x50, 0x58, 0x60};
 }
 Bus::Bus() : cpu(this), cartridge(this), memoryMap(this), ppu(this) {
 	inputClockSelect = 1024;
@@ -69,7 +65,7 @@ void Bus::runCycle() {
 		clockUpdate(numberCyclesCurrent);
 
 		//Interruptions
-		performInterruption();		
+		cpu.performInterruption();		
 	}
 	//Store remaining cycles to burn on next execution.
 	pendingCycles = clock - CYCLES_PER_FRAME;
@@ -94,9 +90,8 @@ void Bus::updateTimerValue() {
 		}
 	}
 }
-
 void Bus::setInterruptFlag(CPU::INTERRUPTIONS_TYPE type){
-	memoryMap[IF_ADDR] |= (1UL << static_cast<int>(type));
+	cpu.setInterruptFlag(type);
 }
 
 //This does *NOT* implement the obscure behaviour of the DIV
@@ -132,54 +127,4 @@ void Bus::clockUpdate(uint16_t ticks) {
 		memoryMap[0xFF04] += (clockTicksReal%DIV_REGISTER_INCREMENT_PER_FRAME == 0)%DIV_REGISTER_INCREMENT;
 	}
 }
-bool Bus::isInterruptionPending() {
-	const uint8_t _IE = memoryMap[IE_ADDR];
-	const uint8_t _IF = memoryMap[IF_ADDR];
-	return ((_IF & _IE) & 0x1F);
-}
 
-//This should be moved to the CPU
-void Bus::performInterruption() {
-	const uint8_t _IE = memoryMap[IE_ADDR];
-	const uint8_t _IF = memoryMap[IF_ADDR];
-
-	//Specific unhalt mechanism if we have an interruption to be served
-	if(_IF & 0x1F){
-		cpu.resetHalt();
-		cpu.resume();
-	} else {
-		//No interruption to serve, so lets get out
-		return;
-	}
-
-	//We undo the halt if _IF is set even if interrupts are not enabled
-	if(!cpu.interruptionsEnabled())
-		return;
-
-	//RevertPC interruption bug is handled directly on executeNext.
-	//If an interruption happens, and the HALT was triggered with disabled interruptions
-	//We just disable halt.
-	if(cpu.getHaltType() == CPU::HaltType::NoInterruption){
-		return;
-	}
-
-	//Look at the 5 possible bits and check if any is both enabled and checked
-	//Interruptuion priority goes from the highest bit to the lowest
-	for(int x=4; x>=0; x--){
-		if((_IE >> x) & 0x1 && (_IF >> x) & 0x1){
-			//Disable interruption
-			cpu.disableInterruptions();
-
-			//Store PC on stack
-			//Have in mind that here the PC is already incremented, so no need to increment before push
-			cpu.pushPC();
-			cpu.setPC(INTERRUPTION_TARGET[x]);
-			//Reset IF flag (we DO NOT reset the IE flag here)
-			memoryMap[IF_ADDR] &= ~(1UL << x);
-			//Stop here, we serve this interruption, once it finishes we serve
-			//the next one (if we just set the PC twice we will only serve the one)
-			//with the lowest priority
-			return;
-		}
-	}
-}

@@ -33,7 +33,6 @@ int main(int argc, char** argv){
 
     //Games
 	//bus.cartridge.loadRom("Tetris_o.gb");
-    //bus.cartridge.loadRom("drmario.gb");
 
     //SCX ONLY USED FOR FOOTER
     //bus.cartridge.loadRom("dmg-acid2.gb");
@@ -87,7 +86,9 @@ int main(int argc, char** argv){
         window.clear();
         bus.runCycle();
         
-        auto buffer = bus.getPPUFrameBuffer();
+        //Get the PPU data and store into a texture
+        //That will be used to render
+        const auto buffer = bus.getPPUFrameBuffer();
         sf::Image image = texture.copyToImage();
         for(int x=0; x<160; x++){
             for(int y=0; y<144; y++){

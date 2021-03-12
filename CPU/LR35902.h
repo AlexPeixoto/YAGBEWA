@@ -73,6 +73,9 @@ namespace CPU{
 		}
 		HaltType getHaltType() { return haltType; }
 		void resetHalt() { haltType = HaltType::None; }
-		
+		void setInterruptFlag(CPU::INTERRUPTIONS_TYPE type);
+
+		bool isInterruptionPending();
+		void performInterruption();
 	};
 }
