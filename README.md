@@ -8,7 +8,7 @@ The code does pass all the blargg test roms and almost all the DMG-ACID2 checks 
 
 As for game testing I only played with Tetris and I am aware of the Dr Mario abort instruction call (probably affects other games).
 
-![It works](./ItWorks.png)
+![It works](https://github.com/AlexPeixoto/GBEmulator/blob/master/ItWorks.png)
 
 # Missing features
  - Lack of Memory Bank controller (only 32kb rom can be loaded)
