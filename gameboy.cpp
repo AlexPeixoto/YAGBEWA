@@ -32,22 +32,17 @@ uint8_t buildJOYPButtons(const sf::Keyboard::Key& code){
 }
 
 int main(int argc, char** argv){
-    /*if(argc != 2)
-        return 1;
-
-    std::string filename = argv[1];
-	*/
 	Bus bus;
 
     //Games
-	bus.cartridge.loadRom("Tetris.gb");
+	//bus.cartridge.loadRom("Tetris_o.gb");
     //bus.cartridge.loadRom("drmario.gb");
 
     //SCX ONLY USED FOR FOOTER
     //bus.cartridge.loadRom("dmg-acid2.gb");
-    //Tests
+
+    //CPU Tests
     //bus.cartridge.loadRom("01op.gb");
-    //interrupts (FAILS WITH _IF instead of isInterruptionPending, which halts other tests)
     //bus.cartridge.loadRom("02op.gb"); 
     //bus.cartridge.loadRom("03op.gb");
     //bus.cartridge.loadRom("04op.gb");
@@ -58,8 +53,9 @@ int main(int argc, char** argv){
     //bus.cartridge.loadRom("09op.gb");
     //bus.cartridge.loadRom("10op.gb");
     //bus.cartridge.loadRom("11op.gb");
+
+    //Startup test
     //bus.cartridge.loadRom("boot_regs-A.gb");
-    //bus.cartridge.loadRom("boot_div-A.gb");
     bus.initCPU();
 
     //Yet another Gameboy emulator without audio

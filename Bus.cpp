@@ -8,6 +8,7 @@ namespace{
 	const uint32_t CYCLES_PER_FRAME = FREQUENCY/FPS;
 	//DIV register is updated at a different pace, so we use it to properly update it
 	const uint32_t DIV_REGISTER_INCREMENT = 16384;
+	const uint32_t DIV_REGISTER_INCREMENT_PER_FRAME = DIV_REGISTER_INCREMENT/FPS;
 	const uint16_t IE_ADDR = 0xFFFF;
 	const uint16_t IF_ADDR = 0xFF0F;
 
@@ -106,37 +107,33 @@ void Bus::setInterruptFlag(CPU::INTERRUPTIONS_TYPE type){
 void Bus::clockUpdate(uint16_t ticks) {
 	//Isolated number of ticks for the timer
 	static uint32_t clockTicks=0;
+	//Isolated number of ticks for the "real TIMER";
+	static uint32_t clockTicksReal=0;
 	if(cpu.stopped()){
 		clockTicks = 0;	
 		return;
 	} else {
 		clockTicks+=ticks;
+		clockTicksReal+=ticks;
 	}
-
 	//Every time that the clock reaches the "selected update mode"
 	//We increase FF05.
 	if(clockTicks > inputClockSelect){
-		if(memoryMap[0xFF05] == 0xFF){
+		if(memoryMap[0xFF05] >= 0xFF){
 			memoryMap[0xFF05]=memoryMap[0xFF06];
 			setInterruptFlag(CPU::INTERRUPTIONS_TYPE::TIMER);
-			clockTicks=0;
+			clockTicks = 0;
 		}
 		//Is Timer enabled?
-		else if(memoryMap[0xFF07] & 0x04)
+		else if((memoryMap[0xFF07] & 0x4) == 0x4){
 			memoryMap[0xFF05]++;
+		}
 	}
-	if(!cpu.stopped() && clockTicks == 0xFF){
-		clockTicks = 0;
-		memoryMap[0xFF04]++;
-		return;
+	
+	if(!cpu.stopped()){
+		//We increment but mod it by the number of clocks per second
+		memoryMap[0xFF04] += (clockTicksReal%DIV_REGISTER_INCREMENT_PER_FRAME == 0)%DIV_REGISTER_INCREMENT;
 	}
-
-	//Just reset the clock (for safekeeping),
-	//probably not necessary
-	//if(clockTicks >= 0xFF){
-	//	clockTicks = 0;
-	//	return;
-	//}
 }
 bool Bus::isInterruptionPending() {
 	const uint8_t _IE = memoryMap[IE_ADDR];

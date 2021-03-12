@@ -244,30 +244,7 @@ namespace Memory{
 				//Block writes on ROM
 				if(addr < videoRam.position)
 					return;
-
-				//Tetris testing JOYP hack
-				if(addr == 0xFF00){
-					//Button
-					if(((val >> 5) & 0x1) == 0){
-						memory[addr] =  ~buttons;
-						if((memory[addr] & 0xF) != 0xF){
-							triggerJOYP = true;
-						}
-					} else if(((val >> 4) & 0x1) == 0){
-						memory[addr] =  ~directions;
-						if((memory[addr] & 0xF) != 0xF){
-							triggerJOYP = true;
-						}
-					} else{
-						memory[addr] = 0x0F;
-					}
-					return;
-				}
-
-				if(addr == 0xFF41){
-					//7th bit (last one) is always 1
-					val |= 0b10000000;
-				}
+				
 				//Block CPU writes on mode 2 or 3 to the VRAM memory
 				/*
 				 * When the LCD controller is reading a particular part of video memory, that memory is inaccessible to the CPU.
@@ -290,11 +267,33 @@ namespace Memory{
 						if(addr >= 0x8000 && addr <= 0x9FF)
 							return;
 				}
+
 				//Special write handling
 				switch(addr){
+					//JOYP
+					case 0xFF00:
+						if(((val >> 5) & 0x1) == 0){
+							memory[addr] =  ~buttons;
+							if((memory[addr] & 0xF) != 0xF){
+								triggerJOYP = true;
+							}
+						} else if(((val >> 4) & 0x1) == 0){
+							memory[addr] =  ~directions;
+							if((memory[addr] & 0xF) != 0xF){
+								triggerJOYP = true;
+							}
+						} else{
+							memory[addr] = 0x0F;
+						}
+						return;
+
 					//Reset 0xFF04 on attempts to write to it (Timer).
 					case 0xFF04:
 						memory[addr] = 0;
+						return;
+
+					case 0xFF41:
+						memory[addr] = val | 0b10000000;
 						return;
 
 					case 0xFF46:
@@ -321,23 +320,6 @@ namespace Memory{
 
 			inline uint8_t& read(uint16_t addr) {
 				return memory[addr];
-			}
-
-			//Used to fill certain areas of the memory.
-			//Mem area is used to prevent writing to a wrong memory space
-			//Maybe I should change that to a single write
-			template<typename T>
-			void fillWith(const T& memArr, std::size_t size, MemArea area) {
-				if (!isValidWrite(size, area))
-					std::runtime_error("Invalid write for: " + std::to_string(static_cast<int>(area)));
-				switch (area) {
-				case MemArea::ROMBANK_0:	
-					break;
-				case MemArea::ROMBANK_1:
-					break;
-				default:
-					break;
-				}
 			}
 	};
 }
