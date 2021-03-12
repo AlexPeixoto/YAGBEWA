@@ -95,13 +95,13 @@ uint16_t OpCodeMapping::executeNext(LR35902& cpu, Memory::Map& memMap){
         cpu.registers.PC--;
         cpu.haltType = HaltType::None;
     }
-    uint8_t* oldPC = cpu.registers.PC;
     op.call(cpu, memMap, op);
 
     return op.cycleCount + cpu.extraCycles;
 }
 
 void OpCodeMapping::Call::ABORT(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
+    //Invalid instructions, if that is ever called we did something wrong....
     abort();
 }
 

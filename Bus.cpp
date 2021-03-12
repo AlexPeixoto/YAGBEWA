@@ -71,6 +71,7 @@ void Bus::runCycle() {
 	pendingCycles = clock - CYCLES_PER_FRAME;
 }
 
+//Left timer here for simplicity.
 void Bus::updateTimerValue() {
 	int8_t toDiv = memoryMap.read(0xFF07);
 	if(toDiv & 0b00000100) {
@@ -105,8 +106,8 @@ void Bus::clockUpdate(uint16_t ticks) {
 		clockTicks = 0;	
 		return;
 	} else {
-		clockTicks+=ticks;
-		clockTicksReal+=ticks;
+		clockTicks += ticks;
+		clockTicksReal += ticks;
 	}
 	//Every time that the clock reaches the "selected update mode"
 	//We increase FF05.

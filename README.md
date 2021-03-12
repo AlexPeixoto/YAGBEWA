@@ -6,7 +6,7 @@ The code was heavily commented when it comes to odd behaviors (Like unhalting th
 
 The code does pass all the blargg test roms and almost all the DMG-ACID2 checks (besides the 2nd window that doesn't render correctly).
 
-As for game testing I only played with Tetris and I am aware of the Dr Mario bug.
+As for game testing I only played with Tetris and I am aware of the Dr Mario abort instruction call (probably affects other games).
 
 # Missing features
  - Lack of Memory Bank controller (only 32kb rom can be loaded)

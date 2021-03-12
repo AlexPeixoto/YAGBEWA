@@ -452,7 +452,6 @@ void Core::checkLYC_LY(){
         //Set Coincidence flag
         bus->memoryMap[LCD_STATUS_REGISTER_ADDR] |= 0b0000100;
         bus->setInterruptFlag(CPU::INTERRUPTIONS_TYPE::LCDC);
-        //bus->memoryMap[LCD_STATUS_REGISTER_ADDR] &= ~(0b00100000);
         //Unset the flags
         bus->memoryMap[LCD_STATUS_REGISTER_ADDR] &= ~(0b00000100);
     }  
