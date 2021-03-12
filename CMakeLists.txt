@@ -20,13 +20,11 @@ endif()
 
 # Include header files
 include_directories(.)
-include_directories(debug)
 
 include_directories(Memory)
 
 include_directories(CPU)
 include_directories(PPU)
-include_directories(APU)
 
 include_directories(IO)
 

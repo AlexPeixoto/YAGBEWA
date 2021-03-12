@@ -1,9 +1,6 @@
 #include <iostream>
 #include <fstream>
-#include <iomanip>
-#include <string>
 
-#include <APU/audiocontroller.h>
 #include <Bus.h>
 
 #include <SFML/Window.hpp>

@@ -52,9 +52,6 @@ void Bus::runCycle() {
 		} else {
 			cost += 4;
 		}
-		/*if(cpu.interruptionsEnabled() && cpu.interruptionsEnabled()){
-			cost += 12;
-		}*/
 		if(memoryMap.triggerJOYP){
 			memoryMap.triggerJOYP = false;
 			setInterruptFlag(CPU::INTERRUPTIONS_TYPE::JOYP);
@@ -62,15 +59,15 @@ void Bus::runCycle() {
 		numberCyclesCurrent += cost;
 		clock += cost;
 
-		//This sometimes causes a skip on the whole line or just skips a step
-		//Graphics here, IT IS DONE with the CPU
+		//We tick each clock individually (easier to control)
 		for(int _clock=0; _clock < numberCyclesCurrent; _clock++){
 			ppu.tick();	
 		}
 
-		//Timer, we use pending here
+		//Read the TAC here
 		updateTimerValue();
 		clockUpdate(numberCyclesCurrent);
+
 		//Interruptions
 		performInterruption();		
 	}
@@ -163,7 +160,6 @@ void Bus::performInterruption() {
 	//If an interruption happens, and the HALT was triggered with disabled interruptions
 	//We just disable halt.
 	if(cpu.getHaltType() == CPU::HaltType::NoInterruption){
-		//Instead of jumping we just continue here.
 		return;
 	}
 
