@@ -26,7 +26,7 @@ As for game testing I only played with Tetris and I am aware of the Dr Mario bug
  - Triggering LCDC for mode 3 by mistake.
  - Was not incrementing the DIV properly (Was having the same piece all the times on Tetris).
 
-References used:
+# References used:
 
 - https://github.com/gbdev/awesome-gbdev
 - https://gekkio.fi/files/gb-docs/gbctr.pdf
