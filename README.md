@@ -28,11 +28,11 @@ As for game testing I only played with Tetris and I am aware of the Dr Mario bug
 
 References used:
 
-https://github.com/gbdev/awesome-gbdev
-https://gekkio.fi/files/gb-docs/gbctr.pdf
-https://www.huderlem.com/demos/gameboy2bpp.html
-https://hacktix.github.io/GBEDG/ppu/#lcd-control-register--lcdc----ff40-
-http://marc.rawer.de/Gameboy/Docs/GBCPUman.pdf
-http://gbdev.gg8.se/wiki/articles/Memory_Bank_Controllers#0000-3FFF_-_ROM_Bank_00_.28Read_Only.29
-https://www.pastraiser.com/cpu/gameboy/gameboy_opcodes.html
-https://gbdev.io/pandocs/
+- https://github.com/gbdev/awesome-gbdev
+- https://gekkio.fi/files/gb-docs/gbctr.pdf
+- https://www.huderlem.com/demos/gameboy2bpp.html
+- https://hacktix.github.io/GBEDG/ppu/#lcd-control-register--lcdc----ff40-
+- http://marc.rawer.de/Gameboy/Docs/GBCPUman.pdf
+- http://gbdev.gg8.se/wiki/articles/Memory_Bank_Controllers#0000-3FFF_-_ROM_Bank_00_.28Read_Only.29
+- https://www.pastraiser.com/cpu/gameboy/gameboy_opcodes.html
+- https://gbdev.io/pandocs/
