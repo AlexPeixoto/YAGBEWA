@@ -65,11 +65,20 @@ void Core::setMode(uint8_t mode){
     //2 first bits are the mode
     bus->memoryMap[LCD_STATUS_REGISTER_ADDR] &= 0b11111100;
     bus->memoryMap[LCD_STATUS_REGISTER_ADDR] |= (mode & 0x3);
+
+    //Only attempts to trigger interrupt for mode (0, 1, 2)
+    if(mode == 3)
+        return;
+
     //We also check if the the specifc bit for that interrupt is enabled, if it is
     //during the mode switch we trigger a LCDC interrupt
-    const uint8_t modeBit = (mode + 2);
-    if(bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & (1UL << modeBit))
+    //This whole interruption between mode changes is broken
+    const uint8_t modeBit = (mode + 3);
+    //I should prevent this from triggering if its serving the STAT interruption....
+    //This is breaking the ACID test as each stat interruption changes the next one and messes up with the flags
+    if((bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & (1UL << modeBit)) == (1UL << modeBit)){
         bus->setInterruptFlag(CPU::INTERRUPTIONS_TYPE::LCDC);
+    }
 }
 
 uint8_t Core::getMode(){
@@ -430,8 +439,9 @@ void Core::checkLYC_LY(){
         bus->setInterruptFlag(CPU::INTERRUPTIONS_TYPE::VBLANK);
 
         //If I also need to set LCDC during VBLANK
-        if(bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0b00010000)
+        if(bus->memoryMap[LCD_STATUS_REGISTER_ADDR] & 0b00010000){
             bus->setInterruptFlag(CPU::INTERRUPTIONS_TYPE::LCDC);
+        }
 
         bus->memoryMap[LCD_STATUS_REGISTER_ADDR] &= ~(0b00010000);
     } 

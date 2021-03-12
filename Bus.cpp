@@ -13,7 +13,6 @@ namespace{
 
 	const uint16_t INTERRUPTION_TARGET[] = {0x40, 0x48, 0x50, 0x58, 0x60};
 }
-
 Bus::Bus() : cpu(this), cartridge(this), memoryMap(this), ppu(this) {
 	inputClockSelect = 1024;
 }
@@ -41,8 +40,8 @@ void Bus::runCycle() {
 			//For revert we still continue execution, but PC will fail to increase
 			(cpu.getHaltType() == CPU::HaltType::None || cpu.getHaltType() == CPU::HaltType::Revert))
 		{
-			cpu.enableInterruptionIfOnNext();
 
+			cpu.enableInterruptionIfOnNext();
 			//This is to create a cycle acurrate emulation, where we "burn the cycles"
 			numberCyclesCurrent=cpu.tick();
 			//No need to add memory cost, the DMA doest halt the CPU, it just take that many cycles to complete
@@ -107,17 +106,23 @@ void Bus::setInterruptFlag(CPU::INTERRUPTIONS_TYPE type){
 void Bus::clockUpdate(uint16_t ticks) {
 	//Isolated number of ticks for the timer
 	static uint32_t clockTicks=0;
-	clockTicks+=ticks;
-	
+	if(cpu.stopped()){
+		clockTicks = 0;	
+		return;
+	} else {
+		clockTicks+=ticks;
+	}
+
 	//Every time that the clock reaches the "selected update mode"
 	//We increase FF05.
 	if(clockTicks > inputClockSelect){
 		if(memoryMap[0xFF05] == 0xFF){
 			memoryMap[0xFF05]=memoryMap[0xFF06];
 			setInterruptFlag(CPU::INTERRUPTIONS_TYPE::TIMER);
-			clockTicks-=inputClockSelect;
+			clockTicks=0;
 		}
-		else
+		//Is Timer enabled?
+		else if(memoryMap[0xFF07] & 0x04)
 			memoryMap[0xFF05]++;
 	}
 	if(!cpu.stopped() && clockTicks == 0xFF){
@@ -128,15 +133,15 @@ void Bus::clockUpdate(uint16_t ticks) {
 
 	//Just reset the clock (for safekeeping),
 	//probably not necessary
-	if(clockTicks >= 0xFF){
-		clockTicks = 0;
-		return;
-	}
+	//if(clockTicks >= 0xFF){
+	//	clockTicks = 0;
+	//	return;
+	//}
 }
 bool Bus::isInterruptionPending() {
 	const uint8_t _IE = memoryMap[IE_ADDR];
 	const uint8_t _IF = memoryMap[IF_ADDR];
-	return ((_IF & _IE));// & 0x1F);
+	return ((_IF & _IE) & 0x1F);
 }
 
 //This should be moved to the CPU
@@ -145,7 +150,7 @@ void Bus::performInterruption() {
 	const uint8_t _IF = memoryMap[IF_ADDR];
 
 	//Specific unhalt mechanism if we have an interruption to be served
-	if(_IF){ //isInterruptionPending()){
+	if(_IF & 0x1F){
 		cpu.resetHalt();
 		cpu.resume();
 	} else {
@@ -175,11 +180,8 @@ void Bus::performInterruption() {
 			//Store PC on stack
 			//Have in mind that here the PC is already incremented, so no need to increment before push
 			cpu.pushPC();
-			
 			cpu.setPC(INTERRUPTION_TARGET[x]);
 			//Reset IF flag (we DO NOT reset the IE flag here)
-			if(x == static_cast<int>(CPU::INTERRUPTIONS_TYPE::JOYP))
-				abort();
 			memoryMap[IF_ADDR] &= ~(1UL << x);
 			//Stop here, we serve this interruption, once it finishes we serve
 			//the next one (if we just set the PC twice we will only serve the one)

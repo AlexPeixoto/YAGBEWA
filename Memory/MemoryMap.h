@@ -241,6 +241,10 @@ namespace Memory{
 			
 			//Write here does not allow (for now), to write on vram
 			inline void write(uint8_t val, uint16_t addr) { 
+				//Block writes on ROM
+				if(addr < videoRam.position)
+					return;
+
 				//Tetris testing JOYP hack
 				if(addr == 0xFF00){
 					//Button
@@ -259,10 +263,11 @@ namespace Memory{
 					}
 					return;
 				}
-				
-				if(addr < videoRam.position)
-					return;
 
+				if(addr == 0xFF41){
+					//7th bit (last one) is always 1
+					val |= 0b10000000;
+				}
 				//Block CPU writes on mode 2 or 3 to the VRAM memory
 				/*
 				 * When the LCD controller is reading a particular part of video memory, that memory is inaccessible to the CPU.
@@ -270,10 +275,6 @@ namespace Memory{
 				 * During modes 2 and 3, the CPU cannot access OAM (FE00h-FE9Fh).
 				 * During mode 3, the CPU cannot access VRAM or CGB Palette Data (FF69,FF6B).
 				 */
-				if(addr == 0xFF41){
-					//7th bit (last one) is always 1
-					val |= 0b10000000;
-				}
 				switch(memory[0xFF41] & 0x3){
 					case 2:
 						//NO OAM ACCESS
@@ -289,14 +290,8 @@ namespace Memory{
 						if(addr >= 0x8000 && addr <= 0x9FF)
 							return;
 				}
-				//if(addr >= 0xc000 && addr <= 0xc09f){
-					
-					//abort();
-				//}
 				//Special write handling
 				switch(addr){
-					
-					
 					//Reset 0xFF04 on attempts to write to it (Timer).
 					case 0xFF04:
 						memory[addr] = 0;
@@ -336,8 +331,7 @@ namespace Memory{
 				if (!isValidWrite(size, area))
 					std::runtime_error("Invalid write for: " + std::to_string(static_cast<int>(area)));
 				switch (area) {
-				case MemArea::ROMBANK_0:
-					
+				case MemArea::ROMBANK_0:	
 					break;
 				case MemArea::ROMBANK_1:
 					break;
@@ -345,10 +339,5 @@ namespace Memory{
 					break;
 				}
 			}
-			//Perform std::fill with 0
-			void clearMemory();
-			
-			//Method that will be triggered once the interruption memory value is changed
-			void registerInterruptionCallback(std::function<void()> func);
 	};
 }
