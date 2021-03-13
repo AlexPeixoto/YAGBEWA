@@ -74,6 +74,8 @@ namespace Memory{
 			//Mainly used for UT
 			Map(){}
 
+			//"Hack" for triggering JOYP (it was the last thing missing).
+			//I really really wanted to see it work ;).
 			bool triggerJOYP = false;
 			void setButtonsDirections(uint8_t buttons, uint8_t directions){
 				this->buttons = buttons;
