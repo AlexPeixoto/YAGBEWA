@@ -374,8 +374,10 @@ void Core::processModes(){
 void Core::tick() {
     static uint16_t cycles = 110;
     static bool lineRendered = false;
-    if(!isLCDEnabled())
+    if(!isLCDEnabled()){
         return;
+    }
+
 
     if(cycles++ >= 456)
         cycles = 0;
@@ -394,7 +396,7 @@ void Core::tick() {
         } else if(cycles < 456){
             //Mode 0 does nothing, 
             lineRendered = false;
-            setMode(0);   
+            setMode(0);
         }
         //H-BLANK
         else {
@@ -432,6 +434,8 @@ void Core::checkLYC_LY(){
     //the documentation description).
     if(bus->memoryMap[LCD_LY_ADDR] == bus->memoryMap[LCD_LYC_ADDR]){
         bus->memoryMap[LCD_STATUS_REGISTER_ADDR] |= 0b0000100;
+    } else{
+        bus->memoryMap[LCD_STATUS_REGISTER_ADDR] &= ~(0b00000100);
     }
     //Check for VBLANK
     if(bus->memoryMap[LCD_LY_ADDR] == 144) {

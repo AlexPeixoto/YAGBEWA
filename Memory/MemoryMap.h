@@ -293,7 +293,7 @@ namespace Memory{
 						return;
 
 					case 0xFF41:
-						memory[addr] = val | 0b10000000;
+						memory[addr] = val;// | 0b10000000;
 						return;
 
 					case 0xFF46:

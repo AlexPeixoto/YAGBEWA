@@ -15,14 +15,12 @@ private:
 	//Memory writing operations can trigger interruptions.
 	//This has to come before cpu and cartridge to ensure the ordering of the object creation
 	
-	uint16_t inputClockSelect;
-    CPU::LR35902 cpu;
+	CPU::LR35902 cpu;
 	PPU::Core ppu;
 	uint8_t buttons = 0;
 	uint8_t directions = 0;
     
-	void updateTimerValue();
-	void clockUpdate(uint16_t ticks);
+	void clockUpdate();
 
 public:
 	Memory::Map memoryMap;

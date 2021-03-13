@@ -2,6 +2,10 @@
 #include <bitset>
 
 namespace{
+	const uint16_t DIV_ADDR = 0xFF04;
+	const uint16_t TIMA_ADDR = 0xFF05;
+	const uint16_t TMA_ADDR = 0xFF06;
+	const uint16_t TAC_ADDR = 0xFF07;
 	const uint32_t FREQUENCY = 4194304;
 	const uint32_t FPS = 60;
 	//How many cycles we can process on each frame
@@ -11,15 +15,12 @@ namespace{
 	const uint32_t DIV_REGISTER_INCREMENT_PER_FRAME = DIV_REGISTER_INCREMENT/FPS;
 }
 Bus::Bus() : cpu(this), cartridge(this), memoryMap(this), ppu(this) {
-	inputClockSelect = 1024;
 }
 Bus::~Bus () {}
 
 
 //RunCycle happens on the Bus as here it is the coordinator of the whole thing.
 void Bus::runCycle() {	
-	//Debug
-	static uint64_t totalCycles = 0;
 	//Cycles that have to be burned down from last iteration
 	static uint64_t pendingCycles = 0;
 
@@ -44,7 +45,6 @@ void Bus::runCycle() {
 			//No need to add memory cost, the DMA doest halt the CPU, it just take that many cycles to complete
 			//So we dont calculate it, its the game's code job to swait for it to finish
 			clock+=numberCyclesCurrent;
-			totalCycles+=numberCyclesCurrent;
 		} else {
 			cost += 4;
 		}
@@ -60,9 +60,11 @@ void Bus::runCycle() {
 			ppu.tick();	
 		}
 
-		//Read the TAC here
-		updateTimerValue();
-		clockUpdate(numberCyclesCurrent);
+		//4 ticks
+		clockUpdate();
+		clockUpdate();
+		clockUpdate();
+		clockUpdate();
 
 		//Interruptions
 		cpu.performInterruption();		
@@ -71,61 +73,32 @@ void Bus::runCycle() {
 	pendingCycles = clock - CYCLES_PER_FRAME;
 }
 
-//Left timer here for simplicity.
-void Bus::updateTimerValue() {
-	int8_t toDiv = memoryMap.read(0xFF07);
-	if(toDiv & 0b00000100) {
-		switch(toDiv & 0b00000011) {
-			case 0x00:
-				inputClockSelect = 1024;
-				break;
-			case 0x01:
-				inputClockSelect = 16;
-				break;
-			case 0x10:
-				inputClockSelect = 64;
-				break;
-			case 0x11:
-				inputClockSelect = 256;
-				break;
-		}
-	}
-}
 void Bus::setInterruptFlag(CPU::INTERRUPTIONS_TYPE type){
 	cpu.setInterruptFlag(type);
 }
 
 //This does *NOT* implement the obscure behaviour of the DIV
 //Also this is quite untested
-void Bus::clockUpdate(uint16_t ticks) {
-	//Isolated number of ticks for the timer
-	static uint32_t clockTicks=0;
-	//Isolated number of ticks for the "real TIMER";
-	static uint32_t clockTicksReal=0;
-	if(cpu.stopped()){
-		clockTicks = 0;	
+void Bus::clockUpdate() {
+	//Translate the clock select into what bit I should observe
+	static uint8_t bitPosition[] = {9, 3, 5, 7};
+	static bool lastCycle = false;
+	if(cpu.stopped())
 		return;
-	} else {
-		clockTicks += ticks;
-		clockTicksReal += ticks;
-	}
-	//Every time that the clock reaches the "selected update mode"
-	//We increase FF05.
-	if(clockTicks > inputClockSelect){
-		if(memoryMap[0xFF05] >= 0xFF){
-			memoryMap[0xFF05]=memoryMap[0xFF06];
-			setInterruptFlag(CPU::INTERRUPTIONS_TYPE::TIMER);
-			clockTicks = 0;
-		}
-		//Is Timer enabled?
-		else if((memoryMap[0xFF07] & 0x4) == 0x4){
-			memoryMap[0xFF05]++;
+		
+	memoryMap[DIV_ADDR]++;
+	//Which bit we should mask? (use lookup table)
+	uint16_t currentBitMask = 1UL << bitPosition[memoryMap[TAC_ADDR]&0x3];
+	bool enabled = ((memoryMap[TAC_ADDR] & 0x4) == 0x4);
+	bool currentCycle = (memoryMap[DIV_ADDR] & currentBitMask);
+	currentCycle = currentCycle && enabled;
+	//Falling edge
+	if(!currentCycle && lastCycle){
+		if(++memoryMap[TIMA_ADDR] == 0x00){
+			memoryMap[TIMA_ADDR] = memoryMap[TMA_ADDR];
+			cpu.setInterruptFlag(CPU::INTERRUPTIONS_TYPE::TIMER);
 		}
 	}
-	
-	if(!cpu.stopped()){
-		//We increment but mod it by the number of clocks per second
-		memoryMap[0xFF04] += (clockTicksReal%DIV_REGISTER_INCREMENT_PER_FRAME == 0)%DIV_REGISTER_INCREMENT;
-	}
+	lastCycle = currentCycle;
 }
 
