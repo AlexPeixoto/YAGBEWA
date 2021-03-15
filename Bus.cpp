@@ -48,8 +48,8 @@ void Bus::runCycle() {
 		} else {
 			cost += 4;
 		}
-		if(memoryMap.triggerJOYP){
-			memoryMap.triggerJOYP = false;
+		if(memoryMap[0xFF00] == 0x0F){
+			memoryMap[0xFF00] = 0;
 			setInterruptFlag(CPU::INTERRUPTIONS_TYPE::JOYP);
 		}
 		numberCyclesCurrent += cost;
