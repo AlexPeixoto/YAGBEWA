@@ -933,7 +933,7 @@ void OpCodeMapping::Call::JR_r8(LR35902& cpu, Memory::Map& memMap, OpStructure& 
 void OpCodeMapping::Call::JR_NZ_r8(LR35902& cpu, Memory::Map& memMap, OpStructure& info){
     // jump if Z is not set
     ++cpu.registers.PC;
-    if(!cpu.registers.F.Z ) {
+    if(!cpu.registers.F.Z) {
        cpu.registers.PC+=*reinterpret_cast<int8_t*>(cpu.registers.PC);
        cpu.extraCycles=4;
     }

@@ -61,8 +61,6 @@ void Bus::runCycle() {
 			clockUpdate();
 		}
 
-		//4 ticks
-		
 		//Interruptions
 		cpu.performInterruption();		
 	}

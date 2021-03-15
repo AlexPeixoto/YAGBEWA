@@ -34,7 +34,6 @@ int main(int argc, char** argv){
     //Games
     //bus.cartridge.loadRom("Tetris_o.gb");
     bus.cartridge.loadRom("drmario.gb");
-    //bus.cartridge.loadRom("volley.gb");
 
     //SCX ONLY USED FOR FOOTER
     //bus.cartridge.loadRom("dmg-acid2.gb");

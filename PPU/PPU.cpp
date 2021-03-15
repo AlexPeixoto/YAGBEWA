@@ -375,6 +375,9 @@ void Core::tick() {
     static uint16_t cycles = 110;
     static bool lineRendered = false;
     if(!isLCDEnabled()){
+        //Reset the registers (could be intercepted on the MemoryMap, but this is "easier to see")
+        bus->memoryMap[LCD_STATUS_REGISTER_ADDR] &= 0b11111100;
+        bus->memoryMap[LCD_LY_ADDR] = 0;
         return;
     }
 
