@@ -4,7 +4,7 @@ This is a non 100% accurate gameboy emulator.
 This was implemented only as a fun side-project and has not the goal to be more than a reference.
 The code was heavily commented when it comes to odd behaviors (Like unhalting the CPU if IF register is set but IE is not).
 
-The code does pass almost all the blargg test roms (besides the last introduced issue on the timer interrupt) and almost all the DMG-ACID2 checks (besides the 2nd window that doesn't render correctly).
+The code does pass all the blargg test roms and almost all the DMG-ACID2 checks (besides the 2nd window that doesn't render correctly).
 
 As for game testing I only played with Tetris and I am aware of the Dr Mario is currently freezing (probably affects other games).
 

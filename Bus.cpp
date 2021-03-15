@@ -58,14 +58,11 @@ void Bus::runCycle() {
 		//We tick each clock individually (easier to control)
 		for(int _clock=0; _clock < numberCyclesCurrent; _clock++){
 			ppu.tick();	
+			clockUpdate();
 		}
 
 		//4 ticks
-		clockUpdate();
-		clockUpdate();
-		clockUpdate();
-		clockUpdate();
-
+		
 		//Interruptions
 		cpu.performInterruption();		
 	}
