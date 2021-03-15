@@ -434,8 +434,6 @@ void Core::checkLYC_LY(){
     //the documentation description).
     if(bus->memoryMap[LCD_LY_ADDR] == bus->memoryMap[LCD_LYC_ADDR]){
         bus->memoryMap[LCD_STATUS_REGISTER_ADDR] |= 0b0000100;
-    } else{
-        bus->memoryMap[LCD_STATUS_REGISTER_ADDR] &= ~(0b00000100);
     }
     //Check for VBLANK
     if(bus->memoryMap[LCD_LY_ADDR] == 144) {
