@@ -154,38 +154,28 @@ uint8_t Core::renderBackgroundWindowPixel(uint16_t x, bool isWindow){
         //We fill as empty color if not window (when disabled)
         if(!isWindow)
             internalBuffer[x][line] = backgroundColorMap.at(0);
-        stopRenderingOfPixel = commitPosition = true;
+        return 0;
     }
     if(isWindow){
         //Skip if window is disabled
         if(!isWindowDisplayEnabled())
-            stopRenderingOfPixel = true;
+            return 0;
 
         //Skip id window is out of bounds
         if(windowX < 0 || windowX > 144 ||
-           windowY < 0 || windowY > 166)
-            stopRenderingOfPixel = commitPosition = true;
-
+           windowY < 0 || windowY
+           > 166)
+            return 0;
         //Nothing to render here
         if(x < windowX || line < windowY)
-            stopRenderingOfPixel = true;
-    }
-    if(stopRenderingOfPixel){
-        //Here I mimic the behaviour where it has to remember the
-        //last rendered line (Broken, but i will leave it here for now)
-        if(commitPosition && wyLastLine > wyLastLineCommited) {
-            //The last line that I rendered, so start from next one
-            wyLastLineCommited = wyLastLine + 1;
-            wyLastLine = 0;
-        }
-        return 0;
+            return 0;
     }
     
     //I need 2 things here, my real Y position on the screen, this is calculated with line being rendered + SCY
     //which is the "adjustment". Also the reason why its 256 and not the height of the screen is because
     //er are actually moving inside the "screen buffer" which is 256 x 256 (see SCX, its % 256 as well)
     //0xFF42 + 0xFF44
-    const int yAdjusted = isWindow ? (static_cast<uint32_t>(line) - windowY) + wyLastLineCommited : 
+    const int yAdjusted = isWindow ? wyAdd : 
         //Now I calculate the difference between the tile index and the adjustment
         //For example, I know that each tile is 8 pixels, so if SCY is 14 I skip the first Tile, then 6 pixels of the picked tile    
         //ELSE
@@ -218,14 +208,6 @@ uint8_t Core::renderBackgroundWindowPixel(uint16_t x, bool isWindow){
         tileIndex+=128;
     }
     
-    //Is that a window, should I store the line that I
-    //am rendering to remember later???
-    if(isWindow){
-        if(yAdjusted > wyLastLine){
-            wyLastLine = yAdjusted;
-        }
-    }
-
     const uint16_t backgroundColorByte = baseTileAddr +
                                         ((tileIndex * 16) +
                                         (backgroundLine * 2)); //2 bytes per line
@@ -388,6 +370,7 @@ void Core::tick() {
     //Cycle through modes, 2, 3, 0, 1.
     //OAM, DRAWING, H-BLANK, V-BLANK
     uint8_t& line = bus->memoryMap[LCD_LY_ADDR];
+
     if(line <= 143){
         if(cycles <= 80){
             setMode(2);
@@ -403,6 +386,12 @@ void Core::tick() {
         }
         //H-BLANK
         else {
+            if(isWindowDisplayEnabled()){
+                const int windowX = bus->memoryMap[LCD_WX_ADDR];
+                const int windowY = bus->memoryMap[LCD_WY_ADDR];
+                if (windowX < 166 && windowY < 143 && line > windowY)
+                    wyAdd++;
+            }
             line++;
             checkLYC_LY();
             return;
@@ -415,7 +404,7 @@ void Core::tick() {
         if(cycles == 456){
             line++;
             if(line == 152){
-                wyLastLineCommited = wyLastLine = 0;
+                wyAdd = 1;
                 line = 0;
             }
             checkLYC_LY();

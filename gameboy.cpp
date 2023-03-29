@@ -33,10 +33,10 @@ int main(int argc, char** argv){
 
     //Games
     //bus.cartridge.loadRom("Tetris_o.gb");
-    bus.cartridge.loadRom("drmario.gb");
+    //bus.cartridge.loadRom("drmario.gb");
 
     //SCX ONLY USED FOR FOOTER
-    //bus.cartridge.loadRom("dmg-acid2.gb");
+    bus.cartridge.loadRom("dmg-acid2.gb");
 
     //CPU Tests
     //bus.cartridge.loadRom("01op.gb");

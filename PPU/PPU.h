@@ -48,8 +48,7 @@ namespace PPU{
         //Mark an invalid mode
         uint8_t modeProcessed=5;
         //Mechanism to remember the last rendered window y on this frame
-        uint32_t wyLastLine = 0;
-        uint32_t wyLastLineCommited = 0;
+        uint32_t wyAdd = 1;
 
         Bus* bus;
 
