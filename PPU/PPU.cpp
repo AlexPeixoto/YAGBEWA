@@ -175,7 +175,7 @@ uint8_t Core::renderBackgroundWindowPixel(uint16_t x, bool isWindow){
     //which is the "adjustment". Also the reason why its 256 and not the height of the screen is because
     //er are actually moving inside the "screen buffer" which is 256 x 256 (see SCX, its % 256 as well)
     //0xFF42 + 0xFF44
-    const int yAdjusted = isWindow ? wyAdd : 
+    const int yAdjusted = isWindow ? windowYLine : 
         //Now I calculate the difference between the tile index and the adjustment
         //For example, I know that each tile is 8 pixels, so if SCY is 14 I skip the first Tile, then 6 pixels of the picked tile    
         //ELSE
@@ -389,8 +389,8 @@ void Core::tick() {
             if(isWindowDisplayEnabled()){
                 const int windowX = bus->memoryMap[LCD_WX_ADDR];
                 const int windowY = bus->memoryMap[LCD_WY_ADDR];
-                if (windowX < 166 && windowY < 143 && line > windowY)
-                    wyAdd++;
+                if (windowX < 166 && windowY < 143 && line >= windowY)
+                    windowYLine++;
             }
             line++;
             checkLYC_LY();
@@ -404,7 +404,7 @@ void Core::tick() {
         if(cycles == 456){
             line++;
             if(line == 152){
-                wyAdd = 1;
+                windowYLine = 0;
                 line = 0;
             }
             checkLYC_LY();

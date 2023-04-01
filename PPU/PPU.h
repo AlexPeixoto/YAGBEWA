@@ -46,9 +46,9 @@ namespace PPU{
         //Total of sprites on line
         uint8_t spritesOnLine;
         //Mark an invalid mode
-        uint8_t modeProcessed=5;
+        uint8_t modeProcessed = 5;
         //Mechanism to remember the last rendered window y on this frame
-        uint32_t wyAdd = 1;
+        uint32_t windowYLine = 0;
 
         Bus* bus;
 

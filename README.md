@@ -4,7 +4,7 @@ This is a non 100% accurate gameboy emulator (even tho it still attempts to have
 This was implemented only as a fun side-project and has not the goal to be more than a reference.
 The code was heavily commented when it comes to odd behaviors (Like unhalting the CPU if IF register is set but IE is not).
 
-The code does pass all the blargg test roms and almost all the DMG-ACID2 checks (besides the 2nd window that doesn't render correctly).
+The code does pass all the blargg test roms and all the DMG-ACID2 checks.
 
 As for game testing I only played with Tetris and Started the 1st round of dr mario (as stated this was more of an experient, its possible that other )
 
@@ -16,7 +16,6 @@ As for game testing I only played with Tetris and Started the 1st round of dr ma
  - Doesn't support CGB Games.
 
 # Knows issues
- - ACID-2 test fails the 2nd window area rendering (Incorrect position)!
  - Due to the improper clock mapping the timer is not 100% accurate as well.
 
 # Some problems faced (in case someone might face issues during development)
